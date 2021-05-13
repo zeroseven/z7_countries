@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Zeroseven\Countries\Utility;
+namespace Zeroseven\Countries\Service;
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-class TCAUtility
+class TCAService
 {
     protected const FIELDNAME_MODE = 'tx_z7countries_mode';
 
@@ -52,7 +52,7 @@ class TCAUtility
             ]);
         }
 
-        // Create palett
+        // Create palette
         ExtensionManagementUtility::addFieldsToPalette($table, self::PALETTE_NAME, self::FIELDNAME_MODE . ',--linebreak--,' . self::FIELDNAME_LIST);
 
         // Add new fields to the table
