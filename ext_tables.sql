@@ -21,9 +21,3 @@ CREATE TABLE tx_z7countries_country_mm
     KEY             uid_local (uid_local),
     KEY             uid_foreign (uid_foreign)
 );
-
-CREATE TABLE tt_content
-(
-    tx_z7countries_mode int(11) unsigned DEFAULT '0' NOT NULL,
-    tx_z7countries_list int(11) unsigned DEFAULT '0' NOT NULL,
-);

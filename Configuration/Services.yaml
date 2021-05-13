@@ -1,0 +1,7 @@
+services:
+  Zeroseven\Countries\Events\AlterTableDefinitionStatementsEvent:
+    tags:
+      - name: event.listener
+        identifier: 'add-country-fields'
+        method: 'addCountryConfiguration'
+        event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
