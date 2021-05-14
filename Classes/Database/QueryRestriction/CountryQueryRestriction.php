@@ -23,8 +23,6 @@ class CountryQueryRestriction extends AbstractRestrictionContainer
                 $constraints[] = $expressionBuilder->orX(
 
                     // Mode is null, or 0, or ''
-                    $expressionBuilder->isNull($mode),
-                    $expressionBuilder->eq($mode, $expressionBuilder->literal('')),
                     $expressionBuilder->eq($mode, 0),
 
                     // Check for whitelisted countries
