@@ -54,7 +54,7 @@ class TCAService
                             'type' => 'select',
                             'renderType' => 'selectCheckBox',
                             'foreign_table' => 'tx_z7countries_country',
-                            'MM' => 'tx_z7countries_country_mm'
+                            'default' => ''
                         ]
                     ]
                 ]);
