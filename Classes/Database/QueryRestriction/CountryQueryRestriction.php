@@ -30,13 +30,14 @@ class CountryQueryRestriction extends AbstractRestrictionContainer
                     // Check for whitelisted countries
                     $expressionBuilder->andX(
                         $expressionBuilder->eq($mode, 1),
-                        $expressionBuilder->inSet($list, '1')
-                    ),
-
-                    // Check for blacklisted countries
-                    $expressionBuilder->andX(
-                        $expressionBuilder->eq($mode, 2),
-                        $expressionBuilder->notIn($list, 1)
+                        $expressionBuilder->inSet($list, '1') // Todo: Add dynamic value
+//                    ),
+//
+//                    // Check for blacklisted countries
+//                    // Todo: "NOT FIND_IN_SET(…
+//                    $expressionBuilder->andX(
+//                        $expressionBuilder->eq($mode, 2),
+//                        $expressionBuilder->notIn($list, '1')
                     )
                 );
             }
