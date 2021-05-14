@@ -20,27 +20,25 @@ class CountryQueryRestriction extends AbstractRestrictionContainer
                 && ($mode = $tableAlias . '.' . $setup['mode'])
                 && ($list = $tableAlias . '.' . $setup['list'])
             ) {
-                $constraints = [
-                    $expressionBuilder->orX(
+                $constraints[] = $expressionBuilder->orX(
 
-                        // Mode is null, or 0, or ''
-                        $expressionBuilder->isNull($mode),
-                        $expressionBuilder->eq($mode, $expressionBuilder->literal('')),
-                        $expressionBuilder->eq($mode, $expressionBuilder->literal('0')),
+                    // Mode is null, or 0, or ''
+                    $expressionBuilder->isNull($mode),
+                    $expressionBuilder->eq($mode, $expressionBuilder->literal('')),
+                    $expressionBuilder->eq($mode, 0),
 
-                        // Check for whitelisted countries
-                        $expressionBuilder->andX(
-                            $expressionBuilder->eq($mode, $expressionBuilder->literal('1')),
-                            $expressionBuilder->in($list, 1)
-                        ),
+                    // Check for whitelisted countries
+                    $expressionBuilder->andX(
+                        $expressionBuilder->eq($mode, 1),
+                        $expressionBuilder->inSet($list, '1')
+                    ),
 
-                        // Check for blacklisted countries
-                        $expressionBuilder->andX(
-                            $expressionBuilder->eq($mode, $expressionBuilder->literal('2')),
-                            $expressionBuilder->notIn($list, 1)
-                        )
+                    // Check for blacklisted countries
+                    $expressionBuilder->andX(
+                        $expressionBuilder->eq($mode, 2),
+                        $expressionBuilder->notIn($list, 1)
                     )
-                ];
+                );
             }
         }
 
