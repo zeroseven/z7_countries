@@ -7,8 +7,9 @@ namespace Zeroseven\Countries\Database\QueryRestriction;
 use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\AbstractRestrictionContainer;
+use TYPO3\CMS\Core\Database\Query\Restriction\EnforceableQueryRestrictionInterface;
 
-class CountryQueryRestriction extends AbstractRestrictionContainer
+class CountryQueryRestriction extends AbstractRestrictionContainer implements EnforceableQueryRestrictionInterface
 {
     public function buildExpression(array $queriedTables, ExpressionBuilder $expressionBuilder): CompositeExpression
     {
