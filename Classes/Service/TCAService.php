@@ -10,7 +10,7 @@ class TCAService
 {
     protected const PALETTE_NAME = 'tx_z7countries';
 
-    protected const FIELD_NAME_MODE = 'tx_z7countries_mode';
+    protected const FIELD_NAME_MODE = 'tx_z7countries_mode'; // Countries mode, take me home, to the place I belong … 🎶
 
     protected const FIELD_NAME_LIST = 'tx_z7countries_list';
 
