@@ -21,17 +21,11 @@
 			<trans-unit id="*.tx_z7countries_mode">
 				<source>Mode</source>
 			</trans-unit>
-			<trans-unit id="*.tx_z7countries_mode.select">
-				<source>Select:</source>
-			</trans-unit>
 			<trans-unit id="*.tx_z7countries_mode.0">
 				<source>No restriction</source>
 			</trans-unit>
 			<trans-unit id="*.tx_z7countries_mode.1">
 				<source>Show only selected countries</source>
-			</trans-unit>
-			<trans-unit id="*.tx_z7countries_mode.2">
-				<source>Hide selected countries</source>
 			</trans-unit>
 			<trans-unit id="*.tx_z7countries_list">
 				<source>Select countries</source>
