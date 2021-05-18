@@ -15,7 +15,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
     protected function createLanguageBase(SiteLanguage $language, int $countryUid): UriInterface
     {
         if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getBase()->withPath($language->getTwoLetterIsoCode() . CountryService::DELIMITER . $country['iso_code']);
+            return $language->getBase()->withPath('/' . $language->getTwoLetterIsoCode() . CountryService::DELIMITER . $country['iso_code'] . '/');
         }
 
         return $language->getBase();
