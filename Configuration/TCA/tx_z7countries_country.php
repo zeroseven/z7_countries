@@ -52,7 +52,11 @@ return [
         'iso_code' => [
             'exclude' => false,
             'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.iso_code',
-            'config' => $GLOBALS['TCA']['sys_language']['columns']['language_isocode']['config']
+            'config' => [
+                'type' => 'input',
+                'eval' => 'trim,required,alpha,nospace,unique',
+                'default' => ''
+            ]
         ],
         'flag' => [
             'exclude' => true,
