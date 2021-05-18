@@ -7,12 +7,11 @@ namespace Zeroseven\Countries\Service;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\Uri;
-use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ParameterService
+class CountryService
 {
-    private const DELIMITER = '_';
+    public const DELIMITER = '_';
 
     private static function createUri(): UriInterface
     {
@@ -65,23 +64,5 @@ class ParameterService
     public static function hasCountry(UriInterface $uri = null): bool
     {
         return (bool)self::getCountry($uri);
-    }
-
-    public static function createLanguageBase(SiteLanguage $language, int $countryUid): UriInterface
-    {
-        if ($country = self::getCountryByUid($countryUid)) {
-            return $language->getBase()->withPath($language->getTwoLetterIsoCode() . self::DELIMITER . $country['iso_code']);
-        }
-
-        return $language->getBase();
-    }
-
-    public static function createLanguageHreflang(SiteLanguage $language, int $countryUid): string
-    {
-        if ($country = self::getCountryByUid($countryUid)) {
-            return $language->getTwoLetterIsoCode() . '_' . strtoupper($country['iso_code']);
-        }
-
-        return $language->getHreflang();
     }
 }
