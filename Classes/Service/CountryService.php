@@ -6,30 +6,27 @@ namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 
 class CountryService
 {
     public const DELIMITER = '_';
 
-    private static function createUri(): UriInterface
-    {
-        return new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-    }
-
     public static function getCountries(): array
     {
         // Return from "cache"
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'])) {
-            return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'];
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'])) {
+            return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'];
         }
 
-        // Collect countries from database
-        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'] = (array)GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('tx_z7countries_country')
-            ->createQueryBuilder()
-            ->select('*')
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
+        $queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
+
+        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = (array)$queryBuilder->select('*')
             ->from('tx_z7countries_country')
             ->execute()
             ->fetchAll();
@@ -59,7 +56,7 @@ class CountryService
 
     public static function getCountryByUri(UriInterface $uri = null): ?array
     {
-        $path = ($uri ?: self::createUri())->getPath();
+        $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
 
         return
             preg_match('/^\/?[a-z]+' . self::DELIMITER . '([a-z]+)/i', $path, $matches)

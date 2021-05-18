@@ -10,6 +10,7 @@ use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\AbstractRestrictionContainer;
 use TYPO3\CMS\Core\Database\Query\Restriction\EnforceableQueryRestrictionInterface;
 use TYPO3\CMS\Core\Http\ApplicationType;
+use Zeroseven\Countries\Service\CountryService;
 
 class CountryQueryRestriction extends AbstractRestrictionContainer implements EnforceableQueryRestrictionInterface
 {
@@ -22,7 +23,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
     {
         $constraints = [];
 
-        if ($this->isFrontend()) {
+        if ($this->isFrontend() && !empty($country = CountryService::getCountryByUri())) {
             foreach ($queriedTables as $tableAlias => $tableName) {
                 if (
                     ($setup = $GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['countries'] ?? null)
@@ -33,7 +34,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
                         $expressionBuilder->eq($mode, 0),
                         $expressionBuilder->andX(
                             $expressionBuilder->eq($mode, 1),
-                            $expressionBuilder->inSet($list, '1') // Todo: Add dynamic value
+                            $expressionBuilder->inSet($list, (string)$country['uid'])
                         )
                     );
                 }
