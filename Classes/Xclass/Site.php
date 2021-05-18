@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Xclass;
 
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use Zeroseven\Countries\Service\ParameterService;
 
 class Site extends \TYPO3\CMS\Core\Site\Entity\Site
 {
@@ -13,13 +14,15 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         parent::__construct($identifier, $rootPageId, $configuration);
 
         // Manipulate languages
-        foreach ($this->languages as $i => $language) {
-            $this->languages[$i] = new SiteLanguage(
-                $language->getLanguageId(),
-                $language->getLocale(),
-                $language->getBase()->withPath(rtrim($language->getBase()->getPath(), '/') . '_de/'),
-                $language->toArray()
-            );
+        if ($country = ParameterService::getCountry()) {
+            foreach ($this->languages as $i => $language) {
+                $this->languages[$i] = new SiteLanguage(
+                    $language->getLanguageId(),
+                    $language->getLocale(),
+                    ParameterService::addCountry($country, $language->getBase()),
+                    $language->toArray()
+                );
+            }
         }
     }
 }
