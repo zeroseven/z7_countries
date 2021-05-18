@@ -35,7 +35,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         parent::__construct($identifier, $rootPageId, $configuration);
 
         // Manipulate languages
-        if (($countryUid = CountryService::getCountry()) !== null) {
+        if (($countryUid = CountryService::getCountryByUri()) !== null) {
             foreach ($this->languages as $i => $language) {
 
                 $configuration = $language->toArray();
@@ -50,6 +50,5 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
                 );
             }
         }
-
     }
 }

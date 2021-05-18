@@ -18,6 +18,17 @@ class CountryService
         return new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     }
 
+    public static function getCountries(): array
+    {
+        return (array)GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_z7countries_country')
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('tx_z7countries_country')
+            ->execute()
+            ->fetchAll();
+    }
+
     public static function getCountryByIsoCode(string $countryIsoCode): ?array
     {
         foreach (self::getCountries() as $country) {
@@ -40,18 +51,7 @@ class CountryService
         return null;
     }
 
-    public static function getCountries(): array
-    {
-        return (array)GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('tx_z7countries_country')
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('tx_z7countries_country')
-            ->execute()
-            ->fetchAll();
-    }
-
-    public static function getCountry(UriInterface $uri = null): ?int
+    public static function getCountryByUri(UriInterface $uri = null): ?int
     {
         $path = ($uri ?: self::createUri())->getPath();
 
