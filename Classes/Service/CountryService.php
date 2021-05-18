@@ -51,13 +51,13 @@ class CountryService
         return null;
     }
 
-    public static function getCountryByUri(UriInterface $uri = null): ?int
+    public static function getCountryByUri(UriInterface $uri = null): ?array
     {
         $path = ($uri ?: self::createUri())->getPath();
 
         return
             preg_match('/^\/?[a-z]+' . self::DELIMITER . '([a-z]+)/i', $path, $matches)
             && ($countryIsoCode = $matches[1])
-            && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country['uid'] : null;
+            && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country : null;
     }
 }

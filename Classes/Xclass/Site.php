@@ -35,17 +35,17 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         parent::__construct($identifier, $rootPageId, $configuration);
 
         // Manipulate languages
-        if (($countryUid = CountryService::getCountryByUri()) !== null) {
+        if (!empty($country = CountryService::getCountryByUri())) {
             foreach ($this->languages as $i => $language) {
 
                 $configuration = $language->toArray();
 
-                $configuration['hreflang'] = $this->createLanguageHreflang($language, $countryUid);
+                $configuration['hreflang'] = $this->createLanguageHreflang($language, (int)$country['uid']);
 
                 $this->languages[$i] = new SiteLanguage(
                     $language->getLanguageId(),
                     $language->getLocale(),
-                    $this->createLanguageBase($language, $countryUid),
+                    $this->createLanguageBase($language, (int)$country['uid']),
                     $configuration
                 );
             }
