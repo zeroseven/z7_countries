@@ -19,18 +19,25 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return isset($GLOBALS['TYPO3_REQUEST']) && $GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
     }
 
+    protected function getCountry(): ?array
+    {
+        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] = CountryService::getCountryByUri());
+    }
+
     public function buildExpression(array $queriedTables, ExpressionBuilder $expressionBuilder): CompositeExpression
     {
         $constraints = [];
 
-        if ($this->isFrontend() && !empty($country = CountryService::getCountryByUri())) {
+        if ($this->isFrontend()) {
+            $country = $this->getCountry();
+
             foreach ($queriedTables as $tableAlias => $tableName) {
                 if (
                     ($setup = $GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['countries'] ?? null)
                     && ($mode = $tableAlias . '.' . $setup['mode'])
                     && ($list = $tableAlias . '.' . $setup['list'])
                 ) {
-                    $constraints[] = $expressionBuilder->orX(
+                    $constraints[] = empty($country) ? $expressionBuilder->eq($mode, 0) : $expressionBuilder->orX(
                         $expressionBuilder->eq($mode, 0),
                         $expressionBuilder->andX(
                             $expressionBuilder->eq($mode, 1),
