@@ -20,7 +20,13 @@ class CountryService
 
     public static function getCountries(): array
     {
-        return (array)GeneralUtility::makeInstance(ConnectionPool::class)
+        // Return from "cache"
+        if (isset($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'])) {
+            return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'];
+        }
+
+        // Collect countries from database
+        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['list'] = (array)GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('tx_z7countries_country')
             ->createQueryBuilder()
             ->select('*')
