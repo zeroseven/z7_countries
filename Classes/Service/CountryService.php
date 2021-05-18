@@ -60,9 +60,4 @@ class CountryService
             && ($countryIsoCode = $matches[1])
             && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country['uid'] : null;
     }
-
-    public static function hasCountry(UriInterface $uri = null): bool
-    {
-        return (bool)self::getCountry($uri);
-    }
 }
