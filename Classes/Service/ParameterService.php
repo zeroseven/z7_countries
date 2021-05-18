@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Service;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
-use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ParameterService
 {
@@ -18,21 +19,47 @@ class ParameterService
         return new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     }
 
-    private static function getCountries(): array
+    public static function getCountryByIsoCode(string $countryIsoCode): ?array
     {
-        // TODO: Create dynamic list
-        return ['de', 'en', 'fr'];
+        foreach (self::getCountries() as $country) {
+            if ($country['iso_code'] === $countryIsoCode) {
+                return $country;
+            }
+        }
+
+        return null;
     }
 
-    public static function getCountry(UriInterface $uri = null): ?string
+    public static function getCountryByUid(int $countryUid): ?array
+    {
+        foreach (self::getCountries() as $country) {
+            if ((int)$country['uid'] === $countryUid) {
+                return $country;
+            }
+        }
+
+        return null;
+    }
+
+    public static function getCountries(): array
+    {
+        return (array)GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable('tx_z7countries_country')
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('tx_z7countries_country')
+            ->execute()
+            ->fetchAll();
+    }
+
+    public static function getCountry(UriInterface $uri = null): ?int
     {
         $path = ($uri ?: self::createUri())->getPath();
 
         return
             preg_match('/^\/?[a-z]+' . self::DELIMITER . '([a-z]+)/i', $path, $matches)
-            && ($country = $matches[1])
-            && ($countries = self::getCountries())
-            && (in_array($country, $countries, true)) ? $country : null;
+            && ($countryIsoCode = $matches[1])
+            && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country['uid'] : null;
     }
 
     public static function hasCountry(UriInterface $uri = null): bool
@@ -40,31 +67,21 @@ class ParameterService
         return (bool)self::getCountry($uri);
     }
 
-    public static function addCountry(string $country, UriInterface $uri = null): UriInterface
+    public static function createLanguageBase(SiteLanguage $language, int $countryUid): UriInterface
     {
-        if ($uri === null) {
-            $uri = self::createUri();
+        if ($country = self::getCountryByUid($countryUid)) {
+            return $language->getBase()->withPath($language->getTwoLetterIsoCode() . self::DELIMITER . $country['iso_code']);
         }
 
-        return $uri->withPath(rtrim($uri->getPath(), '/') . self::DELIMITER . $country . '/');
+        return $language->getBase();
     }
 
-    public static function removeCountry(string $country = null, UriInterface $uri = null): UriInterface
+    public static function createLanguageHreflang(SiteLanguage $language, int $countryUid): string
     {
-        if ($uri === null) {
-            $uri = self::createUri();
+        if ($country = self::getCountryByUid($countryUid)) {
+            return $language->getTwoLetterIsoCode() . '_' . strtoupper($country['iso_code']);
         }
 
-        if ($country === null) {
-            $country = self::getCountry($uri);
-        }
-
-        if ($country) {
-            $path = $uri->getPath();
-
-            return $uri->withPath(preg_replace('/^(\/?[a-z])(' . self::DELIMITER . $country . ')(.*)/i', '$1$3', $path));
-        }
-
-        return $uri;
+        return $language->getHreflang();
     }
 }

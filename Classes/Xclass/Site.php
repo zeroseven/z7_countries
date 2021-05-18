@@ -14,15 +14,21 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         parent::__construct($identifier, $rootPageId, $configuration);
 
         // Manipulate languages
-        if ($country = ParameterService::getCountry()) {
+        if (($countryUid = ParameterService::getCountry()) !== null) {
             foreach ($this->languages as $i => $language) {
+
+                $configuration = $language->toArray();
+
+                $configuration['hreflang'] = ParameterService::createLanguageHreflang($language, $countryUid);
+
                 $this->languages[$i] = new SiteLanguage(
                     $language->getLanguageId(),
                     $language->getLocale(),
-                    ParameterService::addCountry($country, $language->getBase()),
-                    $language->toArray()
+                    ParameterService::createLanguageBase($language, $countryUid),
+                    $configuration
                 );
             }
         }
+
     }
 }
