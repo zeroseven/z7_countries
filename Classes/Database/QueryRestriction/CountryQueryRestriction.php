@@ -37,10 +37,10 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
                     && ($mode = $tableAlias . '.' . $setup['mode'])
                     && ($list = $tableAlias . '.' . $setup['list'])
                 ) {
-                    $constraints[] = empty($country) ? $expressionBuilder->eq($mode, 0) : $expressionBuilder->orX(
+                    $constraints[] = empty($country) ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
                         $expressionBuilder->eq($mode, 0),
                         $expressionBuilder->andX(
-                            $expressionBuilder->eq($mode, 1),
+                            $expressionBuilder->in($mode, ['1', '2']),
                             $expressionBuilder->inSet($list, (string)$country['uid'])
                         )
                     );

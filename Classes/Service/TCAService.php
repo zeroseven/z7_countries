@@ -46,6 +46,7 @@ class TCAService
                         'items' => [
                             ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.0', '0'],
                             ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.1', '1'],
+                            ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.2', '2'],
                         ],
                         'default' => '0'
                     ]
