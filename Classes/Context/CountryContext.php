@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Zeroseven\Countries\Utility;
+namespace Zeroseven\Countries\Context;
 
 use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Core\Context\AspectInterface;
+use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Zeroseven\Countries\Service\CountryService;
 
-class LanguageUtility
+class CountryContext implements AspectInterface
 {
     /** @var array */
     protected $originalLanguages;
@@ -58,13 +60,27 @@ class LanguageUtility
         return $language->getHreflang();
     }
 
-    public function getOriginalLanguages(): array
-    {
-        return (array)$this->originalLanguages;
-    }
+//    public function getHreflangs(): array
+//    {
 
-    public function getManipulatedLanguages(): array
+//    }
+
+    /**
+     * Fetch common information about the user
+     *
+     * @param string $name
+     * @return int|bool|string|array
+     * @throws AspectPropertyNotFoundException
+     */
+    public function get(string $name)
     {
-        return (array)$this->manipulatedLanguages;
+        switch ($name) {
+            case 'originalLanguages':
+                return (array)$this->originalLanguages;
+            case 'manipulatedLanguages':
+                return (array)$this->manipulatedLanguages;
+        }
+
+        throw new AspectPropertyNotFoundException('Property "' . $name . '" not found in Aspect "' . __CLASS__ . '".', 1621452385);
     }
 }
