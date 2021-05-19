@@ -13,7 +13,7 @@ use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 
 class CountryService
 {
-    public const DELIMITER = '_';
+    public const DELIMITER = '-';
 
     public static function getCountries(): array
     {
