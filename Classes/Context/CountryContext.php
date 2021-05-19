@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Context;
 
-use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Core\Context\AspectInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Zeroseven\Countries\Service\CountryService;
+use Zeroseven\Countries\Service\LanguageService;
 
 class CountryContext implements AspectInterface
 {
@@ -32,38 +32,15 @@ class CountryContext implements AspectInterface
     protected function manipulateLanguage(SiteLanguage $language, int $country): SiteLanguage
     {
         $configuration = $language->toArray();
-        $configuration['hreflang'] = $this->createLanguageHreflang($language, $country);
+        $configuration['hreflang'] = LanguageService::createHreflang($language, $country);
 
         return new SiteLanguage(
             $language->getLanguageId(),
             $language->getLocale(),
-            $this->createLanguageBase($language, $country),
+            LanguageService::createBase($language, $country),
             $configuration
         );
     }
-
-    protected function createLanguageBase(SiteLanguage $language, int $countryUid): UriInterface
-    {
-        if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getBase()->withPath('/' . $language->getTwoLetterIsoCode() . CountryService::DELIMITER . $country['iso_code'] . '/');
-        }
-
-        return $language->getBase();
-    }
-
-    protected function createLanguageHreflang(SiteLanguage $language, int $countryUid): string
-    {
-        if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getTwoLetterIsoCode() . '_' . strtoupper($country['iso_code']);
-        }
-
-        return $language->getHreflang();
-    }
-
-//    public function getHreflangs(): array
-//    {
-
-//    }
 
     /**
      * Fetch common information about the user
