@@ -88,10 +88,10 @@ class TCAService
         self::addFields($table);
         self::addPalette($table, $position, $typeList);
 
-        return self::getEnableColumns($table);
+        return self::getEnableColumn($table);
     }
 
-    public static function getEnableColumns(string $table): ?array
+    public static function getEnableColumn(string $table): ?array
     {
         if (($setup = $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'] ?? null) && isset($setup['mode'], $setup['list'])) {
             return $setup;

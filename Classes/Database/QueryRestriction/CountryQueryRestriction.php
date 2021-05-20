@@ -44,8 +44,8 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
             $country = $this->getCountry();
 
             foreach ($queriedTables as $tableAlias => $tableName) {
-                if ($setup = TCAService::getEnableColumns($tableAlias)) {
-                    $constraints[] = self::getExpression($expressionBuilder, $setup['mode'], $setup['list'], $country);
+                if ($fields = TCAService::getEnableColumn($tableAlias)) {
+                    $constraints[] = self::getExpression($expressionBuilder, $fields['mode'], $fields['list'], $country);
                 }
             }
         }

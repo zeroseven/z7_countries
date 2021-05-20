@@ -41,7 +41,7 @@ class ModifyHrefLangTagsEvent
         $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->tableName);
         $this->queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
 
-        $this->tableSetup = TCAService::getEnableColumns($this->tableName);
+        $this->tableSetup = TCAService::getEnableColumn($this->tableName);
     }
 
     protected function pageExists(SiteLanguage $language, array $country = null): bool
