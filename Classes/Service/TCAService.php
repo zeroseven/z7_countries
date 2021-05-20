@@ -81,7 +81,7 @@ class TCAService
         }
     }
 
-    public static function registerPalette(string $table, string $position = null, string $typeList = null): array
+    public static function registerPalette(string $table, string $position = null, string $typeList = null): ?array
     {
         self::checkTable($table);
         self::addEnableColumns($table);

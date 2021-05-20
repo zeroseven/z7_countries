@@ -68,13 +68,6 @@ class ModifyHrefLangTagsEvent
             ->fetchOne();
     }
 
-    protected function createUrl(): string
-    {
-        $pageUid = (int)$this->getTypoScriptFrontendController()->id;
-
-        return $this->uriBuilder->reset()->setTargetPageUid($pageUid)->build();
-    }
-
     public function __invoke(OriginalEvent $event): void
     {
         if ((int)$this->getTypoScriptFrontendController()->page['no_index'] === 1) {

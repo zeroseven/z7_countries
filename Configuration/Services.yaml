@@ -2,12 +2,12 @@ services:
   Zeroseven\Countries\Events\AlterTableDefinitionStatementsEvent:
     tags:
       - name: event.listener
-        identifier: 'add-country-fields'
+        identifier: 'z7_country/add-fields'
         method: 'addCountryConfiguration'
         event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
   Zeroseven\Countries\Events\ModifyHrefLangTagsEvent:
     tags:
       - name: event.listener
-        identifier: 'my-ext/ownHrefLang'
+        identifier: 'z7_country/hreflang'
         after: 'typo3-seo/hreflangGenerator'
         event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
