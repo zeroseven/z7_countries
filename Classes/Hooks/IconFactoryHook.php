@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Hooks;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\TCAService;
 
 class IconFactoryHook
@@ -17,7 +19,15 @@ class IconFactoryHook
             }
 
             if ($row[$fields['mode']]) {
-                return 'overlay-country-restriction';
+                if (
+                    count($countries = GeneralUtility::intExplode(',', (string)$row[$fields['list']])) === 1
+                    && ($country = CountryService::getCountryByUid($countries[0]))
+                    && ($flag = $country['flag'])
+                ) {
+                    return 'flags-' . $flag;
+                }
+
+                return 'flags-multiple';
             }
         }
 
