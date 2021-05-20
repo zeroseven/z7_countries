@@ -109,7 +109,13 @@ class ModifyHrefLangTagsEvent
             }
         }
 
+        // Set new set of tags
         $event->setHrefLangs($hreflangTags);
+
+        // Add "original" x-default
+        if ($xDefault = $hreflangs['x-default'] ?? null) {
+            $event->addHrefLang('x-default', $xDefault);
+        }
     }
 
     protected function getTypoScriptFrontendController(): TypoScriptFrontendController
