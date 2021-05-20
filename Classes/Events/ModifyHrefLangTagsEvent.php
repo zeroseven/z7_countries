@@ -88,10 +88,20 @@ class ModifyHrefLangTagsEvent
 
                 if ($count) {
                     if ($this->pageExists($language)) {
+
+                        // Get original language
                         $originalLanguage = $originalLanguages[$key];
+
+                        // Set x-default to default language
+                        if (!$language->getLanguageId()) {
+                            $hreflangTags['x-default'] = $originalLanguage->getBase() . $path;
+                        }
+
+                        // Set hreflang of language (without country)
                         $hreflangTags[$originalLanguage->getHreflang()] = $originalLanguage->getBase() . $path;
                     }
 
+                    // Set country variants of given language
                     foreach ($countries as $country) {
                         if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
                             $countryUid = (int)$country['uid'];
@@ -104,11 +114,6 @@ class ModifyHrefLangTagsEvent
 
         // Set new set of tags
         $event->setHrefLangs($hreflangTags);
-
-        // Add "original" x-default
-        if ($xDefault = $hreflangs['x-default'] ?? null) {
-            $event->addHrefLang('x-default', $xDefault);
-        }
     }
 
     protected function getTypoScriptFrontendController(): TypoScriptFrontendController
