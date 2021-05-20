@@ -16,7 +16,7 @@ class IconFactoryHook
     {
         if (empty($iconName) && $fields = TCAService::getEnableColumn($table)) {
             if (!isset($row[$fields['mode']], $row[$fields['list']]) && $uid = $row['uid'] ?? null) {
-                $row = BackendUtility::getRecord($table, $uid);
+                $row = (array)BackendUtility::getRecord($table, $uid, implode(',', $fields));
             }
 
             if ($row[$fields['mode']]) {

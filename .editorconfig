@@ -7,7 +7,7 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{ts,js}]
+[*.{ts, js}]
 indent_style = space
 indent_size = 2
 
@@ -29,17 +29,17 @@ indent_size = 3
 # package.json
 # .travis.yml
 # bower.json
-[{package.json,.travis.yml,bower.json,composer.json}]
+[{package.json, .travis.yml, bower.json, composer.json}]
 indent_style = space
 indent_size = 2
 
 # TypoScript
-[{*.typoscript,*.tsconfig,setup.txt,constants.txt,ext_typoscript_setup.txt,ext_typoscript_constants.txt,ext_conf_template.txt}]
+[{*.typoscript, *.tsconfig, setup.txt, constants.txt, ext_typoscript_setup.txt, ext_typoscript_constants.txt, ext_conf_template.txt}]
 indent_style = space
 indent_size = 2
 
 # XML-Files
-[{*.xml,*.xlf}]
+[{*.xml, *.xlf}]
 indent_style = tab
 indent_size = 4
 
@@ -49,7 +49,7 @@ indent_style = tab
 indent_size = 2
 
 # ChangeLog files
-[{ChangeLog,ChangeLog.txt}]
+[{ChangeLog, ChangeLog.txt}]
 indent_style = tab
 indent_size = 4
 
