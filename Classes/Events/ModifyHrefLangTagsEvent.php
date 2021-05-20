@@ -83,19 +83,28 @@ class ModifyHrefLangTagsEvent
 
         $context = GeneralUtility::makeInstance(Context::class);
         $originalLanguages = $context->getPropertyFromAspect('country', 'originalLanguages');
+        $languages = $context->getPropertyFromAspect('country', 'manipulatedLanguages') ?: $originalLanguages;
+        $hreflangs = $event->getHrefLangs();
         $countries = CountryService::getCountries();
 
         $hreflangTags = [];
 
-        foreach ($originalLanguages as $language) {
-            if ($this->pageExists($language)) {
-                $hreflangTags[$language->getHreflang()] = (string)$language->getBase();
-            }
+        foreach ($languages as $key => $language) {
+            if (($url = $hreflangs[$language->getHreflang()])) {
+                $path = ltrim(str_replace((string)$language->getBase(), '', $url, $count), '/');
 
-            foreach ($countries as $country) {
-                if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
-                    $countryUid = (int)$country['uid'];
-                    $hreflangTags[LanguageService::createHreflang($language, $countryUid)] = (string)LanguageService::createBase($language, $countryUid);
+                if ($count) {
+                    if ($this->pageExists($language)) {
+                        $originalLanguage = $originalLanguages[$key];
+                        $hreflangTags[$originalLanguage->getHreflang()] = $originalLanguage->getBase() . $path;
+                    }
+
+                    foreach ($countries as $country) {
+                        if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
+                            $countryUid = (int)$country['uid'];
+                            $hreflangTags[LanguageService::createHreflang($language, $countryUid)] = LanguageService::createBase($language, $countryUid) . $path;
+                        }
+                    }
                 }
             }
         }
