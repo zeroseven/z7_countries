@@ -11,6 +11,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\AbstractRestrictionContainer;
 use TYPO3\CMS\Core\Database\Query\Restriction\EnforceableQueryRestrictionInterface;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use Zeroseven\Countries\Service\CountryService;
+use Zeroseven\Countries\Service\TCAService;
 
 class CountryQueryRestriction extends AbstractRestrictionContainer implements EnforceableQueryRestrictionInterface
 {
@@ -24,6 +25,17 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] = CountryService::getCountryByUri());
     }
 
+    public static function getExpression(ExpressionBuilder $expressionBuilder, string $mode, string $list, array $country = null)
+    {
+        return empty($country) ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
+            $expressionBuilder->eq($mode, 0),
+            $expressionBuilder->andX(
+                $expressionBuilder->in($mode, ['1', '2']),
+                $expressionBuilder->inSet($list, (string)$country['uid'])
+            )
+        );
+    }
+
     public function buildExpression(array $queriedTables, ExpressionBuilder $expressionBuilder): CompositeExpression
     {
         $constraints = [];
@@ -32,18 +44,8 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
             $country = $this->getCountry();
 
             foreach ($queriedTables as $tableAlias => $tableName) {
-                if (
-                    ($setup = $GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['countries'] ?? null)
-                    && ($mode = $tableAlias . '.' . $setup['mode'])
-                    && ($list = $tableAlias . '.' . $setup['list'])
-                ) {
-                    $constraints[] = empty($country) ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
-                        $expressionBuilder->eq($mode, 0),
-                        $expressionBuilder->andX(
-                            $expressionBuilder->in($mode, ['1', '2']),
-                            $expressionBuilder->inSet($list, (string)$country['uid'])
-                        )
-                    );
+                if ($setup = TCAService::getEnableColumns($tableAlias)) {
+                    $constraints[] = self::getExpression($expressionBuilder, $setup['mode'], $setup['list'], $country);
                 }
             }
         }
