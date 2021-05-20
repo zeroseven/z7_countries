@@ -1,15 +1,24 @@
-# Countries :jp: :us: :fr: :es: :it: :ru: :gb: :uk: :de:
+# Countries :jp: :us: :fr: :es: :it: :ru: :gb: :de:
 
 Diese Erweiterung bringt eine Länderkonfiguration für Singletree-Websites.
 Dabei können beliebige Datenbank-Tabellen um eine Länderauswahl erweitert werden um Inhalte nur für ausgewählte Länder zur Verfügung zu stellen.
-Zusätzliche steht pro Sprache auch eine "internationale" Version – also ohne Land zur Verfügung.
 
-**Beispiele:**
+Für jedes Land wird für jede Seite in jeder Sprachen eine Variante mit einer dynamischen Basis-URL generiert. Diese setzt sich aus dem ISO-Code der Sprache und dem ISO-Code des Landes zusammen.
+Wird beim Aufruf einer Seite, eine solche Sprach-Land-Kombination in der URL ermittelt, wird bereits beim Initialiseren der `Site` die Sprache manipuliert indem die Basis-URL verändert wird.
+Anschlißend werden automatisch in jeder Datenbankabfrage der konfigurierten Tabellen die Ländereinstellungen berücksichtigt.
 
-* `examle.com/path` (Seite in der Standardsprache)
+Für jede Sprache steht weiterhin auch eine "internationale" Version – also ohne Land zur Verfügung.
+
+Bei 100 Seiten in 4 Sprachen und 10 Länder gibt es also ganze `100 * 4 * (10 + 1) = 4400` Seiten (abzüglich derer, die für manche Länder ausgeblendet wurden).
+
+### Beispiel:
+
+* `examle.com/de/path` (Seite auf deutsch)
 * `examle.com/de-de/path` (Seite auf deutsch für Deutschland)
 * `examle.com/de-at/path` (Seite auf deutsch für Österreich)
+* `examle.com/en/path` (Seite auf englisch)
 * `examle.com/en-de/path` (Seite auf englisch für Deutschland)
+* `examle.com/en-at/path` (Seite auf englisch für Österreich)
 
 ## Features:
 
@@ -17,23 +26,15 @@ Zusätzliche steht pro Sprache auch eine "internationale" Version – also ohne 
 * Erweiterung der hreflang-Tags
 * Einfache Ländererweiterung für Tabellen.
 
-## Was passiert:
+## Konfiguration:
 
-Für jedes Land wird pro Sprachen eine individelle Base-URL generiert. Diese setzt sich aus dem ISO-Code der Sprache und dem ISO-Code eines Landes zusammen.
-Wird beim Aufruf einer Seite, eine solche Kombination in der URL ermittelt, wird bereits beim Initialiseren der `Site` die Sprache manipuliert indem die Basis-URL verändert wird.
-In allen nachfolgenden Prozessen in TYPO3 wird die manipulierte Basis-URL verwendet – so dass es ab hier im Code "ganz normal" weitergeht.
+### Länder definieren:
 
-## Konfigurieren
+Auf Rootebene (uid:0) können beliebig viele Länder erstellt werden. Diese Länder können für konfigurierte Tabellen verwendet werden.
 
-### Länder erstellen
+### Datenbank erweitern
 
-Auf rootebene (uid:0) können beliebig viele Länder erstellt werden.
-Dabei ist zu beachten, dass mit jedem Land für jede Seite und in jeder Sprache eine zusätzliche Version zur Verfügung gestellt wird.
-Du solltest dir im Idealfall also vorher Gedanken machen welche Länder du benötigst.
-
-### TCA erweitern
-
-Um die Länderauswahl im Datensatz zu integrieren und letztlich auch die Abfrage dafür dynamisch zu erweitern ist nur eine kleine Konfiguration notwendig:
+Um die Länderauswahl in einem Datensatz/Tabelle zu integrieren um entsprechend die Datenbank-Abfragen dafür dynamisch zu erweitern ist nur eine kleine Konfiguration notwendig:
 
 ```php
 <?php
@@ -41,4 +42,4 @@ Um die Länderauswahl im Datensatz zu integrieren und letztlich auch die Abfrage
 \Zeroseven\Countries\Service\TCAService::registerPalette('pages');
 ```
 
-… und fertig!
+Der Database-Analyzer im Install-Tool erkennt diese Konfiguration automatisch und erweitert die Tabelle beim Ausführen entsprechend.
