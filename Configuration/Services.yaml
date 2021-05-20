@@ -5,3 +5,9 @@ services:
         identifier: 'add-country-fields'
         method: 'addCountryConfiguration'
         event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
+  Zeroseven\Countries\Events\ModifyHrefLangTagsEvent:
+    tags:
+      - name: event.listener
+        identifier: 'my-ext/ownHrefLang'
+        after: 'typo3-seo/hreflangGenerator'
+        event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
