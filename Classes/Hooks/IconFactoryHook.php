@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Hooks;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\TCAService;
@@ -19,15 +20,12 @@ class IconFactoryHook
             }
 
             if ($row[$fields['mode']]) {
-                if (
-                    count($countries = GeneralUtility::intExplode(',', (string)$row[$fields['list']])) === 1
-                    && ($country = CountryService::getCountryByUid($countries[0]))
-                    && ($flag = $country['flag'])
-                ) {
-                    return 'flags-' . $flag;
-                }
+                $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+                $country = count($countries = GeneralUtility::intExplode(',', (string)$row[$fields['list']])) === 1
+                    ? CountryService::getCountryByUid($countries[0])
+                    : [];
 
-                return 'flags-multiple';
+                return $iconFactory->mapRecordTypeToIconIdentifier('tx_z7countries_country', (array)$country);
             }
         }
 
