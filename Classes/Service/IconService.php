@@ -55,7 +55,7 @@ class IconService
                     ? CountryService::getCountryByUid($countries[0])
                     : [];
 
-                return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $country);;
+                return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, (array)$country);
             }
         }
 
