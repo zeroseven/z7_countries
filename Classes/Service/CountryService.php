@@ -29,7 +29,7 @@ class CountryService
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = (array)$queryBuilder->select('*')
             ->from('tx_z7countries_country')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     public static function getCountryByIsoCode(string $countryIsoCode): ?array
