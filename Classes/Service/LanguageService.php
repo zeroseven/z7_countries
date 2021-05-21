@@ -21,7 +21,7 @@ class LanguageService
     public static function createHreflang(SiteLanguage $language, int $countryUid): string
     {
         if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getTwoLetterIsoCode() . '_' . strtoupper($country['iso_code']);
+            return $language->getTwoLetterIsoCode() . '-' . strtoupper($country['iso_code']);
         }
 
         return $language->getHreflang();
