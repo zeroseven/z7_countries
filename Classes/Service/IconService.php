@@ -34,10 +34,10 @@ class IconService
         return null;
     }
 
-    public static function getCountryIcon(array $country, $size = null, $overlayIdentifier = null): ?string
+    public static function getCountryIcon(array $country, $size = null, $overlayIdentifier = null): ?Icon
     {
         if ($identifier = self::getCountryIdentifier($country)) {
-            return (string)GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL, $overlayIdentifier);
+            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL, $overlayIdentifier);
         }
 
         return null;

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Hooks;
 
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Recordlist\RecordList\RecordListHookInterface;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
@@ -26,17 +28,29 @@ class DatabaseRecordList implements RecordListHookInterface
     {
         if (TCAService::getEnableColumn($table)) {
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+            $buttonBar = GeneralUtility::makeInstance(ButtonBar::class);
 
+            // Collect buttons
             foreach (CountryService::getCountries() ?: [] as $country) {
-                $title = $country['title'] ?? '';
-                $icon = IconService::getCountryIcon($country) ?: $title;
+                $active = (int)$country['uid'] === $this->getCountryParameter();
                 $url = $uriBuilder->buildUriFromRoute('web_list', [
                     'table' => $table,
                     'id' => $parentObject->id,
-                    self::PARAMETER => (int)$country['uid'] === $this->getCountryParameter() ? 0 : $country['uid']
+                    self::PARAMETER => $active ? 0 : $country['uid']
                 ]);
 
-                $headerColumns['_CONTROL_'] .= sprintf('<a href="%s" title="%s">%s</a>', $url, $title, $icon);
+                $buttonBar->addButton($buttonBar->makeLinkButton()
+                    ->setHref($url)
+                    ->setTitle($country['title'] ?? '')
+                    ->setShowLabelText($active)
+                    ->setIcon(IconService::getCountryIcon($country, null, $active ? 'overlay-readonly' : '')), null, $active ? 1 : 2);
+            }
+
+            // Render button bar
+            foreach ($buttonBar->getButtons() as $groups) {
+                foreach ($groups as $group) {
+                    $headerColumns['_CONTROL_'] .= ' ' . implode('', $group);
+                }
             }
         }
 
