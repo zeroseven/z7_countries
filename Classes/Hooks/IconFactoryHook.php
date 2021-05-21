@@ -10,7 +10,7 @@ class IconFactoryHook
 {
     public function postOverlayPriorityLookup(string $table, array $row, array $status, string $iconName = null): ?string
     {
-        if (empty($iconName) && $flagIdentifier = IconService::getFlagIdentifier($table, (int)$row['uid'], $row)) {
+        if (empty($iconName) && $flagIdentifier = IconService::getRecordFlagIdentifier($table, (int)$row['uid'], $row)) {
             return $flagIdentifier;
         }
 

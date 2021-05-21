@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Hooks;
 
 use TYPO3\CMS\Recordlist\RecordList\RecordListHookInterface;
 use Zeroseven\Countries\Service\CountryService;
+use Zeroseven\Countries\Service\IconService;
 use Zeroseven\Countries\Service\TCAService;
 
 class DatabaseRecordList implements RecordListHookInterface
@@ -25,7 +26,7 @@ class DatabaseRecordList implements RecordListHookInterface
     {
         if (TCAService::getEnableColumn($table)) {
             foreach (CountryService::getCountries() ?: [] as $country) {
-                $headerColumns['_CONTROL_'] .= $country['title'];
+                $headerColumns['_CONTROL_'] .= IconService::getCountryIcon($country);
             }
         }
 
