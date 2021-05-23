@@ -7,7 +7,7 @@ namespace Zeroseven\Countries\Hooks;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Recordlist\RecordList\RecordListHookInterface;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
@@ -22,6 +22,15 @@ class DatabaseRecordList implements RecordListHookInterface
     protected function getCountryParameter(): int
     {
         return (int)(GeneralUtility::_GET(self::PARAMETER) ?: 0);
+    }
+
+    protected function translate(string $key): string
+    {
+        if (isset($GLOBALS['LANG']) && $GLOBALS['LANG'] instanceof LanguageService) {
+            return htmlspecialchars($GLOBALS['LANG']->sL($key));
+        }
+
+        return '';
     }
 
     public function renderListHeader($table, $currentIdList, $headerColumns, &$parentObject)
@@ -48,6 +57,8 @@ class DatabaseRecordList implements RecordListHookInterface
 
             // Render button bar
             foreach ($buttonBar->getButtons() as $groups) {
+                $headerColumns['_CONTROL_'] .= $this->translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country');
+                
                 foreach ($groups as $group) {
                     $headerColumns['_CONTROL_'] .= ' ' . implode('', $group);
                 }
