@@ -25,6 +25,7 @@ Bei 100 Seiten in 4 Sprachen und 10 Länder gibt es also ganze `100 * 4 * (10 + 
 * Manipulation der Base-URL mit dynamischer Sprach-Land-Kombination (z.B. `de-ch`, `en-nl` …)
 * Erweiterung der hreflang-Tags
 * Einfache Ländererweiterung für Tabellen.
+* Länderfilter im Backend
 
 ## Konfiguration:
 
