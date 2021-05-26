@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Context;
 
 use TYPO3\CMS\Core\Context\AspectInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageService;
@@ -18,13 +19,19 @@ class CountryContext implements AspectInterface
     /** @var array */
     protected $manipulatedLanguages;
 
-    public function __construct(array $originalLanguages)
+    public function __construct(Site $site)
     {
-        $this->originalLanguages = $originalLanguages;
+        $this->originalLanguages = $site->getLanguages();
 
         if (!empty($country = CountryService::getCountryByUri())) {
-            foreach ($originalLanguages as $originalLanguage) {
-                $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
+            foreach ($this->originalLanguages as $originalLanguage) {
+                $countries = CountryService::getCountriesByLanguageUid($originalLanguage->getLanguageId(), $site);
+
+                if (in_array((int)$country['uid'], array_map(static function ($c) {
+                    return (int)$c['uid'];
+                }, $countries), true)) {
+                    $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
+                }
             }
         }
     }

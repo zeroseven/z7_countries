@@ -16,7 +16,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
 
         // Create instance of LanguageUtility
         $context = GeneralUtility::makeInstance(Context::class);
-        $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $this->languages));
+        $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $this));
 
         // Manipulate languages
         if (!empty($manipulatedLanguages = $context->getPropertyFromAspect('country', 'manipulatedLanguages'))) {
