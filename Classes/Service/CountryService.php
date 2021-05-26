@@ -9,6 +9,7 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
@@ -34,15 +35,14 @@ class CountryService
             ->fetchAllAssociative();
     }
 
-    public static function getCountriesByLanguageUid(int $languageUid = null): array
+    public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
     {
         if ($languageUid === null) {
             $context = GeneralUtility::makeInstance(Context::class);
             $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
         }
 
-        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id);
-        $siteConfiguration = $site->getConfiguration();
+        $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
 
         if ($siteLanguage = $siteConfiguration['languages'][$languageUid] ?? null) {
             return array_map(static function ($uid) {
