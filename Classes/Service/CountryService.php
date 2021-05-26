@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
+use Zeroseven\Countries\Model\Country;
 
 class CountryService
 {
@@ -29,10 +30,9 @@ class CountryService
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
         $queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
 
-        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = (array)$queryBuilder->select('*')
-            ->from('tx_z7countries_country')
-            ->execute()
-            ->fetchAllAssociative();
+        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = array_map(static function ($row) {
+            return Country::makeInstance($row);
+        }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
     }
 
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
@@ -53,10 +53,10 @@ class CountryService
         return [];
     }
 
-    public static function getCountryByIsoCode(string $countryIsoCode): ?array
+    public static function getCountryByIsoCode(string $countryIsoCode): ?Country
     {
         foreach (self::getAllCountries() as $country) {
-            if ($country['iso_code'] === $countryIsoCode) {
+            if ($country->getIsoCode() === $countryIsoCode) {
                 return $country;
             }
         }
@@ -64,10 +64,10 @@ class CountryService
         return null;
     }
 
-    public static function getCountryByUid(int $countryUid): ?array
+    public static function getCountryByUid(int $countryUid): ?Country
     {
         foreach (self::getAllCountries() as $country) {
-            if ((int)$country['uid'] === $countryUid) {
+            if ($country->getUid() === $countryUid) {
                 return $country;
             }
         }
@@ -75,7 +75,7 @@ class CountryService
         return null;
     }
 
-    public static function getCountryByUri(UriInterface $uri = null): ?array
+    public static function getCountryByUri(UriInterface $uri = null): ?Country
     {
         $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
 
