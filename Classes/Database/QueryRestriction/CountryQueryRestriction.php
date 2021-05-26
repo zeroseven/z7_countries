@@ -10,6 +10,7 @@ use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\AbstractRestrictionContainer;
 use TYPO3\CMS\Core\Database\Query\Restriction\EnforceableQueryRestrictionInterface;
 use TYPO3\CMS\Core\Http\ApplicationType;
+use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\TCAService;
 
@@ -20,18 +21,18 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return isset($GLOBALS['TYPO3_REQUEST']) && $GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
     }
 
-    protected function getCountry(): ?array
+    protected function getCountry(): ?Country
     {
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] = CountryService::getCountryByUri());
     }
 
-    public static function getExpression(ExpressionBuilder $expressionBuilder, string $mode, string $list, array $country = null)
+    public static function getExpression(ExpressionBuilder $expressionBuilder, string $mode, string $list, Country $country = null)
     {
-        return empty($country) ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
+        return $country === null ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
             $expressionBuilder->eq($mode, 0),
             $expressionBuilder->andX(
                 $expressionBuilder->in($mode, ['1', '2']),
-                $expressionBuilder->inSet($list, (string)$country['uid'])
+                $expressionBuilder->inSet($list, (string)$country->getUid())
             )
         );
     }

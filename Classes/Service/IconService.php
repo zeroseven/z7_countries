@@ -8,23 +8,26 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Zeroseven\Countries\Model\Country;
 
 class IconService
 {
     protected const TABLE = 'tx_z7countries_country';
 
-    public static function getCountryIdentifier(array $country): ?string
+    public static function getCountryIdentifier(Country $country): ?string
     {
-        if (($iconColumn = $GLOBALS['TCA'][self::TABLE]['ctrl']['typeicon_column'] ?? null) && $country[$iconColumn] ?? null) {
+        $countryArray = $country->toArray();
+
+        if (($iconColumn = $GLOBALS['TCA'][self::TABLE]['ctrl']['typeicon_column'] ?? null) && $countryArray[$iconColumn] ?? null) {
             if (
                 ($mask = $GLOBALS['TCA'][self::TABLE]['ctrl']['typeicon_classes']['mask'] ?? null)
-                && ($icon = str_replace('###TYPE###', (string)$country[$iconColumn], (string)$mask, $count))
+                && ($icon = str_replace('###TYPE###', (string)$countryArray[$iconColumn], (string)$mask, $count))
                 && $count
             ) {
                 return $icon;
             }
 
-            return $country[$iconColumn];
+            return $countryArray[$iconColumn];
         }
 
         if ($defaultIcon = $GLOBALS['TCA'][self::TABLE]['ctrl']['typeicon_classes']['default']) {
@@ -34,7 +37,7 @@ class IconService
         return null;
     }
 
-    public static function getCountryIcon(array $country, $size = null, $overlayIdentifier = null): ?Icon
+    public static function getCountryIcon(Country $country, $size = null, $overlayIdentifier = null): ?Icon
     {
         if ($identifier = self::getCountryIdentifier($country)) {
             return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL, $overlayIdentifier);
@@ -53,9 +56,9 @@ class IconService
             if ($row[$fields['mode']]) {
                 $country = count($countries = GeneralUtility::intExplode(',', (string)$row[$fields['list']])) === 1
                     ? CountryService::getCountryByUid($countries[0])
-                    : [];
+                    : null;
 
-                return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, (array)$country);
+                return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $country ? $country->toArray() : []);
             }
         }
 
