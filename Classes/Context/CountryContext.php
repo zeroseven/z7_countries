@@ -24,12 +24,12 @@ class CountryContext implements AspectInterface
 
         if (!empty($country = CountryService::getCountryByUri())) {
             foreach ($originalLanguages as $originalLanguage) {
-                $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, (int)$country['uid']);
+                $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
             }
         }
     }
 
-    protected function manipulateLanguage(SiteLanguage $language, int $country): SiteLanguage
+    protected function manipulateLanguage(SiteLanguage $language, array $country): SiteLanguage
     {
         $configuration = $language->toArray();
         $configuration['hreflang'] = LanguageService::createHreflang($language, $country);
