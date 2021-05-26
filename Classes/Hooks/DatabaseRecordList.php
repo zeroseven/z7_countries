@@ -40,7 +40,7 @@ class DatabaseRecordList implements RecordListHookInterface
             $buttonBar = GeneralUtility::makeInstance(ButtonBar::class);
 
             // Collect buttons
-            foreach (CountryService::getCountries() ?: [] as $country) {
+            foreach (CountryService::getAllCountries() ?: [] as $country) {
                 $active = (int)$country['uid'] === $this->getCountryParameter();
                 $url = $uriBuilder->buildUriFromRoute('web_list', [
                     'table' => $table,
@@ -58,7 +58,7 @@ class DatabaseRecordList implements RecordListHookInterface
             // Render button bar
             foreach ($buttonBar->getButtons() as $groups) {
                 $headerColumns['_CONTROL_'] .= $this->translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country');
-                
+
                 foreach ($groups as $group) {
                     $headerColumns['_CONTROL_'] .= ' ' . implode('', $group);
                 }

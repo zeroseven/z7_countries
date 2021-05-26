@@ -78,7 +78,6 @@ class ModifyHrefLangTagsEvent
         $originalLanguages = $context->getPropertyFromAspect('country', 'originalLanguages');
         $languages = $context->getPropertyFromAspect('country', 'manipulatedLanguages') ?: $originalLanguages;
         $hreflangs = $event->getHrefLangs();
-        $countries = CountryService::getCountries();
 
         $hreflangTags = [];
 
@@ -102,7 +101,7 @@ class ModifyHrefLangTagsEvent
                     }
 
                     // Set country variants of given language
-                    foreach ($countries as $country) {
+                    foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
                         if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
                             $countryUid = (int)$country['uid'];
                             $hreflangTags[LanguageService::createHreflang($language, $countryUid)] = LanguageService::createBase($language, $countryUid) . $path;

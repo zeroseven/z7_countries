@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 
@@ -15,7 +17,7 @@ class CountryService
 {
     public const DELIMITER = '-';
 
-    public static function getCountries(): array
+    public static function getAllCountries(): array
     {
         // Return from "cache"
         if (isset($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'])) {
@@ -32,9 +34,28 @@ class CountryService
             ->fetchAllAssociative();
     }
 
+    public static function getCountriesByLanguageUid(int $languageUid = null): array
+    {
+        if ($languageUid === null) {
+            $context = GeneralUtility::makeInstance(Context::class);
+            $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
+        }
+
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id);
+        $siteConfiguration = $site->getConfiguration();
+
+        if ($siteLanguage = $siteConfiguration['languages'][$languageUid] ?? null) {
+            return array_map(static function ($uid) {
+                return self::getCountryByUid($uid);
+            }, (array)GeneralUtility::intExplode(',', $siteLanguage['countries']));
+        }
+
+        return [];
+    }
+
     public static function getCountryByIsoCode(string $countryIsoCode): ?array
     {
-        foreach (self::getCountries() as $country) {
+        foreach (self::getAllCountries() as $country) {
             if ($country['iso_code'] === $countryIsoCode) {
                 return $country;
             }
@@ -45,7 +66,7 @@ class CountryService
 
     public static function getCountryByUid(int $countryUid): ?array
     {
-        foreach (self::getCountries() as $country) {
+        foreach (self::getAllCountries() as $country) {
             if ((int)$country['uid'] === $countryUid) {
                 return $country;
             }
