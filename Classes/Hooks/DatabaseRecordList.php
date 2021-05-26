@@ -41,16 +41,16 @@ class DatabaseRecordList implements RecordListHookInterface
 
             // Collect buttons
             foreach (CountryService::getAllCountries() ?: [] as $country) {
-                $active = (int)$country['uid'] === $this->getCountryParameter();
+                $active = $country->getUid() === $this->getCountryParameter();
                 $url = $uriBuilder->buildUriFromRoute('web_list', [
                     'table' => $table,
                     'id' => $parentObject->id,
-                    self::PARAMETER => $active ? 0 : $country['uid']
+                    self::PARAMETER => $active ? 0 : $country->getUid()
                 ]);
 
                 $buttonBar->addButton($buttonBar->makeLinkButton()
                     ->setHref($url)
-                    ->setTitle($country['title'] ?? '')
+                    ->setTitle($country->getTitle())
                     ->setShowLabelText($active)
                     ->setIcon(IconService::getCountryIcon($country, null, $active ? 'overlay-readonly' : '')), null, $active ? 1 : 2);
             }

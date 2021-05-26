@@ -8,6 +8,7 @@ use TYPO3\CMS\Core\Context\AspectInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageService;
 
@@ -27,8 +28,8 @@ class CountryContext implements AspectInterface
             foreach ($this->originalLanguages as $originalLanguage) {
                 $countries = CountryService::getCountriesByLanguageUid($originalLanguage->getLanguageId(), $site);
 
-                if (in_array((int)$country['uid'], array_map(static function ($c) {
-                    return (int)$c['uid'];
+                if (in_array($country->getUid(), array_map(static function ($c) {
+                    return (int)$c->getUid();
                 }, $countries), true)) {
                     $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
                 }
@@ -36,7 +37,7 @@ class CountryContext implements AspectInterface
         }
     }
 
-    protected function manipulateLanguage(SiteLanguage $language, array $country): SiteLanguage
+    protected function manipulateLanguage(SiteLanguage $language, Country $country): SiteLanguage
     {
         $configuration = $language->toArray();
         $configuration['hreflang'] = LanguageService::createHreflang($language, $country);

@@ -14,6 +14,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent as OriginalEvent;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
+use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageService;
 use Zeroseven\Countries\Service\TCAService;
@@ -44,7 +45,7 @@ class ModifyHrefLangTagsEvent
         $this->tableSetup = TCAService::getEnableColumn($this->tableName);
     }
 
-    protected function pageExists(SiteLanguage $language, array $country = null): bool
+    protected function pageExists(SiteLanguage $language, Country $country = null): bool
     {
         $constraints = [];
 
