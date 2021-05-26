@@ -9,19 +9,19 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 
 class LanguageService
 {
-    public static function createBase(SiteLanguage $language, int $countryUid): UriInterface
+    public static function createBase(SiteLanguage $language, array $country): UriInterface
     {
-        if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getBase()->withPath('/' . $language->getTwoLetterIsoCode() . CountryService::DELIMITER . $country['iso_code'] . '/');
+        if ($isoCode = $country['iso_code'] ?? null) {
+            return $language->getBase()->withPath('/' . $language->getTwoLetterIsoCode() . CountryService::DELIMITER . $isoCode . '/');
         }
 
         return $language->getBase();
     }
 
-    public static function createHreflang(SiteLanguage $language, int $countryUid): string
+    public static function createHreflang(SiteLanguage $language, array $country): string
     {
-        if ($country = CountryService::getCountryByUid($countryUid)) {
-            return $language->getTwoLetterIsoCode() . '-' . strtoupper($country['iso_code']);
+        if ($isoCode = $country['iso_code'] ?? null) {
+            return $language->getTwoLetterIsoCode() . '-' . strtoupper($isoCode);
         }
 
         return $language->getHreflang();
