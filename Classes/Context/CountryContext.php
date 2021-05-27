@@ -28,8 +28,8 @@ class CountryContext implements AspectInterface
             foreach ($this->originalLanguages as $originalLanguage) {
                 $countries = CountryService::getCountriesByLanguageUid($originalLanguage->getLanguageId(), $site);
 
-                if (in_array($country->getUid(), array_map(static function ($c) {
-                    return (int)$c->getUid();
+                if ($countries && in_array($country->getUid(), array_map(static function ($c) {
+                    return $c ? $c->getUid() : 0;
                 }, $countries), true)) {
                     $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
                 }
