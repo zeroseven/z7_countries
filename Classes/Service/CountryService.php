@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -33,6 +34,23 @@ class CountryService
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = array_map(static function ($row) {
             return Country::makeInstance($row);
         }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+    }
+
+    public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
+    {
+        if ($setup = TCAService::getEnableColumn($table)) {
+            if (empty($row) || !isset($row[$setup['mode']], $row[$setup['list']])) {
+                $row = (array)BackendUtility::getRecord($table, $uid, implode(',', $setup));
+            }
+
+            if ($row[$setup['mode']]) {
+                return array_map(static function ($uid) {
+                    return self::getCountryByUid($uid);
+                }, GeneralUtility::intExplode(',', $row[$setup['list']]));
+            }
+        }
+
+        return null;
     }
 
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
