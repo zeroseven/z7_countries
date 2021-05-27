@@ -11,3 +11,9 @@ services:
         identifier: 'z7_country/hreflang'
         after: 'typo3-seo/hreflangGenerator'
         event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
+  Zeroseven\Countries\Events\AfterFormEnginePageInitializedEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/form-engine'
+        method: 'checkCountryAndLanguageSettings'
+        event: TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent
