@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Service;
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -48,18 +47,10 @@ class IconService
 
     public static function getRecordFlagIdentifier(string $table, int $uid, array $row = null): ?string
     {
-        if ($fields = TCAService::getEnableColumn($table)) {
-            if ($row === null || !isset($row[$fields['mode']], $row[$fields['list']])) {
-                $row = (array)BackendUtility::getRecord($table, $uid, implode(',', $fields));
-            }
+        if ($countries = CountryService::getCountriesByRecord($table, $uid, $row)) {
+            $data = count($countries) === 1 && $countries[0] ? $countries[0]->toArray() : [];
 
-            if ($row[$fields['mode']]) {
-                $country = count($countries = GeneralUtility::intExplode(',', (string)$row[$fields['list']])) === 1
-                    ? CountryService::getCountryByUid($countries[0])
-                    : null;
-
-                return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $country ? $country->toArray() : []);
-            }
+            return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $data);
         }
 
         return null;

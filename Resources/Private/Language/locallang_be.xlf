@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages">
+		<header/>
+		<body>
+			<trans-unit id="unavailableLanguage.title">
+				<source>The language %s is not available</source>
+			</trans-unit>
+			<trans-unit id="unavailableLanguage.description">
+				<source>Due to the country restrictions for this record, it cannot be displayed in %s language. To make the record available, activate one of the following countries: %s</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -35,6 +36,23 @@ class CountryService
         }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
     }
 
+    public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
+    {
+        if ($setup = TCAService::getEnableColumn($table)) {
+            if (empty($row) || !isset($row[$setup['mode']], $row[$setup['list']])) {
+                $row = (array)BackendUtility::getRecord($table, $uid, implode(',', $setup));
+            }
+
+            if ($row[$setup['mode']]) {
+                return $row[$setup['list']] === '' ? [] : array_map(static function ($uid) {
+                    return self::getCountryByUid($uid);
+                }, GeneralUtility::intExplode(',', (string)$row[$setup['list']]));
+            }
+        }
+
+        return null;
+    }
+
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
     {
         if ($languageUid === null) {
@@ -44,10 +62,10 @@ class CountryService
 
         $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
 
-        if ($siteLanguage = $siteConfiguration['languages'][$languageUid] ?? null) {
+        if ($countryList = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
             return array_map(static function ($uid) {
                 return self::getCountryByUid($uid);
-            }, (array)GeneralUtility::intExplode(',', $siteLanguage['countries']));
+            }, (array)GeneralUtility::intExplode(',', $countryList));
         }
 
         return [];
