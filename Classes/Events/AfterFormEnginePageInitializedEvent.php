@@ -11,6 +11,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use Zeroseven\Countries\Service\CountryService;
+use Zeroseven\Countries\Service\TCAService;
 
 class AfterFormEnginePageInitializedEvent
 {
@@ -26,7 +27,11 @@ class AfterFormEnginePageInitializedEvent
 
     protected function isMatching(string $table, int $uid, array $row = null): bool
     {
-        if ($configuredCountries = CountryService::getCountriesByRecord($table, $uid, $row)) {
+        if (
+            ($modeField = TCAService::getModeColumn($table))
+            && (int)($row[$modeField] ?? null) === 1
+            && $configuredCountries = CountryService::getCountriesByRecord($table, $uid, $row)
+        ) {
             $availableCountries = $this->getAvailableCountries($table, $uid, $row);
             $availableCountryUids = array_map(static function ($country) {
                 return $country->getUid();

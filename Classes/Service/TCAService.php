@@ -99,4 +99,14 @@ class TCAService
 
         return null;
     }
+
+    public static function getModeColumn($table): ?string
+    {
+        return ($setup = self::getEnableColumn($table)) ? $setup['mode'] : null;
+    }
+
+    public static function getListColumn($table): ?string
+    {
+        return ($setup = self::getEnableColumn($table)) ? $setup['list'] : null;
+    }
 }
