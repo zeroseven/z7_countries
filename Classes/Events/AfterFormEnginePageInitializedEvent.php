@@ -7,32 +7,68 @@ namespace Zeroseven\Countries\Events;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\TCAService;
 
 class AfterFormEnginePageInitializedEvent
 {
-    protected function getAvailableCountries(string $table, int $uid, array $row = null): ?array
-    {
-        $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? null;
-        $languageId = (int)((is_array($row[$languageField]) ? $row[$languageField][0] : $row[$languageField]) ?? 0);
-        $pageId = (int)($table === 'pages' ? ($languageId ? $row[$row['transOrigPointerField']] : $row['uid']) : $row['pid']);
-        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
+    /** @var string */
+    protected $table;
 
-        return CountryService::getCountriesByLanguageUid($languageId, $site);
+    /** @var int */
+    protected $uid;
+
+    /** @var array */
+    protected $row;
+
+    /** @var int */
+    protected $languageUid;
+
+    /** @var int */
+    protected $pageUid;
+
+    protected function init(Event $event): void
+    {
+        $data = $event->getController()->data;
+
+        if (empty($data)) {
+            $data = GeneralUtility::_GP('edit');
+        }
+
+        $this->table = (string)array_key_first($data);
+        $this->uid = (int)array_key_first($data[$this->table] ?? []);
+        $this->row = $data[$this->table][$this->uid] ?? null;
+
+        if (!is_array($this->row) || !count($this->row) || !isset($this->row['pid'])) {
+            $this->row = (array)BackendUtility::getRecord($this->table, $this->uid);
+        }
+
+        $languageField = $GLOBALS['TCA'][$this->table]['ctrl']['languageField'] ?? null;
+        $this->languageUid = (int)((is_array($this->row[$languageField]) ? $this->row[$languageField][0] : $this->row[$languageField]) ?? 0);
+
+        $this->pageUid = (int)($this->table === 'pages' ? ($this->languageId ? $this->row[$this->row['transOrigPointerField']] : $this->row['uid']) : $this->row['pid']);
     }
 
-    protected function isMatching(string $table, int $uid, array $row = null): bool
+    protected function getSite(): Site
     {
-        if (
-            ($modeField = TCAService::getModeColumn($table))
-            && (int)($row[$modeField] ?? null) === 1
-            && $configuredCountries = CountryService::getCountriesByRecord($table, $uid, $row)
-        ) {
-            $availableCountries = $this->getAvailableCountries($table, $uid, $row);
+        return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+    }
+
+    protected function getAvailableCountries(): array
+    {
+        return CountryService::getCountriesByLanguageUid($this->languageUid, $this->getSite());
+    }
+
+    protected function isMatching(): bool
+    {
+        if (($modeField = TCAService::getModeColumn($this->table)) && (int)($this->row[$modeField] ?? null) === 1) {
+            $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
+            $availableCountries = $this->getAvailableCountries();
             $availableCountryUids = array_map(static function ($country) {
                 return $country->getUid();
             }, $availableCountries);
@@ -49,33 +85,31 @@ class AfterFormEnginePageInitializedEvent
         return true;
     }
 
-    public function checkCountryAndLanguageSettings(Event $configuration): void
+    protected function translate(string $key, array $arguments = null): string
     {
-        $data = $configuration->getController()->data;
+        return LocalizationUtility::translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_be.xlf:' . $key, null, $arguments) ?: $key;
+    }
 
-        if (empty($data)) {
-            $data = GeneralUtility::_GP('edit');
-        }
+    public function checkCountryAndLanguageSettings(Event $event): void
+    {
+        $this->init($event);
 
-        $table = (string)array_key_first($data);
-        $uid = (int)array_key_first($data[$table] ?? []);
-        $row = $data[$table][$uid] ?? null;
+        if (!$this->isMatching()) {
+            $languageTitle = '"' . $this->getSite()->getLanguageById($this->languageUid)->getTitle() . '"';
+            $availableCountryNames = implode(', ', array_map(static function ($country) {
+                return '"' . $country->getTitle() . '"';
+            }, $this->getAvailableCountries()));
 
-        if (!is_array($row) || !count($row) || !isset($row['pid'])) {
-            $row = (array)BackendUtility::getRecord($table, $uid);
-        }
-
-        if (!$this->isMatching($table, $uid, $row)) {
             $flashMessage = GeneralUtility::makeInstance(
                 FlashMessage::class,
-                '',
-                ':(',
-                FlashMessage::INFO,
+                $this->translate('unavailableLanguage.description', [$languageTitle, $availableCountryNames]),
+                $this->translate('unavailableLanguage.title', [$languageTitle]),
+                FlashMessage::WARNING,
                 true
             );
 
-            $defaultFlashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
-            $defaultFlashMessageQueue->enqueue($flashMessage);
+            $flashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
+            $flashMessageQueue->enqueue($flashMessage);
         }
     }
 }
