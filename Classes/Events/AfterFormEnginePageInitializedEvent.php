@@ -4,45 +4,73 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Events;
 
-use TYPO3\CMS\Backend\Controller\EditDocumentController;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use Zeroseven\Countries\Service\CountryService;
 
 class AfterFormEnginePageInitializedEvent
 {
-    protected function getDataCountryRestrictions(EditDocumentController $editDocumentController): array
+    protected function getAvailableCountries(string $table, int $uid, array $row = null): ?array
     {
-        $data = $editDocumentController->data;
+        $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? null;
+        $languageId = (int)((is_array($row[$languageField]) ? $row[$languageField][0] : $row[$languageField]) ?? 0);
+        $pageId = (int)($table === 'pages' ? ($languageId ? $row[$row['transOrigPointerField']] : $row['uid']) : $row['pid']);
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId);
+
+        return CountryService::getCountriesByLanguageUid($languageId, $site);
+    }
+
+    protected function isMatching(string $table, int $uid, array $row = null): bool
+    {
+        if ($configuredCountries = CountryService::getCountriesByRecord($table, $uid, $row)) {
+            $availableCountries = $this->getAvailableCountries($table, $uid, $row);
+            $availableCountryUids = array_map(static function ($country) {
+                return $country->getUid();
+            }, $availableCountries);
+
+            foreach ($configuredCountries as $country) {
+                if (in_array($country->getUid(), $availableCountryUids, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function checkCountryAndLanguageSettings(Event $configuration): void
+    {
+        $data = $configuration->getController()->data;
 
         if (empty($data)) {
             $data = GeneralUtility::_GP('edit');
         }
 
-        if (($table = (string)array_key_first($data)) && $uid = (int)array_key_first($data[$table] ?? [])) {
+        $table = (string)array_key_first($data);
+        $uid = (int)array_key_first($data[$table] ?? []);
+        $row = $data[$table][$uid] ?? null;
 
-            $countries = CountryService::getCountriesByRecord($table, $uid, (array)($data[$table][$uid] ?? []));
-
-            debug($countries, $table . $uid);
+        if (!is_array($row) || !count($row) || !isset($row['pid'])) {
+            $row = (array)BackendUtility::getRecord($table, $uid);
         }
 
-        return $data;
-    }
+        if (!$this->isMatching($table, $uid, $row)) {
+            $flashMessage = GeneralUtility::makeInstance(
+                FlashMessage::class,
+                '',
+                ':(',
+                FlashMessage::INFO,
+                true
+            );
 
-    public function checkCountryAndLanguageSettings($x): void
-    {
-        $flashMessage = GeneralUtility::makeInstance(
-            FlashMessage::class,
-            '',
-            'Test',
-            FlashMessage::INFO,
-            true
-        );
-
-        $this->getDataCountryRestrictions($x->getController());
-
-        $defaultFlashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
-        $defaultFlashMessageQueue->enqueue($flashMessage);
+            $defaultFlashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
+            $defaultFlashMessageQueue->enqueue($flashMessage);
+        }
     }
 }
