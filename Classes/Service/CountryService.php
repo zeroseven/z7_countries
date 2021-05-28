@@ -62,10 +62,10 @@ class CountryService
 
         $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
 
-        if ($countryList = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
+        if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
             return array_map(static function ($uid) {
-                return self::getCountryByUid($uid);
-            }, (array)GeneralUtility::intExplode(',', $countryList));
+                return self::getCountryByUid((int)$uid);
+            }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries);
         }
 
         return [];
