@@ -104,7 +104,7 @@ class ModifyHrefLangTagsEvent
                     // Set country variants of given language
                     foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
                         if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
-                            $hreflangTags[LanguageService::createHreflang($language, $country)] = LanguageService::createBase($language, $country) . $path;
+                            $hreflangTags[LanguageService::manipulateHreflang($language, $country)] = LanguageService::manipulateBase($language, $country) . $path;
                         }
                     }
                 }

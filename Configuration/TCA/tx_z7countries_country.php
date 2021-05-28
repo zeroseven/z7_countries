@@ -55,6 +55,7 @@ return [
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim,required,alpha,nospace,unique',
+                'max' => 3,
                 'default' => ''
             ]
         ],

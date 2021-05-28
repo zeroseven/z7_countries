@@ -40,12 +40,12 @@ class CountryContext implements AspectInterface
     protected function manipulateLanguage(SiteLanguage $language, Country $country): SiteLanguage
     {
         $configuration = $language->toArray();
-        $configuration['hreflang'] = LanguageService::createHreflang($language, $country);
+        $configuration['hreflang'] = LanguageService::manipulateHreflang($language, $country);
 
         return new SiteLanguage(
             $language->getLanguageId(),
             $language->getLocale(),
-            LanguageService::createBase($language, $country),
+            LanguageService::manipulateBase($language, $country),
             $configuration
         );
     }
