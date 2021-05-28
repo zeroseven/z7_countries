@@ -3,8 +3,11 @@
 	<file source-language="en" datatype="plaintext" original="messages">
 		<header/>
 		<body>
-			<trans-unit id="site_language.country">
-				<source>Country</source>
+			<trans-unit id="site_language.countries">
+				<source>Available countries</source>
+			</trans-unit>
+			<trans-unit id="site_language.countries.description">
+				<source>Here you can select the country combinations for which the language should be available in order to generate dynamic language base such as "en-de", "en-it" etc.</source>
 			</trans-unit>
 		</body>
 	</file>
