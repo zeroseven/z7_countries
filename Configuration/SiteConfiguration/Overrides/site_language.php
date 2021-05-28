@@ -16,4 +16,3 @@ $GLOBALS['SiteConfiguration']['site_language']['columns']['countries'] = [
 foreach ($GLOBALS['SiteConfiguration']['site_language']['types'] ?? [] as $key => $value) {
     $GLOBALS['SiteConfiguration']['site_language']['types'][$key]['showitem'] .= ',countries';
 }
-
