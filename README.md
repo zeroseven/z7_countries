@@ -9,19 +9,19 @@ For a clean and easy to understand administration in the backend, this extension
 ## Example usage:
 
 Let‘s take the German language. With this extension it’s possible to subdivide the language “German” into the countries “Germany”, “Austria” and “Switzerland” in order to limit selected content to individual countries.
-In this example, in addition to the German language URL of the website (`examle.com/de/path`), other URLs are automatically available:
+In this example, in addition to the German language URL of the website (`example.com/de/path`), other URLs are automatically available:
 
-* `examle.com/de-de/schweiz`
-* `examle.com/de-at/schweiz`
-* `examle.com/de-ch/schweiz`
+* `example.com/de-de/schweiz`
+* `example.com/de-at/schweiz`
+* `example.com/de-ch/schweiz`
 
 Now, if a content element, a page or any other database record has exclusively been made available for the country Switzerland, it would only be available under `example.com/de-ch/schweiz` (note the **de-ch**) but not on the other example urls.
 
 In this example, the content restricted to Switzerland could also be available in other translations, so it can be viewed in other languages:
 
-* `examle.com/en-ch/switzerland`
-* `examle.com/it-ch/la-suisse`
-* `examle.com/fr-ch/svizzera`
+* `example.com/en-ch/switzerland`
+* `example.com/it-ch/la-suisse`
+* `example.com/fr-ch/svizzera`
 
 ## How it works:
 
@@ -31,7 +31,7 @@ When accessing a page with a language country combination like that in the URL, 
 
 ## SEO:
 
-There’s no need to worry here. Aside from the URLs, the hreflang as well as the lang attribute of the page are getting altered. This way, the search engines find a perfectly fine identifiable and correct country variaton. To put it simple: there will be no duplicate content complaints.
+There’s no need to worry here. Aside from the URLs, the hreflang as well as the lang attribute of the page are getting altered. This way, the search engines find a perfectly fine identifiable and correct country variation. To put it simple: there will be no duplicate content complaints.
 
 ### Examples for hreflang tags:
 
@@ -76,7 +76,7 @@ If the data record type has been made available for country configuration, the r
 
 <img src="./Documentation/Images/restriction.png" alt="restriction" style="width:468px;"/>
 
-### Language-/country check:
+### Language/country check:
 
 When creating or editing a data record, there will be checks if it’s even displayed under current country settings in the chosen language.
 This way, you can avoid any wasted efforts on misleading configuration.
@@ -90,7 +90,7 @@ Now you can check which content is available for any chosen country without any 
 
 <img src="./Documentation/Images/filter.png" alt="filter" style="width:520px;"/>
 
-## Coming features:
+## Upcoming features:
 
 We are currently still in development with this extension. In the near future, you can expect more features, like:
 
