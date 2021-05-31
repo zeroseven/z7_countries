@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Model;
 
+use Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Country
@@ -24,7 +25,7 @@ class Country
     {
         foreach (['uid', 'title', 'iso_code', 'flag'] as $property) {
             if (empty($row[$property])) {
-                throw new \Exception('Required property "' . $property . '" is missing. Object of country cannot be created.', 1622057576);
+                throw new Exception('Required property "' . $property . '" is missing. Object of country cannot be created.', 1622057576);
             }
         }
 
