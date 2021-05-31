@@ -7,7 +7,7 @@ $GLOBALS['SiteConfiguration']['site_language']['columns']['countries'] = [
     'description' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_siteconfiguration.xlf:site_language.countries.description',
     'config' => [
         'type' => 'select',
-        'renderType' => 'selectCheckBox',
+        'renderType' => 'selectMultipleSideBySide',
         'foreign_table' => 'tx_z7countries_country',
         'min' => 0
     ]
