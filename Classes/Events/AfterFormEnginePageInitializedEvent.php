@@ -32,13 +32,9 @@ class AfterFormEnginePageInitializedEvent
     /** @var int */
     protected $pageUid;
 
-    protected function init(Event $event): void
+    protected function init(): void
     {
-        $data = $event->getController()->data;
-
-        if (empty($data)) {
-            $data = GeneralUtility::_GP('edit');
-        }
+        $data = GeneralUtility::_GP('edit') ?: [];
 
         $this->table = (string)array_key_first($data);
         $this->uid = (int)array_key_first($data[$this->table] ?? []);
@@ -92,7 +88,7 @@ class AfterFormEnginePageInitializedEvent
 
     public function checkCountryAndLanguageSettings(Event $event): void
     {
-        $this->init($event);
+        $this->init();
 
         if (!$this->isMatching()) {
             $languageTitle = '"' . $this->getSite()->getLanguageById($this->languageUid)->getTitle() . '"';
