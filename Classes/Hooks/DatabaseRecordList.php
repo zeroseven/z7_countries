@@ -56,11 +56,13 @@ class DatabaseRecordList implements RecordListHookInterface
             }
 
             // Render button bar
-            foreach ($buttonBar->getButtons() as $groups) {
+            if($buttons = $buttonBar->getButtons()) {
                 $headerColumns['_CONTROL_'] .= $this->translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country');
 
-                foreach ($groups as $group) {
-                    $headerColumns['_CONTROL_'] .= ' ' . implode('', $group);
+                foreach ($buttonBar->getButtons() as $groups) {
+                    foreach ($groups as $group) {
+                        $headerColumns['_CONTROL_'] .= ' ' . implode('', $group);
+                    }
                 }
             }
         }
