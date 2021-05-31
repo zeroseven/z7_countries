@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Countries',
     'description' => '',
-    'category' => 'plugin',
+    'category' => 'fe',
     'author' => 'Raphael Thanner',
     'author_email' => 'r.thanner@zeroseven.de',
     'author_company' => 'zeroseven design studios GmbH',
