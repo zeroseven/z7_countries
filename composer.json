@@ -2,7 +2,7 @@
   "name": "zeroseven/z7-countries",
   "license": "GPL-2.0-only",
   "type": "typo3-cms-extension",
-  "description": "",
+  "description": "This TYPO3 extension offers the possibility of a flexible country configuration for single tree content.",
   "authors": [
     {
       "name": "Raphael Thanner",
