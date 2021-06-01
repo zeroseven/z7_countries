@@ -23,7 +23,7 @@ class Country
 
     public function __construct(array $row)
     {
-        foreach (['uid', 'title', 'iso_code', 'flag'] as $property) {
+        foreach (['uid', 'title', 'iso_code'] as $property) {
             if (empty($row[$property])) {
                 throw new Exception('Required property "' . $property . '" is missing. Object of country cannot be created.', 1622057576);
             }
