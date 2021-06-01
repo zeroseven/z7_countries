@@ -56,7 +56,7 @@ class DatabaseRecordListHook implements RecordListHookInterface
             }
 
             // Render button bar
-            if($buttons = $buttonBar->getButtons()) {
+            if ($buttons = $buttonBar->getButtons()) {
                 $headerColumns['_CONTROL_'] .= $this->translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country');
 
                 foreach ($buttonBar->getButtons() as $groups) {
