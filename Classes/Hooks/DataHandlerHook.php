@@ -22,7 +22,7 @@ class DataHandlerHook
     {
         if (
             $table === 'pages'
-            && ($config = TCAService::getEnableColumn($table))
+            && ($config = TCAService::getEnableColumns($table))
             && !empty(array_intersect($config, array_keys($fieldArray)))
         ) {
             $dataHandler->pagetreeNeedsRefresh = true;
