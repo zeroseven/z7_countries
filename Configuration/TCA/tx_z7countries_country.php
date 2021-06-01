@@ -52,6 +52,7 @@ return [
         'iso_code' => [
             'exclude' => false,
             'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.iso_code',
+            'description' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.iso_code.description',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim,required,alpha,nospace,unique',

@@ -12,6 +12,9 @@
 			<trans-unit id="tx_z7countries_country.iso_code">
 				<source>ISO-Code</source>
 			</trans-unit>
+			<trans-unit id="tx_z7countries_country.iso_code.description">
+				<source>Used for manipulating the language base URL. Example: https://domain.com/en-[ISO-Code]/</source>
+			</trans-unit>
 			<trans-unit id="tx_z7countries_country.flag">
 				<source>Flag</source>
 			</trans-unit>
