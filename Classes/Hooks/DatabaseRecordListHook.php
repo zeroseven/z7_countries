@@ -15,7 +15,7 @@ use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\IconService;
 use Zeroseven\Countries\Service\TCAService;
 
-class DatabaseRecordList implements RecordListHookInterface
+class DatabaseRecordListHook implements RecordListHookInterface
 {
     protected const PARAMETER = 'tx_z7country';
 

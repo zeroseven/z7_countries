@@ -11,8 +11,8 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'] = [];
 
 // Register hooks
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\TYPO3\CMS\Core\Imaging\IconFactory::class]['overrideIconOverlay'][] = \Zeroseven\Countries\Hooks\IconFactoryHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class]['modifyQuery'][] = \Zeroseven\Countries\Hooks\DatabaseRecordList::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.db_list_extra.inc']['actions'][] = \Zeroseven\Countries\Hooks\DatabaseRecordList::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class]['modifyQuery'][] = \Zeroseven\Countries\Hooks\DatabaseRecordListHook::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.db_list_extra.inc']['actions'][] = \Zeroseven\Countries\Hooks\DatabaseRecordListHook::class;
 
 // Register xclass objects
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Site\Entity\Site::class] = [
