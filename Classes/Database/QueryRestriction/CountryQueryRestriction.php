@@ -26,8 +26,11 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] = CountryService::getCountryByUri());
     }
 
-    public static function getExpression(ExpressionBuilder $expressionBuilder, string $mode, string $list, Country $country = null)
+    public static function getExpression(ExpressionBuilder $expressionBuilder, string $table, Country $country = null)
     {
+        $mode = TCAService::getModeColumn($table);
+        $list = TCAService::getListColumn($table);
+
         return $country === null ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
             $expressionBuilder->eq($mode, 0),
             $expressionBuilder->andX(
@@ -45,8 +48,8 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
             $country = $this->getCountry();
 
             foreach ($queriedTables as $tableAlias => $tableName) {
-                if ($fields = TCAService::getEnableColumn($tableAlias)) {
-                    $constraints[] = self::getExpression($expressionBuilder, $fields['mode'], $fields['list'], $country);
+                if (TCAService::hasCountryConfiguration($tableAlias)) {
+                    $constraints[] = self::getExpression($expressionBuilder, $tableAlias, $country);
                 }
             }
         }

@@ -35,7 +35,7 @@ class DatabaseRecordListHook implements RecordListHookInterface
 
     public function renderListHeader($table, $currentIdList, $headerColumns, &$parentObject)
     {
-        if (TCAService::getEnableColumn($table)) {
+        if (TCAService::hasCountryConfiguration($table)) {
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
             $buttonBar = GeneralUtility::makeInstance(ButtonBar::class);
 
@@ -74,10 +74,10 @@ class DatabaseRecordListHook implements RecordListHookInterface
     {
         if (
             ($countryId = $this->getCountryParameter())
-            && ($setup = TCAService::getEnableColumn($table))
+            && TCAService::hasCountryConfiguration($table)
             && ($country = CountryService::getCountryByUid($countryId))
         ) {
-            $expression = CountryQueryRestriction::getExpression($queryBuilder->expr(), $setup['mode'], $setup['list'], $country);
+            $expression = CountryQueryRestriction::getExpression($queryBuilder->expr(), $table, $country);
             $queryBuilder->andWhere($expression);
         }
     }

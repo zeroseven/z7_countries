@@ -100,13 +100,18 @@ class TCAService
         return null;
     }
 
-    public static function getModeColumn($table): ?string
+    public static function getModeColumn(string $table): ?string
     {
         return ($setup = self::getEnableColumn($table)) ? $setup['mode'] : null;
     }
 
-    public static function getListColumn($table): ?string
+    public static function getListColumn(string $table): ?string
     {
         return ($setup = self::getEnableColumn($table)) ? $setup['list'] : null;
+    }
+
+    public static function hasCountryConfiguration(string $table): bool
+    {
+        return self::getListColumn($table) !== null;
     }
 }
