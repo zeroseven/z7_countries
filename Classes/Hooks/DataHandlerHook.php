@@ -14,11 +14,11 @@ class DataHandlerHook
      *
      * @param bool $status
      * @param string $table
-     * @param int $id
+     * @param int|string $id
      * @param array $fieldArray
      * @param DataHandler $dataHandler
      */
-    public function processDatamap_postProcessFieldArray(bool $status, string $table, int $id, array $fieldArray, DataHandler $dataHandler): void
+    public function processDatamap_postProcessFieldArray(bool $status, string $table, $id, array $fieldArray, DataHandler $dataHandler): void
     {
         if (
             $table === 'pages'
