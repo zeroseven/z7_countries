@@ -29,6 +29,8 @@ With every country that is assigned to a language, the language is made availabl
 
 When accessing a page with a language country combination like that in the URL, all database queries on configured tables will be made with these country restrictions in mind.
 
+:bulb: _Therefor the href in the site configuration should only contain the language (e.g. "fr" instead of "fr-FR")._
+
 ## SEO:
 
 There’s no need to worry here. Aside from the URLs, the hreflang as well as the lang attribute of the page are getting altered. This way, the search engines find a perfectly fine identifiable and correct country variation. To put it simple: there will be no duplicate content complaints.
