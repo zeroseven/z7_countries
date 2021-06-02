@@ -14,7 +14,7 @@ class AlterTableDefinitionStatementsEvent
         $multiSelectTemplate = PHP_EOL . 'CREATE TABLE %s (' . PHP_EOL . '  %s varchar(255) DEFAULT \'\' NOT NULL' . PHP_EOL . ');' . PHP_EOL;
 
         foreach ($GLOBALS['TCA'] ?? [] as $table => $config) {
-            if (!empty($fields = TCAService::getEnableColumn($table))) {
+            if (!empty($fields = TCAService::getEnableColumns($table))) {
                 foreach ($fields as $field) {
                     $template = $GLOBALS['TCA'][$table]['columns'][$field]['config']['renderType'] === 'selectSingle' ? $singleSelectTemplate : $multiSelectTemplate;
                     $event->addSqlData(sprintf($template, $table, $field));

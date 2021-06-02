@@ -81,6 +81,30 @@ class TCAService
         }
     }
 
+    public static function getModeColumn(string $table): ?string
+    {
+        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries']['mode'] ?? null;
+    }
+
+    public static function getListColumn(string $table): ?string
+    {
+        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries']['list'] ?? null;
+    }
+
+    public static function getEnableColumns(string $table): ?array
+    {
+        if (($mode = self::getModeColumn($table)) && ($list = self::getListColumn($table))) {
+            return ['mode' => $mode, 'list' => $list];
+        }
+
+        return null;
+    }
+
+    public static function hasCountryConfiguration(string $table): bool
+    {
+        return self::getModeColumn($table) && self::getListColumn($table);
+    }
+
     public static function registerPalette(string $table, string $position = null, string $typeList = null): ?array
     {
         self::checkTable($table);
@@ -88,25 +112,6 @@ class TCAService
         self::addFields($table);
         self::addPalette($table, $position, $typeList);
 
-        return self::getEnableColumn($table);
-    }
-
-    public static function getEnableColumn(string $table): ?array
-    {
-        if (($setup = $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'] ?? null) && isset($setup['mode'], $setup['list'])) {
-            return $setup;
-        }
-
-        return null;
-    }
-
-    public static function getModeColumn($table): ?string
-    {
-        return ($setup = self::getEnableColumn($table)) ? $setup['mode'] : null;
-    }
-
-    public static function getListColumn($table): ?string
-    {
-        return ($setup = self::getEnableColumn($table)) ? $setup['list'] : null;
+        return self::getEnableColumns($table);
     }
 }

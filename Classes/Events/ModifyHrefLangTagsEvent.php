@@ -30,9 +30,6 @@ class ModifyHrefLangTagsEvent
     /** @var string */
     protected $tableName;
 
-    /** @var array */
-    protected $tableSetup;
-
     public function __construct()
     {
         $this->uriBuilder = GeneralUtility::makeInstance(ObjectManager::class)->get(UriBuilder::class);
@@ -41,8 +38,6 @@ class ModifyHrefLangTagsEvent
 
         $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->tableName);
         $this->queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
-
-        $this->tableSetup = TCAService::getEnableColumn($this->tableName);
     }
 
     protected function pageExists(SiteLanguage $language, Country $country = null): bool
@@ -58,8 +53,8 @@ class ModifyHrefLangTagsEvent
             $constraints[] = $this->queryBuilder->expr()->eq('uid', $this->getTypoScriptFrontendController()->id);
         }
 
-        if (!empty($this->tableSetup)) {
-            $constraints[] = CountryQueryRestriction::getExpression($this->queryBuilder->expr(), $this->tableSetup['mode'], $this->tableSetup['list'], $country);
+        if (TCAService::hasCountryConfiguration($this->tableName)) {
+            $constraints[] = CountryQueryRestriction::getExpression($this->queryBuilder->expr(), $this->tableName, $country);
         }
 
         return (bool)$this->queryBuilder->count('uid')
@@ -103,7 +98,7 @@ class ModifyHrefLangTagsEvent
 
                     // Set country variants of given language
                     foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
-                        if (empty($this->tableSetup) || $this->pageExists($language, $country)) {
+                        if (!TCAService::hasCountryConfiguration($this->tableName) || $this->pageExists($language, $country)) {
                             $hreflangTags[LanguageService::manipulateHreflang($language, $country)] = LanguageService::manipulateBase($language, $country) . $path;
                         }
                     }
