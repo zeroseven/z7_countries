@@ -77,21 +77,21 @@ Get the extension via composer: `composer require zeroseven/z7-countries`
 
 If the data record type has been made available for country configuration, the record can now be restricted to specific countries.
 
-![restriction](./Documentation/Images/restriction.png")
+![restriction](./Documentation/Images/restriction.png)
 
 ### Language/country check:
 
 When creating or editing a data record, there will be checks if it’s even displayed under current country settings in the chosen language.
 This way, you can avoid any wasted efforts on misleading configuration.
 
-![language check](./Documentation/Images/language_check.png")
+![language check](./Documentation/Images/language_check.png)
 
 ### Country filter:
 
 In the list module, there’s a filter available for you.
 Now you can check which content is available for any chosen country without any effort.
 
-![filter" style](./Documentation/Images/filter.png")
+![filter" style](./Documentation/Images/filter.png)
 
 ## Upcoming features:
 
