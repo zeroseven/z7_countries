@@ -9,7 +9,7 @@ For a clean and easy to understand administration in the backend, this extension
 ## Example usage:
 
 Let‘s take the German language. With this extension it’s possible to subdivide the language “German” into the countries “Germany”, “Austria” and “Switzerland” in order to limit selected content to individual countries.
-In this example, in addition to the German language URL of the website (`example.com/de/path`), other URLs are automatically available:
+In this example, in addition to the German language URL of the website (`example.com/de/schweiz`), other URLs are automatically available:
 
 * `example.com/de-de/schweiz`
 * `example.com/de-at/schweiz`
@@ -40,6 +40,7 @@ There’s no need to worry here. Aside from the URLs, the hreflang as well as th
 ```html
 <link rel="alternate" hreflang="en" href="https://example.com/path"/>             <!-- english content -->
 <link rel="alternate" hreflang="en-AT" href="https://example.com/en-at/path"/>    <!-- english content for Austria -->
+<link rel="alternate" hreflang="en-BE" href="https://example.com/en-be/path"/>    <!-- english content for Belgium -->
 <link rel="alternate" hreflang="en-CH" href="https://example.com/en-ch/path"/>    <!-- english content for Switzerland -->
 <link rel="alternate" hreflang="en-DE" href="https://example.com/en-de/path"/>    <!-- english content for Germany -->
 <link rel="alternate" hreflang="de" href="https://example.com/de/path"/>          <!-- german content -->
@@ -76,21 +77,21 @@ Get the extension via composer: `composer require zeroseven/z7-countries`
 
 If the data record type has been made available for country configuration, the record can now be restricted to specific countries.
 
-<img src="./Documentation/Images/restriction.png" alt="restriction" style="width:468px;"/>
+![restriction](./Documentation/Images/restriction.png")
 
 ### Language/country check:
 
 When creating or editing a data record, there will be checks if it’s even displayed under current country settings in the chosen language.
 This way, you can avoid any wasted efforts on misleading configuration.
 
-<img src="./Documentation/Images/language_check.png" alt="language check" style="width:748px;"/>
+![language check](./Documentation/Images/language_check.png")
 
 ### Country filter:
 
 In the list module, there’s a filter available for you.
 Now you can check which content is available for any chosen country without any effort.
 
-<img src="./Documentation/Images/filter.png" alt="filter" style="width:520px;"/>
+![filter" style](./Documentation/Images/filter.png")
 
 ## Upcoming features:
 
