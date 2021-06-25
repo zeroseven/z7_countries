@@ -21,7 +21,7 @@ class TCAService
 
     public static function addEnableColumns(string $table): void
     {
-        if (isset($GLOBALS['TCA'][$table])) {
+        if (isset($GLOBALS['TCA'][$table]) && !isset($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'])) {
             $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'] = [
                 'mode' => self::FIELD_NAME_MODE,
                 'list' => self::FIELD_NAME_LIST
@@ -65,6 +65,11 @@ class TCAService
         }
     }
 
+    public static function getPalette(): string
+    {
+        return '--palette--;LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.palette.' . self::PALETTE_NAME . ';' . self::PALETTE_NAME;
+    }
+
     public static function addPalette(string $table, string $position = null, string $typeList = null): void
     {
         if (isset($GLOBALS['TCA'][$table]) && !isset($GLOBALS['TCA'][$table]['palettes'][self::PALETTE_NAME])) {
@@ -75,7 +80,7 @@ class TCAService
                 $position = 'after:' . $deletedField;
             }
 
-            ExtensionManagementUtility::addToAllTCAtypes($table, '--palette--;LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.palette.' . self::PALETTE_NAME . ';' . self::PALETTE_NAME, (string)$typeList, (string)$position);
+            ExtensionManagementUtility::addToAllTCAtypes($table, self::getPalette(), (string)$typeList, (string)$position);
         }
     }
 
