@@ -42,9 +42,9 @@ class CountryService
             }
 
             if ($row[$modeColumn]) {
-                return $row[$listColumn] === '' ? [] : array_map(static function ($uid) {
+                return array_filter($row[$listColumn] === '' ? [] : array_map(static function ($uid) {
                     return self::getCountryByUid($uid);
-                }, GeneralUtility::intExplode(',', (string)$row[$listColumn]));
+                }, GeneralUtility::intExplode(',', (string)$row[$listColumn])));
             }
         }
 
@@ -61,9 +61,9 @@ class CountryService
         $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
 
         if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
-            return array_map(static function ($uid) {
+            return array_filter(array_map(static function ($uid) {
                 return self::getCountryByUid((int)$uid);
-            }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries);
+            }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
         }
 
         return [];
