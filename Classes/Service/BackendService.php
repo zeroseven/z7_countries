@@ -8,7 +8,7 @@ class BackendService
 {
     public static function enableConfiguration(string $table, string $position = null, string $typeList = null): ?array
     {
-        if (TCAService::checkTablePermission($table)) {
+        if (TCAService::isDisallowedTable($table)) {
             throw new \Exception('The table "' . $table . '" is not supported for country restrictions. 🤔', 1621109882);
         }
 

@@ -14,9 +14,9 @@ class TCAService
 
     protected const FIELD_NAME_LIST = 'tx_z7countries_list';
 
-    public static function checkTablePermission(string $table): bool
+    public static function isDisallowedTable(string $table): bool
     {
-        return !in_array($table, $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] ?? [], true);
+        return in_array($table, $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] ?? [], true);
     }
 
     public static function addEnableColumns(string $table): void
