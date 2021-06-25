@@ -31,5 +31,10 @@
   },
   "replace": {
     "zeroseven/z7-countries": "self.version"
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "z7_countries"
+    }
   }
 }
