@@ -66,7 +66,7 @@ Get the extension via composer: `composer require zeroseven/z7-countries`
 3. Extend desired data record types for restricting to countries. Example:
 
 ```php
-\Zeroseven\Countries\Service\TCAService::registerPalette('tx_news_domain_model_news');
+\Zeroseven\Countries\Service\BackendService::enableConfiguration('tx_news_domain_model_news');
 ```
 
 :bulb: _The database analyzer in the install tool will automatically add the needed fields to your database when running it._

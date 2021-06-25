@@ -14,14 +14,12 @@ class TCAService
 
     protected const FIELD_NAME_LIST = 'tx_z7countries_list';
 
-    protected static function checkTable(string $table): void
+    public static function checkTablePermission(string $table): bool
     {
-        if (($disallowedTables = $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] ?? null) && in_array($table, $disallowedTables, true)) {
-            throw new \Exception('The table "' . $table . '" is not supported for country restrictions. 🤔', 1621109882);
-        }
+        return !in_array($table, $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] ?? [], true);
     }
 
-    protected static function addEnableColumns(string $table): void
+    public static function addEnableColumns(string $table): void
     {
         if (isset($GLOBALS['TCA'][$table])) {
             $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'] = [
@@ -31,7 +29,7 @@ class TCAService
         }
     }
 
-    protected static function addFields(string $table): void
+    public static function addFields(string $table): void
     {
         if (isset($GLOBALS['TCA'][$table]) && !isset($GLOBALS['TCA'][$table]['columns'][self::FIELD_NAME_MODE], $GLOBALS['TCA'][$table]['columns'][self::FIELD_NAME_LIST])) {
             ExtensionManagementUtility::addTCAcolumns($table, [
@@ -67,7 +65,7 @@ class TCAService
         }
     }
 
-    protected static function addPalette(string $table, string $position = null, string $typeList = null): void
+    public static function addPalette(string $table, string $position = null, string $typeList = null): void
     {
         if (isset($GLOBALS['TCA'][$table]) && !isset($GLOBALS['TCA'][$table]['palettes'][self::PALETTE_NAME])) {
             ExtensionManagementUtility::addFieldsToPalette($table, self::PALETTE_NAME, self::FIELD_NAME_MODE . ',--linebreak--,' . self::FIELD_NAME_LIST);
@@ -103,15 +101,5 @@ class TCAService
     public static function hasCountryConfiguration(string $table): bool
     {
         return self::getModeColumn($table) && self::getListColumn($table);
-    }
-
-    public static function registerPalette(string $table, string $position = null, string $typeList = null): ?array
-    {
-        self::checkTable($table);
-        self::addEnableColumns($table);
-        self::addFields($table);
-        self::addPalette($table, $position, $typeList);
-
-        return self::getEnableColumns($table);
     }
 }
