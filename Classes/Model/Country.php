@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Model;
 
-use Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Zeroseven\Countries\Exception;
 
 class Country
 {
