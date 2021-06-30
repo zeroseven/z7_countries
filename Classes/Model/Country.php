@@ -21,9 +21,12 @@ class Country
     /** @var string */
     protected $flag;
 
+    /** @var string */
+    protected $parameter;
+
     public function __construct(array $row)
     {
-        foreach (['uid', 'title', 'iso_code'] as $property) {
+        foreach (['uid', 'title', 'iso_code', 'parameter'] as $property) {
             if (empty($row[$property])) {
                 throw new Exception('Required property "' . $property . '" is missing. Object of country cannot be created.', 1622057576);
             }
@@ -32,6 +35,7 @@ class Country
         $this->setUid((int)$row['uid']);
         $this->setTitle($row['title']);
         $this->setIsoCode($row['iso_code']);
+        $this->setParameter($row['parameter']);
         $this->setFlag($row['flag']);
     }
 
@@ -46,6 +50,7 @@ class Country
             'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'iso_code' => $this->getIsoCode(),
+            'parameter' => $this->getParameter(),
             'flag' => $this->getFlag()
         ];
     }
@@ -88,5 +93,15 @@ class Country
     public function setFlag(string $flag): void
     {
         $this->flag = $flag;
+    }
+
+    public function getParameter(): string
+    {
+        return $this->parameter;
+    }
+
+    public function setParameter(string $parameter): void
+    {
+        $this->parameter = $parameter;
     }
 }
