@@ -10,10 +10,16 @@
 				<source>Title</source>
 			</trans-unit>
 			<trans-unit id="tx_z7countries_country.iso_code">
-				<source>ISO-Code</source>
+				<source>ISO-Code (ISO 3166-1)</source>
 			</trans-unit>
 			<trans-unit id="tx_z7countries_country.iso_code.description">
-				<source>Used for manipulating the language base URL. Example: https://domain.com/en-[ISO-Code]/</source>
+				<source>Used within for "lang" and "hreflang" attributes</source>
+			</trans-unit>
+			<trans-unit id="tx_z7countries_country.parameter">
+				<source>URL-Parameter</source>
+			</trans-unit>
+			<trans-unit id="tx_z7countries_country.parameter.description">
+				<source>Used for manipulating the language base URL. Example: https://domain.com/en-[parameter]/</source>
 			</trans-unit>
 			<trans-unit id="tx_z7countries_country.flag">
 				<source>Flag</source>
