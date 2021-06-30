@@ -12,11 +12,11 @@ class LanguageService
 {
     public const BASE_DELIMITER = '-';
 
-    protected static function cleanString(string $string, bool $allowUppercase = null, int $maxLength = null): string
+    protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
     {
         $string = preg_replace('/[^a-z]/i', '', $string);
 
-        if (!$allowUppercase) {
+        if ($forceLowercase) {
             $string = strtolower($string);
         }
 
@@ -29,8 +29,8 @@ class LanguageService
 
     public static function manipulateBase(SiteLanguage $language, Country $country = null): UriInterface
     {
-        if ($country && ($isoCode = $country->getIsoCode())) {
-            return $language->getBase()->withPath('/' . self::cleanString($language->getTwoLetterIsoCode(), false, 2) . self::BASE_DELIMITER . self::cleanString($isoCode, true, 3) . '/');
+        if ($country && ($parameter = $country->getParameter())) {
+            return $language->getBase()->withPath('/' . self::cleanString($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
         }
 
         return $language->getBase();
@@ -39,7 +39,7 @@ class LanguageService
     public static function manipulateHreflang(SiteLanguage $language, Country $country = null): string
     {
         if ($country && ($isoCode = $country->getIsoCode())) {
-            return self::cleanString($language->getTwoLetterIsoCode(), false, 2) . '-' . self::cleanString(strtoupper($isoCode), true);
+            return self::cleanString($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanString($isoCode, 2);
         }
 
         return $language->getHreflang();

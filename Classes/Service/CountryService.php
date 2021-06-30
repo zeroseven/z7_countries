@@ -69,10 +69,10 @@ class CountryService
         return [];
     }
 
-    public static function getCountryByIsoCode(string $countryIsoCode): ?Country
+    public static function getCountryByParameter(string $countryParameter): ?Country
     {
         foreach (self::getAllCountries() as $country) {
-            if ($country->getIsoCode() === $countryIsoCode) {
+            if ($country->getParameter() === $countryParameter) {
                 return $country;
             }
         }
@@ -97,7 +97,7 @@ class CountryService
 
         return
             preg_match('/^\/?[a-z]{2}' . LanguageService::BASE_DELIMITER . '([a-zA-Z]+)/', $path, $matches)
-            && ($countryIsoCode = $matches[1])
-            && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country : null;
+            && ($countryParameter = $matches[1])
+            && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
     }
 }
