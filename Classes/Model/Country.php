@@ -46,13 +46,12 @@ class Country
 
     public function toArray(): array
     {
-        return [
+        return array_merge($this->getData(), [
             'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'iso_code' => $this->getIsoCode(),
-            'flag' => $this->getFlag(),
-            'data' => $this->getData()
-        ];
+            'flag' => $this->getFlag()
+        ]);
     }
 
     public function getUid(): int
