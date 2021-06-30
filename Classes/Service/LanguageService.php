@@ -14,7 +14,7 @@ class LanguageService
 
     protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
     {
-        $string = preg_replace('/[^a-z]/i', '', $string);
+        $string = preg_replace('/[^a-z0-9_-]/i', '', $string);
 
         if ($forceLowercase) {
             $string = strtolower($string);
@@ -27,10 +27,14 @@ class LanguageService
         return $string;
     }
 
+    protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null) {
+        return self::cleanString(preg_replace('/[^a-z]/i', '', $string), $maxLength, $forceLowercase);
+    }
+
     public static function manipulateBase(SiteLanguage $language, Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
-            return $language->getBase()->withPath('/' . self::cleanString($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
+            return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
         }
 
         return $language->getBase();
@@ -39,7 +43,7 @@ class LanguageService
     public static function manipulateHreflang(SiteLanguage $language, Country $country = null): string
     {
         if ($country && ($isoCode = $country->getIsoCode())) {
-            return self::cleanString($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanString($isoCode, 2);
+            return self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);
         }
 
         return $language->getHreflang();

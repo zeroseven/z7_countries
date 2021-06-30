@@ -94,7 +94,7 @@ return [
             'description' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.parameter.description',
             'config' => [
                 'type' => 'input',
-                'eval' => 'trim,required,alpha,nospace,unique',
+                'eval' => 'trim,required,alphanum_x,nospace,unique',
                 'default' => ''
             ]
         ],
