@@ -21,6 +21,9 @@ class Country
     /** @var string */
     protected $flag;
 
+    /** @var array */
+    protected $data;
+
     public function __construct(array $row)
     {
         foreach (['uid', 'title', 'iso_code'] as $property) {
@@ -33,6 +36,7 @@ class Country
         $this->setTitle($row['title']);
         $this->setIsoCode($row['iso_code']);
         $this->setFlag($row['flag']);
+        $this->setData(array_diff_key($row, array_flip(['uid', 'title', 'iso_code', 'flag'])));
     }
 
     public static function makeInstance(array $row): self
@@ -46,7 +50,8 @@ class Country
             'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'iso_code' => $this->getIsoCode(),
-            'flag' => $this->getFlag()
+            'flag' => $this->getFlag(),
+            'data' => $this->getData()
         ];
     }
 
@@ -88,5 +93,15 @@ class Country
     public function setFlag(string $flag): void
     {
         $this->flag = $flag;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): void
+    {
+        $this->data = $data;
     }
 }
