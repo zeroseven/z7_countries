@@ -68,29 +68,28 @@ class Country
             $key = GeneralUtility::camelCaseToLowerCaseUnderscored($matches[2]);
 
             // Check if key exists in data array
-            if (!array_key_exists($key, $this->data)) {
-                throw new Exception(sprintf('Property "%s" does not exist in country data.', $key), 1625127365);
-            }
+            if (array_key_exists($key, $this->data)) {
 
-            // Get value
-            if ($action === 'get' || $action === 'has' || $action === 'is') {
-                if (count($arguments)) {
-                    throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments. ', $name, __CLASS__), 1625127366);
+                // Get/check value
+                if ($action === 'get' || $action === 'has' || $action === 'is') {
+                    if (count($arguments)) {
+                        throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments. ', $name, __CLASS__), 1625127366);
+                    }
+
+                    return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
                 }
 
-                return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
-            }
+                // Set value
+                if ($action === 'set') {
+                    if (count($arguments) !== 1) {
+                        throw new Exception(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
+                    }
 
-            // Set value
-            if ($action === 'set') {
-                if (count($arguments) !== 1) {
-                    throw new Exception(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
+                    return $this->setValue($key, $arguments[0]);
                 }
-
-                return $this->setValue($key, $arguments[0]);
             }
         }
 
-        throw new Exception(sprintf('Method "%s" not found in %s.', $name, __CLASS__), 1625127368);
+        throw new Exception(sprintf('Method "%s()" not found in %s.', $name, __CLASS__), 1625127368);
     }
 }
