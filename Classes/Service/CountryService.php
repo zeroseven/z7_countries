@@ -73,10 +73,10 @@ class CountryService
         return [];
     }
 
-    public static function getCountryByIsoCode(string $countryIsoCode): ?Country
+    public static function getCountryByParameter(string $countryParameter): ?Country
     {
         foreach (self::getAllCountries() as $country) {
-            if ($country->getIsoCode() === $countryIsoCode) {
+            if ($country->getParameter() === $countryParameter) {
                 return $country;
             }
         }
@@ -100,8 +100,8 @@ class CountryService
         $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
 
         return
-            preg_match('/^\/?[a-z]{2}' . LanguageService::BASE_DELIMITER . '([a-zA-Z]+)/', $path, $matches)
-            && ($countryIsoCode = $matches[1])
-            && ($country = self::getCountryByIsoCode($countryIsoCode)) ? $country : null;
+            preg_match('/^\/?[a-z]{2}' . LanguageService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)
+            && ($countryParameter = $matches[1])
+            && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
     }
 }

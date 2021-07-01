@@ -17,7 +17,7 @@ class Country
     {
 
         // Check required fields of a valid country object
-        foreach (['uid', 'title', 'iso_code'] as $property) {
+        foreach (['uid', 'title', 'iso_code', 'parameter'] as $property) {
             if (empty($row[$property])) {
                 throw new Exception(sprintf('Required property "%s" is missing. Instance of %s cannot be created.', $property, __CLASS__), 1625127363);
             }
