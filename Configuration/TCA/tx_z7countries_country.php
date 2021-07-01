@@ -99,7 +99,7 @@ return [
             ]
         ],
         'flag' => [
-            'exclude' => true,
+            'exclude' => false,
             'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.flag',
             'config' => $GLOBALS['TCA']['sys_language']['columns']['flag']['config']
         ]
