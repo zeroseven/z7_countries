@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Service;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Zeroseven\Countries\Exception;
+use Zeroseven\Countries\Exception\BackendException as Exception;
 
 class BackendService
 {
     public static function enableConfiguration(string $table, string $position = null, string $typeList = null): void
     {
         if (TCAService::isDisallowedTable($table)) {
-            throw new Exception('The table "' . $table . '" is not supported for country restrictions. 🤔', 1621109882);
+            throw new Exception('The table "' . $table . '" is not supported for country restrictions.', 1625165946);
         }
 
         TCAService::addEnableColumns($table);
@@ -23,7 +23,7 @@ class BackendService
     public static function extendInlineChildOverrides(string $foreign_table, string $table, string $field, string $typeList = null): void
     {
         if (!TCAService::hasCountryConfiguration($foreign_table)) {
-            throw new Exception('The table "' . $foreign_table . '" has no country configuration. 🤔', 1624626694);
+            throw new Exception('The table "' . $foreign_table . '" has no country configuration.', 1625165947);
         }
 
         if (

@@ -7,7 +7,7 @@ namespace Zeroseven\Countries\Model;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject;
-use Zeroseven\Countries\Exception;
+use Zeroseven\Countries\Exception\CountryException as Exception;
 
 class Country
 {
@@ -73,7 +73,7 @@ class Country
                 // Get/check value
                 if ($action === 'get' || $action === 'has' || $action === 'is') {
                     if (count($arguments)) {
-                        throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments. ', $name, __CLASS__), 1625127366);
+                        throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments.', $name, __CLASS__), 1625127366);
                     }
 
                     return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
