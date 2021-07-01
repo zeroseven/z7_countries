@@ -25,7 +25,7 @@ In this example, the content restricted to Switzerland could also be available i
 
 ## How it works:
 
-With every country that is assigned to a language, the language is made available under an additionally altered base URL. This consists of both the ISO Code of the language and the country.
+With every country that is assigned to a language, the language is made available under an additionally altered base URL. This consists of the ISO Code of the language and a country parameter.
 
 When accessing a page with a language country combination like that in the URL, all database queries on configured tables will be made with these country restrictions in mind.
 
@@ -70,6 +70,20 @@ Get the extension via composer: `composer require zeroseven/z7-countries`
 ```
 
 :bulb: _The database analyzer in the install tool will automatically add the needed fields to your database when running it._
+
+### Extend country objects
+
+To extend the country object, extend the database table `tx_z7countries_country`. The country model automatically provides a `set`,` get`, `has` and a `is` method for each field.
+
+**Example:**
+
+```php
+$country->getMyNewField(); // Returns the value of the field 'my_new_field'
+$country->isDemocratic(); // Returns true or false for the field 'democratic'
+
+// Overwrite the title
+$country->setTitle('Brand new Zealand');
+```
 
 ## Editor:
 
