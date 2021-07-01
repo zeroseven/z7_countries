@@ -6,37 +6,27 @@ namespace Zeroseven\Countries\Model;
 
 use Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject;
 
 class Country
 {
-    /** @var int */
-    protected $uid;
-
-    /** @var string */
-    protected $title;
-
-    /** @var string */
-    protected $isoCode;
-
-    /** @var string */
-    protected $flag;
-
-    /** @var array */
-    protected $data;
+    protected array $data;
 
     public function __construct(array $row)
     {
+
+        // Check required fields of a valid country object
         foreach (['uid', 'title', 'iso_code'] as $property) {
             if (empty($row[$property])) {
-                throw new Exception('Required property "' . $property . '" is missing. Object of country cannot be created.', 1622057576);
+                throw new Exception(sprintf('Required property "%s" is missing. Instance of %s cannot be created.', $property, __CLASS__), 1625127363);
             }
         }
 
-        $this->setUid((int)$row['uid']);
-        $this->setTitle($row['title']);
-        $this->setIsoCode($row['iso_code']);
-        $this->setFlag($row['flag']);
-        $this->setData(array_diff_key($row, array_flip(['uid', 'title', 'iso_code', 'flag'])));
+        // Store data in object
+        foreach ($row as $key => $value) {
+            $this->setValue($key, $value);
+        }
     }
 
     public static function makeInstance(array $row): self
@@ -44,63 +34,63 @@ class Country
         return GeneralUtility::makeInstance(self::class, $row);
     }
 
+    protected function setValue(string $key, $value)
+    {
+        if (is_int($value) || MathUtility::canBeInterpretedAsInteger($value)) {
+            return $this->data[$key] = (int)$value;
+        }
+
+        if (is_string($value) || is_null($value)) {
+            return $this->data[$key] = (string)$value;
+        }
+
+        if (is_object($value) && $value instanceof AbstractDomainObject) {
+            return $this->data[$key] = $value->getUid();
+        }
+
+        throw new Exception(sprintf('Value of field "%s" in %s can not be interpreted to an integer or string.', $key, __CLASS__), 1625127364);
+    }
+
+    protected function getValue(string $key)
+    {
+        return $this->data[$key];
+    }
+
     public function toArray(): array
-    {
-        return array_merge($this->getData(), [
-            'uid' => $this->getUid(),
-            'title' => $this->getTitle(),
-            'iso_code' => $this->getIsoCode(),
-            'flag' => $this->getFlag()
-        ]);
-    }
-
-    public function getUid(): int
-    {
-        return $this->uid;
-    }
-
-    public function setUid(int $uid): void
-    {
-        $this->uid = $uid;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getIsoCode(): string
-    {
-        return $this->isoCode;
-    }
-
-    public function setIsoCode(string $isoCode): void
-    {
-        $this->isoCode = $isoCode;
-    }
-
-    public function getFlag(): string
-    {
-        return $this->flag;
-    }
-
-    public function setFlag(string $flag): void
-    {
-        $this->flag = $flag;
-    }
-
-    public function getData(): array
     {
         return $this->data;
     }
 
-    public function setData(array $data): void
+    public function __call($name, $arguments)
     {
-        $this->data = $data;
+        if (preg_match('/(get|set|has|is)((?:[A-Z][a-z]+)+)/', $name, $matches)) {
+            $action = $matches[1];
+            $key = GeneralUtility::camelCaseToLowerCaseUnderscored($matches[2]);
+
+            // Check if key exists in data array
+            if (!array_key_exists($key, $this->data)) {
+                throw new Exception(sprintf('Property "%s" does not exist in country data.', $key), 1625127365);
+            }
+
+            // Get value
+            if ($action === 'get' || $action === 'has' || $action === 'is') {
+                if (count($arguments)) {
+                    throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments. ', $name, __CLASS__), 1625127366);
+                }
+
+                return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
+            }
+
+            // Set value
+            if ($action === 'set') {
+                if (count($arguments) !== 1) {
+                    throw new Exception(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
+                }
+
+                return $this->setValue($key, $arguments[0]);
+            }
+        }
+
+        throw new Exception(sprintf('Method "%s" not found in %s.', $name, __CLASS__), 1625127368);
     }
 }
