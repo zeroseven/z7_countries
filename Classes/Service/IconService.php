@@ -55,4 +55,13 @@ class IconService
 
         return null;
     }
+
+    public static function getRecordFlagIcon(string $table, int $uid, array $row = null, $size = null): ?Icon
+    {
+        if ($identifier = self::getRecordFlagIdentifier($table, $uid, $row)) {
+            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL);
+        }
+
+        return null;
+    }
 }

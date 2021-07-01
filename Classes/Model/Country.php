@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Model;
 
-use Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject;
+use Zeroseven\Countries\Exception;
 
 class Country
 {
