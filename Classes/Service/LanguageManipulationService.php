@@ -8,7 +8,7 @@ use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Zeroseven\Countries\Model\Country;
 
-class LanguageService
+class LanguageManipulationService
 {
     public const BASE_DELIMITER = '-';
 
@@ -31,7 +31,7 @@ class LanguageService
         return self::cleanString(preg_replace('/[^a-z]/i', '', $string), $maxLength, $forceLowercase);
     }
 
-    public static function manipulateBase(SiteLanguage $language, Country $country = null): UriInterface
+    public static function getBase(SiteLanguage $language, Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
             return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
@@ -40,7 +40,7 @@ class LanguageService
         return $language->getBase();
     }
 
-    public static function manipulateHreflang(SiteLanguage $language, Country $country = null): string
+    public static function getHreflang(SiteLanguage $language, Country $country = null): string
     {
         if ($country && ($isoCode = $country->getIsoCode())) {
             return self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);

@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
-use Zeroseven\Countries\Service\LanguageService;
+use Zeroseven\Countries\Service\LanguageManipulationService;
 
 class CountryContext implements AspectInterface
 {
@@ -40,12 +40,12 @@ class CountryContext implements AspectInterface
     protected function manipulateLanguage(SiteLanguage $language, Country $country): SiteLanguage
     {
         $configuration = $language->toArray();
-        $configuration['hreflang'] = LanguageService::manipulateHreflang($language, $country);
+        $configuration['hreflang'] = LanguageManipulationService::getHreflang($language, $country);
 
         return new SiteLanguage(
             $language->getLanguageId(),
             $language->getLocale(),
-            LanguageService::manipulateBase($language, $country),
+            LanguageManipulationService::getBase($language, $country),
             $configuration
         );
     }

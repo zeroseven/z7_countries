@@ -16,7 +16,7 @@ use TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent as OriginalEvent;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
-use Zeroseven\Countries\Service\LanguageService;
+use Zeroseven\Countries\Service\LanguageManipulationService;
 use Zeroseven\Countries\Service\TCAService;
 
 class ModifyHrefLangTagsEvent
@@ -99,7 +99,7 @@ class ModifyHrefLangTagsEvent
                     // Set country variants of given language
                     foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
                         if (!TCAService::hasCountryConfiguration($this->tableName) || $this->pageExists($language, $country)) {
-                            $hreflangTags[LanguageService::manipulateHreflang($language, $country)] = LanguageService::manipulateBase($language, $country) . $path;
+                            $hreflangTags[LanguageManipulationService::getHreflang($language, $country)] = LanguageManipulationService::getBase($language, $country) . $path;
                         }
                     }
                 }
