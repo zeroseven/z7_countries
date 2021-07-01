@@ -36,13 +36,17 @@ class CountryService
 
     public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
     {
-        if (($modeColumn = TCAService::getModeColumn($table)) && ($listColumn = TCAService::getListColumn($table))) {
+        if (($modeColumn = TCAService::getModeColumn($table)) && $listColumn = TCAService::getListColumn($table)) {
             if (empty($row) || !isset($row[$modeColumn], $row[$listColumn])) {
                 $row = (array)BackendUtility::getRecord($table, $uid, $modeColumn . ',' . $listColumn);
             }
 
             if ($row[$modeColumn]) {
-                return array_filter($row[$listColumn] === '' ? [] : array_map(static function ($uid) {
+                if ($row[$listColumn] === '') {
+                    return [];
+                }
+
+                return array_filter(array_map(static function ($uid) {
                     return self::getCountryByUid($uid);
                 }, GeneralUtility::intExplode(',', (string)$row[$listColumn])));
             }
