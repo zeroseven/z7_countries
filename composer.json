@@ -24,11 +24,6 @@
       "Zeroseven\\Countries\\": "Classes"
     }
   },
-  "extra": {
-    "typo3/cms": {
-      "extension-key": "z7_countries"
-    }
-  },
   "replace": {
     "zeroseven/z7-countries": "self.version"
   },
