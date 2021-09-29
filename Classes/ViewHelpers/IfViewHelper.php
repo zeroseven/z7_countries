@@ -39,7 +39,10 @@ class IfViewHelper extends AbstractConditionViewHelper
     public static function verdict(array $arguments, RenderingContextInterface $renderingContext): bool
     {
         $countryData = ($country = self::getCountry()) ? $country->toArray() : null;
-        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])));
+        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])), static function($v) {
+            return $v !== null;
+        });
+
 
         if (count($conditionalArguments) !== 1) {
             throw new Exception('Please use exactly one condition in ' . __CLASS__, 4685421754);
