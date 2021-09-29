@@ -7,7 +7,8 @@ namespace Zeroseven\Countries\Model;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject;
-use Zeroseven\Countries\Exception\CountryException as Exception;
+use Zeroseven\Countries\Exception\CountryException;
+use Zeroseven\Countries\Exception\ValidationException;
 
 class Country
 {
@@ -19,7 +20,7 @@ class Country
         // Check required fields of a valid country object
         foreach (['uid', 'title', 'iso_code', 'parameter'] as $property) {
             if (empty($row[$property])) {
-                throw new Exception(sprintf('Required property "%s" is missing. Instance of %s cannot be created.', $property, __CLASS__), 1625127363);
+                throw new CountryException(sprintf('Required property "%s" is missing. Instance of %s cannot be created.', $property, __CLASS__), 1625127363);
             }
         }
 
@@ -48,15 +49,15 @@ class Country
             return $value->getUid();
         }
 
-        return null;
+        throw new ValidationException(sprintf('Value of type "%s" in %s cannot be interpreted as an integer or string.', gettype($value), __CLASS__), 1625127364);
     }
 
     protected function setValue(string $key, $value)
     {
-        $castedValue = self::castValue($value);
-
-        if ($castedValue === null) {
-            throw new Exception(sprintf('Value of field "%s" in %s can not be interpreted to an integer or string.', $key, __CLASS__), 1625127364);
+        try {
+            $castedValue = self::castValue($value);
+        } catch (ValidationException $e) {
+            throw new ValidationException(sprintf('Value of field "%s" in %s cannot be interpreted as an integer or string.', $key, __CLASS__), 1625127364);
         }
 
         return $this->data[$key] = $castedValue;
