@@ -34,21 +34,32 @@ class Country
         return GeneralUtility::makeInstance(self::class, $row);
     }
 
+    public static function castValue($value)
+    {
+        if (is_string($value) || is_null($value)) {
+            return (string)$value;
+        }
+
+        if (is_int($value) || MathUtility::canBeInterpretedAsInteger($value)) {
+            return (int)$value;
+        }
+
+        if ($value instanceof AbstractDomainObject) {
+            return $value->getUid();
+        }
+
+        return null;
+    }
+
     protected function setValue(string $key, $value)
     {
-        if (is_int($value) || MathUtility::canBeInterpretedAsInteger($value)) {
-            return $this->data[$key] = (int)$value;
+        $castedValue = self::castValue($value);
+
+        if ($castedValue === null) {
+            throw new Exception(sprintf('Value of field "%s" in %s can not be interpreted to an integer or string.', $key, __CLASS__), 1625127364);
         }
 
-        if (is_string($value) || is_null($value)) {
-            return $this->data[$key] = (string)$value;
-        }
-
-        if (is_object($value) && $value instanceof AbstractDomainObject) {
-            return $this->data[$key] = $value->getUid();
-        }
-
-        throw new Exception(sprintf('Value of field "%s" in %s can not be interpreted to an integer or string.', $key, __CLASS__), 1625127364);
+        return $this->data[$key] = $castedValue;
     }
 
     protected function getValue(string $key)
