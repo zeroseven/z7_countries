@@ -85,6 +85,26 @@ $country->isDemocratic(); // Returns true or false for the field 'democratic'
 $country->setTitle('Brand new Zealand');
 ```
 
+###  Country condition ViewHelpers
+
+With the extension's own ViewHelpers it's possible to create country dependent structures in a template.
+For this‚ you can use any parameter that is available in the `Country` object.
+
+```html
+<html xmlns:countries="http://typo3.org/ns/Zeroseven/Countries/ViewHelpers" data-namespace-typo3-fluid="true">
+    <countries:if isoCode="IT">🍕</countries:if>
+
+    <countries:if uid="4">🥙</countries:if>
+
+    <countries:if title="Deutschland">🍺</countries:if>
+
+    <countries:if isoCode="FR">
+        <countries:then>🥖</countries:then>
+        <countries:else>🍞</countries:else>
+    </countries:if>
+</html>
+```
+
 ## Editor:
 
 ### Adjust country settings for a data record:
@@ -114,4 +134,3 @@ We are currently still in development with this extension. In the near future, y
 * Middleware for automatic redirects
 * Country menu via a simple viewHelper and dataprocessor
 * Extended language menu via a viewHelper and dataprocessor
-* A country condition viewHelper
