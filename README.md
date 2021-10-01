@@ -85,7 +85,9 @@ $country->isDemocratic(); // Returns true or false for the field 'democratic'
 $country->setTitle('Brand new Zealand');
 ```
 
-###  Country condition ViewHelpers
+###  Country template condition
+
+#### ViewHelpers
 
 With the extension's own ViewHelpers it's possible to create country dependent structures in a template.
 For this‚ you can use any parameter that is available in the `Country` object.
@@ -103,6 +105,26 @@ For this‚ you can use any parameter that is available in the `Country` object.
         <countries:else>🍞</countries:else>
     </countries:if>
 </html>
+```
+
+#### TypoScript conditions
+
+In the TypoScript setup, settings can be defined depending on the selected country.
+For this, the `Country` Model is available for [Conditions](https://docs.typo3.org/m/typo3/reference-typoscript/master/en-us/Conditions/Index.html).
+
+```typo3_typoscript
+# Define uid of contact page
+settings.contactPageUid = 5
+
+# Overwrite page uid for italy
+[country.getUid() === 2]
+settings.contactPageUid = 8
+[global]
+
+# Overwrite page uid for germany and austria
+[country.getIsoCode() in ['DE','AT']]
+settings.contactPageUid = 12
+[global]
 ```
 
 ## Editor:
