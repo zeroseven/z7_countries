@@ -1,6 +1,6 @@
 <?php
 return [
     'typoscript' => [
-        \Zeroseven\Countries\ExpressionLanguage\CountryConditionProvider::class
+        \Zeroseven\Countries\ExpressionLanguage\TypoScriptConditionProvider::class
     ]
 ];
