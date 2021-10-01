@@ -24,8 +24,8 @@ class Country
         }
 
         // Store data in object
-        foreach ($row as $key => $value) {
-            $this->setValue($key, $value);
+        foreach ($row as $propertyName => $value) {
+            $this->setProperty($propertyName, $value);
         }
     }
 
@@ -51,30 +51,30 @@ class Country
         throw new ValidationException(sprintf('Value of type "%s" in %s cannot be interpreted as an integer or string.', gettype($value), __CLASS__), 1625127364);
     }
 
-    protected function setValue(string $key, $value)
+    protected function setProperty(string $propertyName, $value)
     {
-        $key = GeneralUtility::underscoredToLowerCamelCase($key);
+        $propertyName = GeneralUtility::underscoredToLowerCamelCase($propertyName);
 
         try {
             $castedValue = self::castValue($value);
         } catch (ValidationException $e) {
-            throw new ValidationException(sprintf('Value of field "%s" in %s cannot be interpreted as an integer or string.', $key, __CLASS__), 1625127364);
+            throw new ValidationException(sprintf('Value of field "%s" in %s cannot be interpreted as an integer or string.', $propertyName, __CLASS__), 1625127364);
         }
 
-        return $this->data[$key] = $castedValue;
+        return $this->data[$propertyName] = $castedValue;
     }
 
-    public function getValue(string $key)
+    public function getProperty(string $propertyName)
     {
-        return $this->data[$key];
+        return $this->data[$propertyName];
     }
 
     public function toArray(): array
     {
         $array = [];
 
-        foreach ($this->data as $key => $value) {
-            $array[GeneralUtility::camelCaseToLowerCaseUnderscored($key)] = $value;
+        foreach ($this->data as $propertyName => $value) {
+            $array[GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName)] = $value;
         }
 
         return $array;
@@ -84,10 +84,10 @@ class Country
     {
         if (preg_match('/(get|set|has|is)((?:[A-Z][a-z]+)+)/', $name, $matches)) {
             $action = $matches[1];
-            $key = lcfirst($matches[2]);
+            $propertyName = lcfirst($matches[2]);
 
             // Check if key exists in data array
-            if (array_key_exists($key, $this->data)) {
+            if (array_key_exists($propertyName, $this->data)) {
 
                 // Get/check value
                 if ($action === 'get' || $action === 'has' || $action === 'is') {
@@ -95,7 +95,7 @@ class Country
                         throw new CountryException(sprintf('The method "%s()" in class %s does not allow any arguments.', $name, __CLASS__), 1625127366);
                     }
 
-                    return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
+                    return $action === 'get' ? $this->getProperty($propertyName) : (bool)$this->getProperty($propertyName);
                 }
 
                 // Set value
@@ -104,7 +104,7 @@ class Country
                         throw new CountryException(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
                     }
 
-                    return $this->setValue($key, $arguments[0]);
+                    return $this->setProperty($propertyName, $arguments[0]);
                 }
             }
         }

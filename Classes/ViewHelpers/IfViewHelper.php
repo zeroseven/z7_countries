@@ -34,9 +34,8 @@ class IfViewHelper extends AbstractConditionViewHelper
             return $v !== null;
         });
 
-
         if (count($conditionalArguments) !== 1) {
-            throw new Exception('Please use exactly one condition in ' . __CLASS__, 4685421754);
+            throw new Exception('Please use exactly one condition in ' . __CLASS__, 1633110558);
         }
 
         if (isset($arguments['isset'])) {
@@ -44,7 +43,7 @@ class IfViewHelper extends AbstractConditionViewHelper
         }
 
         foreach ($conditionalArguments as $argument => $value) {
-            if ($country->getValue($argument) === Country::castValue($value, $argument)) {
+            if ($country->getProperty($argument) === Country::castValue($value, $argument)) {
                 return true;
             }
         }
