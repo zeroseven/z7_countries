@@ -16,7 +16,6 @@ class Country
 
     public function __construct(array $row)
     {
-
         // Check required fields of a valid country object
         foreach (['uid', 'title', 'iso_code', 'parameter'] as $property) {
             if (empty($row[$property])) {
@@ -54,6 +53,8 @@ class Country
 
     protected function setValue(string $key, $value)
     {
+        $key = GeneralUtility::underscoredToLowerCamelCase($key);
+
         try {
             $castedValue = self::castValue($value);
         } catch (ValidationException $e) {
@@ -70,14 +71,20 @@ class Country
 
     public function toArray(): array
     {
-        return $this->data;
+        $array = [];
+
+        foreach ($this->data as $key => $value) {
+            $array[GeneralUtility::camelCaseToLowerCaseUnderscored($key)] = $value;
+        }
+
+        return $array;
     }
 
     public function __call($name, $arguments)
     {
         if (preg_match('/(get|set|has|is)((?:[A-Z][a-z]+)+)/', $name, $matches)) {
             $action = $matches[1];
-            $key = GeneralUtility::camelCaseToLowerCaseUnderscored($matches[2]);
+            $key = lcfirst($matches[2]);
 
             // Check if key exists in data array
             if (array_key_exists($key, $this->data)) {
@@ -85,7 +92,7 @@ class Country
                 // Get/check value
                 if ($action === 'get' || $action === 'has' || $action === 'is') {
                     if (count($arguments)) {
-                        throw new Exception(sprintf('The method "%s()" in class %s does not allow any arguments.', $name, __CLASS__), 1625127366);
+                        throw new CountryException(sprintf('The method "%s()" in class %s does not allow any arguments.', $name, __CLASS__), 1625127366);
                     }
 
                     return $action === 'get' ? $this->getValue($key) : (bool)$this->getValue($key);
@@ -94,7 +101,7 @@ class Country
                 // Set value
                 if ($action === 'set') {
                     if (count($arguments) !== 1) {
-                        throw new Exception(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
+                        throw new CountryException(sprintf('Wrong number of parameters in "%s()" of %s. Please use exactly 1 argument.', $name, __CLASS__), 1625127367);
                     }
 
                     return $this->setValue($key, $arguments[0]);
@@ -102,6 +109,6 @@ class Country
             }
         }
 
-        throw new Exception(sprintf('Method "%s()" not found in %s.', $name, __CLASS__), 1625127368);
+        throw new CountryException(sprintf('Method "%s()" not found in %s.', $name, __CLASS__), 1625127368);
     }
 }

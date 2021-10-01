@@ -6,7 +6,6 @@ namespace Zeroseven\Countries\ExpressionLanguage;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Model\Country;
 
 class CountryConditionFunctionsProvider implements ExpressionFunctionProviderInterface
@@ -35,7 +34,7 @@ class CountryConditionFunctionsProvider implements ExpressionFunctionProviderInt
             $compare = array_map(static function($v) use ($respectCaseAndType) {
                 return $respectCaseAndType ? $v : strtolower((string)$v);
             }, [
-                $country->getValue(GeneralUtility::camelCaseToLowerCaseUnderscored($property)),
+                $country->getValue($property),
                 Country::castValue($value)
             ]);
 

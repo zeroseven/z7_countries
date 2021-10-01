@@ -38,7 +38,7 @@ class IfViewHelper extends AbstractConditionViewHelper
 
     public static function verdict(array $arguments, RenderingContextInterface $renderingContext): bool
     {
-        $countryData = ($country = self::getCountry()) ? $country->toArray() : null;
+        $country = self::getCountry();
         $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])), static function($v) {
             return $v !== null;
         });
@@ -49,11 +49,11 @@ class IfViewHelper extends AbstractConditionViewHelper
         }
 
         if (isset($arguments['isset'])) {
-            return empty($countryData) === !$arguments['isset'];
+            return empty($country) === !$arguments['isset'];
         }
 
         foreach ($conditionalArguments as $argument => $value) {
-            if ($countryData[GeneralUtility::camelCaseToLowerCaseUnderscored($argument)] === Country::castValue($value, $argument)) {
+            if ($country->getValue($argument) === Country::castValue($value, $argument)) {
                 return true;
             }
         }
