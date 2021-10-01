@@ -15,7 +15,7 @@ class IconService
 
     public static function getCountryIdentifier(Country $country): ?string
     {
-        $countryArray = $country->toArray();
+        $countryArray = $country->getRow();
 
         if (($iconColumn = $GLOBALS['TCA'][self::TABLE]['ctrl']['typeicon_column'] ?? null) && $countryArray[$iconColumn] ?? null) {
             if (
@@ -48,7 +48,7 @@ class IconService
     public static function getRecordFlagIdentifier(string $table, int $uid, array $row = null): ?string
     {
         if (is_array($countries = CountryService::getCountriesByRecord($table, $uid, $row))) {
-            $data = count($countries) === 1 && $countries[0] ? $countries[0]->toArray() : [];
+            $data = count($countries) === 1 && $countries[0] ? $countries[0]->getRow() : [];
 
             return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $data);
         }

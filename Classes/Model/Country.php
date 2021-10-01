@@ -12,7 +12,7 @@ use Zeroseven\Countries\Exception\ValidationException;
 
 class Country
 {
-    protected array $data;
+    protected array $properties;
 
     public function __construct(array $row)
     {
@@ -61,19 +61,24 @@ class Country
             throw new ValidationException(sprintf('Value of field "%s" in %s cannot be interpreted as an integer or string.', $propertyName, __CLASS__), 1625127364);
         }
 
-        return $this->data[$propertyName] = $castedValue;
+        return $this->properties[$propertyName] = $castedValue;
     }
 
     public function getProperty(string $propertyName)
     {
-        return $this->data[$propertyName];
+        return $this->properties[$propertyName];
     }
 
     public function toArray(): array
     {
+        return $this->properties;
+    }
+
+    public function getRow(): array
+    {
         $array = [];
 
-        foreach ($this->data as $propertyName => $value) {
+        foreach ($this->properties as $propertyName => $value) {
             $array[GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName)] = $value;
         }
 
@@ -87,7 +92,7 @@ class Country
             $propertyName = lcfirst($matches[2]);
 
             // Check if key exists in data array
-            if (array_key_exists($propertyName, $this->data)) {
+            if (array_key_exists($propertyName, $this->properties)) {
 
                 // Get/check value
                 if ($action === 'get' || $action === 'has' || $action === 'is') {
