@@ -22,17 +22,8 @@ class IfViewHelper extends AbstractConditionViewHelper
 
         // Add dynamic arguments
         foreach ($GLOBALS['TCA']['tx_z7countries_country']['columns'] ?? [] as $key => $value) {
-            $type = 'string';
-
-            if ($value['config']['type'] === 'check') {
-                $type = 'bool';
-            }
-
-            if (strpos($value['config']['eval'] ?? '', 'int') > -1) {
-                $type = 'int';
-            }
-
-            $this->registerArgument(GeneralUtility::underscoredToLowerCamelCase($key), $type, 'If the country matches the "' . $key . '".', false);
+            $propertyName = GeneralUtility::underscoredToLowerCamelCase($key);
+            $this->registerArgument($propertyName, 'mixed', 'If the country matches the "' . $propertyName . '".', false);
         }
     }
 
