@@ -63,7 +63,7 @@ class Country
         return $this->data[$key] = $castedValue;
     }
 
-    protected function getValue(string $key)
+    public function getValue(string $key)
     {
         return $this->data[$key];
     }
