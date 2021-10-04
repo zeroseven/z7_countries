@@ -24,12 +24,18 @@
       "Zeroseven\\Countries\\": "Classes"
     }
   },
-  "replace": {
-    "zeroseven/z7-countries": "self.version"
-  },
   "extra": {
     "typo3/cms": {
       "extension-key": "z7_countries"
     }
+  },
+  "scripts": {
+    "prepare-release": [
+      "rm .editorconfig",
+      "rm .gitattributes",
+      "rm .gitignore",
+      "rm .gitlab-ci.yml",
+      "rm -rf .github"
+    ]
   }
 }
