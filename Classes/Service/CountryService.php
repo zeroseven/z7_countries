@@ -18,59 +18,80 @@ use Zeroseven\Countries\Model\Country;
 
 class CountryService
 {
-    public static function getAllCountries(): array
+    protected static function cacheObject($function, ...$arguments)
     {
+        // Calculate key
+        $key = md5(json_encode($arguments));
+
         // Return from "cache"
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'])) {
-            return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'];
+        if (array_key_exists($key, $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'])) {
+            return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'][$key];
         }
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
-        $queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
+        // Create cache and return value
+        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'][$key] = $function();
+    }
 
-        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['countries'] = array_map(static function ($row) {
-            return Country::makeInstance($row);
-        }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+    public static function getAllCountries(): array
+    {
+        $function = function () {
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
+            $queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
+
+            return array_map(static function ($row) {
+                return Country::makeInstance($row);
+            }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+        };
+
+        return self::cacheObject($function, 'allCountries');
     }
 
     public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
     {
-        if (($modeColumn = TCAService::getModeColumn($table)) && $listColumn = TCAService::getListColumn($table)) {
-            if (empty($row) || !isset($row[$modeColumn], $row[$listColumn])) {
-                $row = (array)BackendUtility::getRecord($table, $uid, $modeColumn . ',' . $listColumn);
-            }
-
-            if ($row[$modeColumn]) {
-                if ($row[$listColumn] === '') {
-                    return [];
+        $function = function () use ($table, $uid, $row) {
+            if (($modeColumn = TCAService::getModeColumn($table)) && $listColumn = TCAService::getListColumn($table)) {
+                if (empty($row) || !isset($row[$modeColumn], $row[$listColumn])) {
+                    $row = (array)BackendUtility::getRecord($table, $uid, $modeColumn . ',' . $listColumn);
                 }
 
-                return array_filter(array_map(static function ($uid) {
-                    return self::getCountryByUid($uid);
-                }, GeneralUtility::intExplode(',', (string)$row[$listColumn])));
-            }
-        }
+                if ($row[$modeColumn]) {
+                    if ($row[$listColumn] === '') {
+                        return [];
+                    }
 
-        return null;
+                    return array_filter(array_map(static function ($uid) {
+                        return self::getCountryByUid($uid);
+                    }, GeneralUtility::intExplode(',', (string)$row[$listColumn])));
+                }
+            }
+
+            return null;
+        };
+
+        return self::cacheObject($function, 'CountriesByRecord', $table, $uid, $row);
     }
 
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
     {
-        if ($languageUid === null) {
-            $context = GeneralUtility::makeInstance(Context::class);
-            $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
-        }
+        $function = function () use ($languageUid, $site) {
+            if ($languageUid === null) {
+                $context = GeneralUtility::makeInstance(Context::class);
+                $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
+            }
 
-        $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
+            $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
 
-        if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
-            return array_filter(array_map(static function ($uid) {
-                return self::getCountryByUid((int)$uid);
-            }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
-        }
+            if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
+                return array_filter(array_map(static function ($uid) {
+                    return self::getCountryByUid((int)$uid);
+                }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
+            }
 
-        return [];
+            return [];
+        };
+
+        return self::cacheObject($function, 'CountriesByLanguageUid', $languageUid, $site ? $site->getIdentifier() : null);
     }
 
     public static function getCountryByParameter(string $countryParameter): ?Country
@@ -97,11 +118,15 @@ class CountryService
 
     public static function getCountryByUri(UriInterface $uri = null): ?Country
     {
-        $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
+        $function = function () use ($uri) {
+            $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
 
-        return
-            preg_match('/^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)
-            && ($countryParameter = $matches[1])
-            && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
+            return
+                preg_match('/^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)
+                && ($countryParameter = $matches[1])
+                && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
+        };
+
+        return self::cacheObject($function, 'CountryByUri', (string)$uri);
     }
 }

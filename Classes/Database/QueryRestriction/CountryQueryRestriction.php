@@ -21,11 +21,6 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return isset($GLOBALS['TYPO3_REQUEST']) && $GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
     }
 
-    protected function getCountry(): ?Country
-    {
-        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['restrictionCountry'] = CountryService::getCountryByUri());
-    }
-
     public static function getExpression(ExpressionBuilder $expressionBuilder, string $table, Country $country = null)
     {
         $mode = TCAService::getModeColumn($table);
@@ -45,7 +40,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         $constraints = [];
 
         if ($this->isFrontend()) {
-            $country = $this->getCountry();
+            $country = CountryService::getCountryByUri();
 
             foreach ($queriedTables as $tableAlias => $tableName) {
                 if (TCAService::hasCountryConfiguration($tableAlias)) {

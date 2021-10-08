@@ -29,8 +29,8 @@ class IfViewHelper extends AbstractConditionViewHelper
 
     public static function verdict(array $arguments, RenderingContextInterface $renderingContext): bool
     {
-        $country = self::getCountry();
-        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])), static function($v) {
+        $country = CountryService::getCountryByUri();
+        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])), static function ($v) {
             return $v !== null;
         });
 
@@ -49,12 +49,5 @@ class IfViewHelper extends AbstractConditionViewHelper
         }
 
         return false;
-    }
-
-    protected static function getCountry(): ?Country
-    {
-        // Cache country in case that there are many viewHelpers on the page
-        return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['conditionCountry']
-            ?? ($GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache']['conditionCountry'] = CountryService::getCountryByUri());
     }
 }
