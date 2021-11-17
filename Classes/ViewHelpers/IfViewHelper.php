@@ -42,6 +42,10 @@ class IfViewHelper extends AbstractConditionViewHelper
             return empty($country) === !$arguments['isset'];
         }
 
+        if (empty($country)) {
+            return false;
+        }
+
         foreach ($conditionalArguments as $argument => $value) {
             if ($country->getProperty($argument) === Country::castValue($value, $argument)) {
                 return true;
