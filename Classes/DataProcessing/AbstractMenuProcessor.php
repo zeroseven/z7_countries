@@ -25,7 +25,7 @@ abstract class AbstractMenuProcessor implements DataProcessorInterface, MenuProc
             return $processedData;
         }
 
-        if($pageId = $cObj->stdWrapValue('pageUid', $processorConfiguration ?? [])) {
+        if ($pageId = $cObj->stdWrapValue('pageUid', $processorConfiguration ?? [])) {
             $this->menuUtility->setPageId($pageId);
         }
 

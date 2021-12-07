@@ -103,7 +103,7 @@ class MenuUtility
             $path = ltrim(str_replace($language->getBase()->getPath(), '', $url, $count), '/');
 
             if ($count) {
-                if(empty($country) && $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages')) {
+                if (empty($country) && $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages')) {
                     return $originalLanguages[$languageId]->getBase() . $path;
                 }
 
