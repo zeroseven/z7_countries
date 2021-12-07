@@ -126,10 +126,8 @@ class MenuUtility
         return $languageId !== null && $languageId === $this->activeLanguageId;
     }
 
-    protected function getCountryMenuItem(Country $country = null, array $languageConfiguration = null): array
+    protected function getCountryMenuItem(Country $country = null, int $languageId = 0): array
     {
-        $languageId = (int)$languageConfiguration['languageId'];
-
         return [
             'data' => $country === null ? [] : $country->toArray(),
             'link' => $this->createLink($languageId, $country),
@@ -189,7 +187,7 @@ class MenuUtility
                 $country = CountryService::getCountryByUid($countryUid);
 
                 if (!isset($menu[$countryUid])) {
-                    $menu[$countryUid] = $this->getCountryMenuItem($country);
+                    $menu[$countryUid] = $this->getCountryMenuItem($country, $this->activeLanguageId);
                 }
 
                 if (!isset($menu[$countryUid]['languages'][$languageId])) {
@@ -214,7 +212,7 @@ class MenuUtility
             foreach ($countryRelations as $countryUid) {
                 $country = CountryService::getCountryByUid($countryUid);
 
-                $menu[$languageId]['countries'][$countryUid] = $this->getCountryMenuItem($country, $languageConfiguration);
+                $menu[$languageId]['countries'][$countryUid] = $this->getCountryMenuItem($country, $languageId);
             }
 
         }
