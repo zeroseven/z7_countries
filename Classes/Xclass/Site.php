@@ -14,7 +14,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
     {
         parent::__construct($identifier, $rootPageId, $configuration);
 
-        // Create instance of LanguageUtility
+        // Sore languages in context
         $context = GeneralUtility::makeInstance(Context::class);
         $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $this));
 
