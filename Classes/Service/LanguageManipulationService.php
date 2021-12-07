@@ -27,7 +27,8 @@ class LanguageManipulationService
         return $string;
     }
 
-    protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null) {
+    protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null)
+    {
         return self::cleanString(preg_replace('/[^a-z]/i', '', $string), $maxLength, $forceLowercase);
     }
 
