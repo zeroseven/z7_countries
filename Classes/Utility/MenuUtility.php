@@ -219,15 +219,4 @@ class MenuUtility
 
         return $menu;
     }
-
-    public function getInternationalMenu(): array
-    {
-        $menu = $this->getCountryMenuItem();
-
-        foreach ($this->getLanguageConfigurations() as $languageConfiguration) {
-            $menu['languages'][$languageConfiguration['languageId']] = $this->getLanguageMenuItem($languageConfiguration);
-        }
-
-        return $menu;
-    }
 }
