@@ -134,7 +134,7 @@ class MenuUtility
             'data' => $country->toArray(),
             'object' => $country,
             'link' => $this->createLink($language, $country),
-            'href' => LanguageManipulationService::getHreflang($language, $country),
+            'hreflang' => LanguageManipulationService::getHreflang($language, $country),
             'available' => $this->isAvailableCountry($country),
             'active' => $this->isActiveCountry($country),
             'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
@@ -149,9 +149,9 @@ class MenuUtility
 
         return [
             'data' => $language->toArray(),
-            'language' => $language,
-            'href' => LanguageManipulationService::getHreflang($language, $country),
+            'object' => $language,
             'link' => $countryAvailable ? $this->createLink($language, $country) : null,
+            'hreflang' => LanguageManipulationService::getHreflang($language, $country),
             'available' => $countryAvailable && $this->isAvailableLanguage($language),
             'active' => $this->isActiveLanguage($language),
             'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
