@@ -8,6 +8,7 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
@@ -25,11 +26,11 @@ class MenuUtility
     /** @var int */
     private $pageId;
 
-    /** @var int */
-    private $activeLanguageId;
-
     /** @var Site */
     private $site;
+
+    /** @var int */
+    private $activeLanguageId;
 
     /** @var Country */
     private $activeCountry;
@@ -40,9 +41,11 @@ class MenuUtility
     /** @var QueryBuilder */
     private $queryBuilder;
 
-    public function __construct(int $pageId = null)
+    public function __construct(int $pageId = null, Site $site = null)
     {
         $this->pageId = $pageId ?: (int)$this->getTypoScriptFrontendController()->id;
+
+        $this->site = $site instanceof Site ? $site : GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId ?: $this->pageId);
 
         $this->activeLanguageId = (int)GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('language', 'id');
 
@@ -52,8 +55,6 @@ class MenuUtility
 
         $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE_NAME);
         $this->queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
-
-        $this->setSite();
     }
 
     protected function getTypoScriptFrontendController(): TypoScriptFrontendController
@@ -61,14 +62,14 @@ class MenuUtility
         return $GLOBALS['TSFE'];
     }
 
-    protected function isAvailableLanguage(int $languageId): bool
+    protected function isAvailableLanguage(SiteLanguage $language): bool
     {
         $constraints = [];
 
-        if ($languageId) {
+        if ($language->getLanguageId()) {
             $constraints[] = $this->queryBuilder->expr()->andX(
                 $this->queryBuilder->expr()->eq('l10n_parent', $this->pageId),
-                $this->queryBuilder->expr()->eq('sys_language_uid', $languageId)
+                $this->queryBuilder->expr()->eq('sys_language_uid', $language->getLanguageId())
             );
         } else {
             $constraints[] = $this->queryBuilder->expr()->eq('uid', $this->pageId);
@@ -96,17 +97,18 @@ class MenuUtility
             ->fetchOne();
     }
 
-    protected function createLink(int $languageId, Country $country = null): ?string
+    protected function createLink(SiteLanguage $language, Country $country = null): ?string
     {
-        if ($url = $this->uriBuilder->reset()->setTargetPageUid($this->pageId)->setLanguage((string)$languageId)->build()) {
-            $language = $this->site->getLanguageById($languageId);
+        $uriBuilder = $this->uriBuilder->reset()->setTargetPageUid($this->pageId);
+
+        if(!empty($language)) {
+            $uriBuilder->setLanguage((string)$language->getLanguageId());
+        }
+
+        if ($url = $uriBuilder->build()) {
             $path = ltrim(str_replace($language->getBase()->getPath(), '', $url, $count), '/');
 
             if ($count) {
-                if (empty($country) && $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages')) {
-                    return $originalLanguages[$languageId]->getBase() . $path;
-                }
-
                 return LanguageManipulationService::getBase($language, $country) . $path;
             }
 
@@ -121,77 +123,60 @@ class MenuUtility
         return empty($country) ? empty($this->activeCountry) : $this->activeCountry && $this->activeCountry->getUid() === $country->getUid();
     }
 
-    protected function isActiveLanguage(int $languageId = null): bool
+    protected function isActiveLanguage(SiteLanguage $language = null): bool
     {
-        return $languageId !== null && $languageId === $this->activeLanguageId;
+        return !empty($language) && $language->getLanguageId() === $this->activeLanguageId;
     }
 
-    protected function getCountryMenuItem(Country $country = null, int $languageId = 0): array
+    protected function getCountryMenuItem(Country $country, SiteLanguage $language = null): array
     {
         return [
-            'data' => $country === null ? [] : $country->toArray(),
-            'link' => $this->createLink($languageId, $country),
+            'data' => $country->toArray(),
+            'object' => $country,
+            'link' => $this->createLink($language, $country),
+            'href' => LanguageManipulationService::getHreflang($language, $country),
             'available' => $this->isAvailableCountry($country),
             'active' => $this->isActiveCountry($country),
-            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($languageId)
+            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
         ];
     }
 
-    protected function getLanguageMenuItem(array $languageConfiguration, Country $country = null, bool $countryAvailable = null): array
+    protected function getLanguageMenuItem(SiteLanguage $language, Country $country = null, bool $countryAvailable = null): array
     {
         if ($countryAvailable === null) {
             $countryAvailable = $this->isAvailableCountry($country);
         }
 
-        $languageId = (int)$languageConfiguration['languageId'];
-
         return [
-            'data' => $languageConfiguration,
-            'link' => $countryAvailable ? $this->createLink($languageId, $country) : null,
-            'available' => $countryAvailable && $this->isAvailableLanguage($languageId),
-            'active' => $this->isActiveLanguage($languageId),
-            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($languageId)
+            'data' => $language->toArray(),
+            'language' => $language,
+            'href' => LanguageManipulationService::getHreflang($language, $country),
+            'link' => $countryAvailable ? $this->createLink($language, $country) : null,
+            'available' => $countryAvailable && $this->isAvailableLanguage($language),
+            'active' => $this->isActiveLanguage($language),
+            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
         ];
-    }
-
-    protected function getLanguageConfigurations(): array
-    {
-        $siteConfiguration = $this->site->getConfiguration();
-
-        return $siteConfiguration['languages'];
-    }
-
-    protected function setSite(int $pageId = null): self
-    {
-        $this->site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId ?: $this->pageId);
-
-        return $this;
     }
 
     public function setPageId(int $pageId): self
     {
         $this->pageId = $pageId;
 
-        return $this->setSite($pageId);
+        return $this;
     }
 
     public function getCountryMenu(): array
     {
         $menu = [];
 
-        foreach ($this->getLanguageConfigurations() as $languageConfiguration) {
-            $languageId = (int)$languageConfiguration['languageId'];
-            $countryRelations = is_string($languageConfiguration['countries']) ? GeneralUtility::intExplode(',', $languageConfiguration['countries']) : $languageConfiguration['countries'];
-
-            foreach ($countryRelations as $countryUid) {
-                $country = CountryService::getCountryByUid($countryUid);
-
-                if (!isset($menu[$countryUid])) {
-                    $menu[$countryUid] = $this->getCountryMenuItem($country, $this->activeLanguageId);
+        foreach ($this->site->getLanguages() as $language) {
+            foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
+                if (!isset($menu[$country->getUid()])) {
+                    $menu[$country->getUid()] = $this->getCountryMenuItem($country, $language);
                 }
 
-                if (!isset($menu[$countryUid]['languages'][$languageId])) {
-                    $menu[$countryUid]['languages'][$languageId] = $this->getLanguageMenuItem($languageConfiguration, $country, $menu[$countryUid]['available']);
+                if (!isset($menu[$country->getUid()]['languages'][$language->getLanguageId()])) {
+                    $menu[$country->getUid()]['languages'][$language->getLanguageId()] = $this->getLanguageMenuItem($language, $country, $menu[$country->getUid()]['available']);
                 }
             }
         }
@@ -203,18 +188,12 @@ class MenuUtility
     {
         $menu = [];
 
-        foreach ($this->getLanguageConfigurations() as $languageConfiguration) {
-            $languageId = (int)$languageConfiguration['languageId'];
-            $countryRelations = is_string($languageConfiguration['countries']) ? GeneralUtility::intExplode(',', $languageConfiguration['countries']) : $languageConfiguration['countries'];
+        foreach ($this->site->getLanguages() as $language) {
+            $menu[$language->getLanguageId()] = $this->getLanguageMenuItem($language);
 
-            $menu[$languageId] = $this->getLanguageMenuItem($languageConfiguration);
-
-            foreach ($countryRelations as $countryUid) {
-                $country = CountryService::getCountryByUid($countryUid);
-
-                $menu[$languageId]['countries'][$countryUid] = $this->getCountryMenuItem($country, $languageId);
+            foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
+                $menu[$language->getLanguageId()]['countries'][$country->getUid()] = $this->getCountryMenuItem($country, $language);
             }
-
         }
 
         return $menu;
