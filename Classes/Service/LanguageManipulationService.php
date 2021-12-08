@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Model\Country;
 
 class LanguageManipulationService
 {
     public const BASE_DELIMITER = '-';
+
+    protected static function getOriginalLanguage(SiteLanguage $language): SiteLanguage
+    {
+        $languageId = $language->getLanguageId();
+        $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages');
+
+        return $originalLanguages[$languageId] ?? $language;
+    }
 
     protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
     {
@@ -37,7 +47,7 @@ class LanguageManipulationService
             return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
         }
 
-        return $language->getBase();
+        return self::getOriginalLanguage($language)->getBase();
     }
 
     public static function getHreflang(SiteLanguage $language, Country $country = null): string
@@ -46,6 +56,6 @@ class LanguageManipulationService
             return self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);
         }
 
-        return $language->getHreflang();
+        return self::getOriginalLanguage($language)->getHreflang();
     }
 }
