@@ -118,7 +118,7 @@ class CountryService
 
     public static function getCountryByUri(UriInterface $uri = null): ?Country
     {
-        $pathFunction = function () use ($uri) {
+        $function = function () use ($uri) {
             $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
 
             return
@@ -127,16 +127,6 @@ class CountryService
                 && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
         };
 
-        $queryFunction = function () use ($uri) {
-            if(preg_match('/[?&]z7_country=(\d+)/', $uri ? $uri->getQuery() : $_SERVER['QUERY_STRING'], $matches)) {
-                return self::getCountryByUid((int)$matches[1]);
-            }
-
-            return null;
-        };
-
-        return
-            self::cacheObject($pathFunction, 'CountryByUri', 'path', (string)$uri) ?:
-            self::cacheObject($queryFunction, 'CountryByUri', 'query', (string)$uri);
+        return self::cacheObject($function, 'CountryByUri', (string)$uri);
     }
 }
