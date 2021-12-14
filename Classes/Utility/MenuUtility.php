@@ -130,14 +130,17 @@ class MenuUtility
 
     protected function getCountryMenuItem(Country $country, SiteLanguage $language = null): array
     {
+        $link = $this->createLink($language, $country);
+        $available = $link && $this->isAvailableCountry($country);
+
         return [
             'data' => $country->toArray(),
             'object' => $country,
-            'link' => $this->createLink($language, $country),
+            'link' => $link,
             'hreflang' => LanguageManipulationService::getHreflang($language, $country),
-            'available' => $this->isAvailableCountry($country),
-            'active' => $this->isActiveCountry($country),
-            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
+            'available' => $available,
+            'active' => $available && $this->isActiveCountry($country),
+            'current' => $available && $this->isActiveCountry($country) && $this->isActiveLanguage($language)
         ];
     }
 
@@ -147,14 +150,16 @@ class MenuUtility
             $countryAvailable = $this->isAvailableCountry($country);
         }
 
+        $available = $countryAvailable && $this->isAvailableLanguage($language);
+
         return [
             'data' => $language->toArray(),
             'object' => $language,
             'link' => $countryAvailable ? $this->createLink($language, $country) : null,
             'hreflang' => LanguageManipulationService::getHreflang($language, $country),
-            'available' => $countryAvailable && $this->isAvailableLanguage($language),
-            'active' => $this->isActiveLanguage($language),
-            'current' => $this->isActiveCountry($country) && $this->isActiveLanguage($language)
+            'available' => $available,
+            'active' => $available && $this->isActiveLanguage($language),
+            'current' => $available && $this->isActiveCountry($country) && $this->isActiveLanguage($language)
         ];
     }
 

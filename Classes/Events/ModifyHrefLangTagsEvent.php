@@ -21,17 +21,17 @@ class ModifyHrefLangTagsEvent
         $menuUtility = GeneralUtility::makeInstance(MenuUtility::class);
 
         foreach ($menuUtility->getLanguageMenu() as $language) {
-            if($language['available'] && $link = $language['link']) {
+            if($language['available']) {
                 if($language['object']->getLanguageId() === 0) {
-                    $hreflang['x-default'] = $link;
+                    $hreflang['x-default'] = $language['link'];
                 }
 
-                $hreflang[$language['hreflang']] = $link;
+                $hreflang[$language['hreflang']] = $language['link'];
             }
 
             foreach ($language['countries'] ?? [] as $country) {
-                if($country['available'] && $link = $country['link']) {
-                    $hreflang[$country['hreflang']] = $link;
+                if($country['available']) {
+                    $hreflang[$country['hreflang']] = $country['link'];
                 }
             }
         }
