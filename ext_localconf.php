@@ -1,6 +1,6 @@
 <?php
 
-defined('TYPO3_MODE') || die('🐰');
+defined('TYPO3') || die('🐰');
 
 // Database manipulation
 $GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'][\Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction::class] = ['disabled' => false];
