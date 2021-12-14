@@ -154,5 +154,3 @@ Now you can check which content is available for any chosen country without any 
 We are currently still in development with this extension. In the near future, you can expect more features, like:
 
 * Middleware for automatic redirects
-* Country menu via a simple viewHelper and dataprocessor
-* Extended language menu via a viewHelper and dataprocessor
