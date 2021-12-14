@@ -7,19 +7,25 @@ namespace Zeroseven\Countries\Xclass;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Context\CountryContext;
+use Zeroseven\Countries\Service\LanguageManipulationService;
 
 class Site extends \TYPO3\CMS\Core\Site\Entity\Site
 {
     public function __construct(string $identifier, int $rootPageId, array $configuration)
     {
+        // Call the "original" Site
         parent::__construct($identifier, $rootPageId, $configuration);
+
+        // Handle languages
+        $originalLanguages = $this->getLanguages();
+        $manipulatedLanguages = LanguageManipulationService::getManipulatedLanguages($originalLanguages);
 
         // Sore languages in context
         $context = GeneralUtility::makeInstance(Context::class);
-        $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $this));
+        $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $originalLanguages, $manipulatedLanguages));
 
-        // Manipulate languages
-        if (!empty($manipulatedLanguages = $context->getPropertyFromAspect('country', 'manipulatedLanguages'))) {
+        // Manipulate site
+        if (!empty($manipulatedLanguages)) {
             $this->languages = $manipulatedLanguages;
         }
     }

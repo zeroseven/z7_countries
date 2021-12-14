@@ -14,14 +14,6 @@ class LanguageManipulationService
 {
     public const BASE_DELIMITER = '-';
 
-    protected static function getOriginalLanguage(SiteLanguage $language): SiteLanguage
-    {
-        $languageId = $language->getLanguageId();
-        $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages');
-
-        return $originalLanguages[$languageId] ?? $language;
-    }
-
     protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
     {
         $string = preg_replace('/[^a-z0-9_-]/i', '', $string);
@@ -35,6 +27,14 @@ class LanguageManipulationService
         }
 
         return $string;
+    }
+
+    protected static function getOriginalLanguage(SiteLanguage $language): SiteLanguage
+    {
+        $languageId = $language->getLanguageId();
+        $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages');
+
+        return $originalLanguages[$languageId] ?? $language;
     }
 
     protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null)
@@ -58,5 +58,31 @@ class LanguageManipulationService
         }
 
         return self::getOriginalLanguage($language)->getHreflang();
+    }
+
+    public static function getManipulatedLanguage(SiteLanguage $language, Country $country): SiteLanguage
+    {
+        $configuration = $language->toArray();
+        $configuration['hreflang'] = LanguageManipulationService::getHreflang($language, $country);
+
+        return new SiteLanguage(
+            $language->getLanguageId(),
+            $language->getLocale(),
+            LanguageManipulationService::getBase($language, $country),
+            $configuration
+        );
+    }
+
+    public static function getManipulatedLanguages(array $originalLanguages): array
+    {
+        $manipulatedLanguages = [];
+
+        if (!empty($country = CountryService::getCountryByUri())) {
+            foreach ($originalLanguages as $originalLanguage) {
+                $manipulatedLanguages[] = self::getManipulatedLanguage($originalLanguage, $country);
+            }
+        }
+
+        return $manipulatedLanguages;
     }
 }

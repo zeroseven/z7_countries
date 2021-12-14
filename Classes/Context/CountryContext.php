@@ -6,51 +6,22 @@ namespace Zeroseven\Countries\Context;
 
 use TYPO3\CMS\Core\Context\AspectInterface;
 use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
-use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
-use Zeroseven\Countries\Model\Country;
-use Zeroseven\Countries\Service\CountryService;
-use Zeroseven\Countries\Service\LanguageManipulationService;
 
 class CountryContext implements AspectInterface
 {
-    /** @var array */
+    /** @var SiteLanguage[] */
     protected $originalLanguages;
 
-    /** @var array */
+    /** @var SiteLanguage[] */
     protected $manipulatedLanguages;
 
-    public function __construct(Site $site)
+    public function __construct(array $originalLanguages, array $manipulatedLanguages)
     {
-        $this->originalLanguages = $site->getLanguages();
-
-        if (!empty($country = CountryService::getCountryByUri())) {
-            foreach ($this->originalLanguages as $originalLanguage) {
-                $this->manipulatedLanguages[] = $this->manipulateLanguage($originalLanguage, $country);
-            }
-        }
+        $this->originalLanguages = $originalLanguages;
+        $this->manipulatedLanguages = $manipulatedLanguages;
     }
 
-    protected function manipulateLanguage(SiteLanguage $language, Country $country): SiteLanguage
-    {
-        $configuration = $language->toArray();
-        $configuration['hreflang'] = LanguageManipulationService::getHreflang($language, $country);
-
-        return new SiteLanguage(
-            $language->getLanguageId(),
-            $language->getLocale(),
-            LanguageManipulationService::getBase($language, $country),
-            $configuration
-        );
-    }
-
-    /**
-     * Fetch common information about the user
-     *
-     * @param string $name
-     * @return int|bool|string|array
-     * @throws AspectPropertyNotFoundException
-     */
     public function get(string $name)
     {
         switch ($name) {
