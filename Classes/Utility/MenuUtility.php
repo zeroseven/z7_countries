@@ -99,17 +99,15 @@ class MenuUtility
 
     protected function createLink(SiteLanguage $language, Country $country = null): ?string
     {
-        $uriBuilder = $this->uriBuilder->reset()->setTargetPageUid($this->pageId);
+        $uriBuilder = $this->uriBuilder->reset()->setTargetPageUid($this->pageId)->setCreateAbsoluteUri(false);
 
         if(!empty($language)) {
             $uriBuilder->setLanguage((string)$language->getLanguageId());
         }
 
         if ($url = $uriBuilder->build()) {
-            $path = ltrim(str_replace($language->getBase()->getPath(), '', $url, $count), '/');
-
-            if ($count) {
-                return LanguageManipulationService::getBase($language, $country) . $path;
+            if(($path = parse_url($url, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
+                return LanguageManipulationService::getBase($language, $country) . substr($path, strlen($languageBase));
             }
 
             return $url;
