@@ -107,6 +107,16 @@ For this‚ you can use any parameter that is available in the `Country` object.
 </html>
 ```
 
+It's also possible to get the current country in fluid with a viewhelper. _Be aware, the country my not selected by the user and therefore can be empty._
+
+```html
+<html xmlns:countries="http://typo3.org/ns/Zeroseven/Countries/ViewHelpers" data-namespace-typo3-fluid="true">
+    <countries:current name="myVar">
+        <span>{myVar.isoCode}</span>
+    </countries:current>
+</html>
+```
+
 #### TypoScript conditions
 
 In the TypoScript setup, settings can be defined depending on the selected country.
