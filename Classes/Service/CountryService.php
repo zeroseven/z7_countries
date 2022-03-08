@@ -34,7 +34,7 @@ class CountryService
 
     public static function getAllCountries(): array
     {
-        $function = function () {
+        $function = static function () {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
             $queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
@@ -49,7 +49,7 @@ class CountryService
 
     public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
     {
-        $function = function () use ($table, $uid, $row) {
+        $function = static function () use ($table, $uid, $row) {
             if (($modeColumn = TCAService::getModeColumn($table)) && $listColumn = TCAService::getListColumn($table)) {
                 if (empty($row) || !isset($row[$modeColumn], $row[$listColumn])) {
                     $row = (array)BackendUtility::getRecord($table, $uid, $modeColumn . ',' . $listColumn);
@@ -61,8 +61,8 @@ class CountryService
                     }
 
                     return array_filter(array_map(static function ($uid) {
-                        return self::getCountryByUid($uid);
-                    }, GeneralUtility::intExplode(',', (string)$row[$listColumn])));
+                        return self::getCountryByUid((int)$uid);
+                    }, is_array($row[$listColumn]) ? $row[$listColumn] : GeneralUtility::intExplode(',', (string)$row[$listColumn])));
                 }
             }
 
@@ -74,7 +74,7 @@ class CountryService
 
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
     {
-        $function = function () use ($languageUid, $site) {
+        $function = static function () use ($languageUid, $site) {
             if ($languageUid === null) {
                 $context = GeneralUtility::makeInstance(Context::class);
                 $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
@@ -118,8 +118,8 @@ class CountryService
 
     public static function getCountryByUri(UriInterface $uri = null): ?Country
     {
-        $function = function () use ($uri) {
-            $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']))->getPath();
+        $function = static function () use ($uri) {
+            $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '')))->getPath();
 
             return
                 preg_match('/^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)

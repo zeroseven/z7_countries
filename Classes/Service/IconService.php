@@ -48,7 +48,7 @@ class IconService
     public static function getRecordFlagIdentifier(string $table, int $uid, array $row = null): ?string
     {
         if (is_array($countries = CountryService::getCountriesByRecord($table, $uid, $row))) {
-            $data = count($countries) === 1 && $countries[0] ? $countries[0]->getRow() : [];
+            $data = count($countries) === 1 && ($countries[0] ?? null) ? $countries[0]->getRow() : [];
 
             return GeneralUtility::makeInstance(IconFactory::class)->mapRecordTypeToIconIdentifier(self::TABLE, $data);
         }
