@@ -69,7 +69,7 @@ class Redirect implements MiddlewareInterface
             if ($language->getTwoLetterIsoCode() === $languageCode) {
                 if ($countryCode && $countries = CountryService::getCountriesByLanguageUid($language->getLanguageId(), $this->site)) {
                     foreach ($countries as $country) {
-                        if(strtolower($country->getIsoCode()) === $countryCode) {
+                        if (strtolower($country->getIsoCode()) === $countryCode) {
                             return (string)LanguageManipulationService::getBase($language, $country);
                         }
                     }
@@ -91,13 +91,7 @@ class Redirect implements MiddlewareInterface
     {
         $this->init($request);
 
-        // Go forwards ...
-        if (!$this->isRootPage() || $this->isLocalReferer() || $this->isDisabled()) {
-            return $handler->handle($request);
-        }
-
-        // Check browser language settings ...
-        if ($languageSettings = $this->getAcceptedLanguages()) {
+        if ($this->isRootPage() && !$this->isLocalReferer() && !$this->isDisabled() && $languageSettings = $this->getAcceptedLanguages()) {
             foreach ($languageSettings as $value) {
                 if ($url = $this->getRedirectUrl($value[0], $value[1])) {
                     return $this->redirect($url);
