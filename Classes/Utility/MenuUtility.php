@@ -101,12 +101,12 @@ class MenuUtility
     {
         $uriBuilder = $this->uriBuilder->reset()->setTargetPageUid($this->pageId)->setCreateAbsoluteUri(false);
 
-        if(!empty($language)) {
+        if (!empty($language)) {
             $uriBuilder->setLanguage((string)$language->getLanguageId());
         }
 
         if ($url = $uriBuilder->build()) {
-            if(($path = parse_url($url, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
+            if (($path = parse_url($url, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
                 return LanguageManipulationService::getBase($language, $country) . substr($path, strlen($languageBase));
             }
 
