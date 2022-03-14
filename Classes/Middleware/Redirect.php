@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -16,8 +17,6 @@ use Zeroseven\Countries\Service\LanguageManipulationService;
 
 class Redirect implements MiddlewareInterface
 {
-    protected const COOKIE_NAME = 'z7countries-redirect';
-
     /** @var ServerRequestInterface */
     protected $request;
 
@@ -48,9 +47,9 @@ class Redirect implements MiddlewareInterface
         return false;
     }
 
-    protected function isRedirected(): bool
+    protected function isDisabled(): bool
     {
-        return (bool)($_COOKIE[self::COOKIE_NAME] ?? false);
+        return (bool)($_COOKIE['disable-language-redirect'] ?? false);
     }
 
     protected function getAcceptedLanguages(): ?array
