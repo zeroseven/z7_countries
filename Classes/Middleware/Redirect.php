@@ -14,25 +14,37 @@ use Zeroseven\Countries\Utility\MenuUtility;
 
 class Redirect implements MiddlewareInterface
 {
-    protected const REDIRECT_HEADER = 'X-Language-Redirect';
+    protected const REDIRECT_HEADER = 'X-z7country-redirect';
 
-    protected function isRootPage(ServerRequestInterface $request): bool
+    /** @var ServerRequestInterface */
+    private $request;
+
+    /** @var RequestHandlerInterface */
+    private $handler;
+
+    protected function init(ServerRequestInterface $request, RequestHandlerInterface $handler): void
     {
-        return $request->getUri()->getPath() === '/';
+        $this->request = $request;
+        $this->handler = $handler;
     }
 
-    protected function isLocalReferer(ServerRequestInterface $request): bool
+    protected function isRootPage(): bool
+    {
+        return $this->request->getUri()->getPath() === '/';
+    }
+
+    protected function isLocalReferer(): bool
     {
         if ($referer = $_SERVER['HTTP_REFERER'] ?? null) {
-            return strtolower(parse_url($referer, PHP_URL_HOST)) === strtolower($request->getUri()->getHost());
+            return strtolower(parse_url($referer, PHP_URL_HOST)) === strtolower($this->request->getUri()->getHost());
         }
 
         return false;
     }
 
-    protected function isDisabled(ServerRequestInterface $request): bool
+    protected function isDisabled(): bool
     {
-        return !empty($request->getHeader(self::REDIRECT_HEADER)) || ($_COOKIE['disable-language-redirect'] ?? false);
+        return !empty($this->request->getHeader(self::REDIRECT_HEADER)) || ($_COOKIE['disable-language-redirect'] ?? false);
     }
 
     protected function getAcceptedLanguages(): ?array
@@ -67,15 +79,21 @@ class Redirect implements MiddlewareInterface
 
     protected function redirect(string $url): ResponseInterface
     {
-        return (new RedirectResponse($url, 307))->withHeader(self::REDIRECT_HEADER, 'z7_countries');
+        if ($url === (string)$this->request->getUri()) {
+            return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'false (same url)');
+        }
+
+        return (new RedirectResponse($url, 307))->withHeader(self::REDIRECT_HEADER, 'true');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $this->init($request, $handler);
+
         if (
-            $this->isRootPage($request)
-            && !$this->isLocalReferer($request)
-            && !$this->isDisabled($request)
+            $this->isRootPage()
+            && !$this->isLocalReferer()
+            && !$this->isDisabled()
             && ($languageSettings = $this->getAcceptedLanguages())
             && ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
         ) {
