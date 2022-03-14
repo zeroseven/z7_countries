@@ -83,20 +83,25 @@ class Redirect implements MiddlewareInterface
         return null;
     }
 
+    protected function redirect(string $url): ResponseInterface
+    {
+        return (new RedirectResponse($url, 302))->withHeader('X-Redirect', 'z7_countries');
+    }
+
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->init($request);
 
-        // Go forwards …
-        if (!$this->isRootPage() || $this->isLocalReferer() || $this->isRedirected()) {
+        // Go forwards ...
+        if (!$this->isRootPage() || $this->isLocalReferer() || $this->isDisabled()) {
             return $handler->handle($request);
         }
 
-        // Check browser language settings
+        // Check browser language settings ...
         if ($languageSettings = $this->getAcceptedLanguages()) {
             foreach ($languageSettings as $value) {
                 if ($url = $this->getRedirectUrl($value[0], $value[1])) {
-//                    die($url);
+                    return $this->redirect($url);
                 }
             }
         }
