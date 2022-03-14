@@ -84,7 +84,7 @@ class Redirect implements MiddlewareInterface
 
     protected function redirect(string $url): ResponseInterface
     {
-        return (new RedirectResponse($url, 302))->withHeader('X-Redirect', 'z7_countries');
+        return (new RedirectResponse($url, 307))->withHeader('X-Redirect', 'z7_countries');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
