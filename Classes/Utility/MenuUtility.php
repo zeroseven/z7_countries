@@ -39,6 +39,17 @@ abstract class AbstractItem
     /** @var bool */
     protected $current;
 
+    /** @return SiteLanguage|Country */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    public function getData(): ?array
+    {
+        return method_exists($this->object, 'toArray') ? $this->object->toArray() : [];
+    }
+
     public function getLink(): string
     {
         return $this->link;
@@ -107,8 +118,8 @@ abstract class AbstractItem
      */
     public function __call($action, $arguments)
     {
-        if (is_callable([$this->object, $action])) {
-            $this->object->$action($arguments);
+        if (is_callable([$this->object, $action]) && preg_match('/^(get|has|is)/', $action)) {
+            return $this->getObject()->$action();
         }
     }
 }
@@ -143,16 +154,16 @@ class LanguageItem extends AbstractItem
     public function hasCountry($country): bool
     {
         if ($country instanceof CountryItem || $country instanceof Country) {
-            return isset($this->countries[$country->getUId()]);
+            return isset($this->countries[$country->getUid()]);
         }
 
         throw new \Exception('Value musst be type of CountryItem or Country', 1647335434);
     }
 
-    public function addCountry(CountryItem $countryItem): self
+    public function addCountryItem(CountryItem $countryItem): self
     {
         if (!$this->hasCountry($countryItem)) {
-            $this->countries[$countryItem->getUId()] = $countryItem;
+            $this->countries[$countryItem->getUid()] = $countryItem;
         }
 
         return $this;
