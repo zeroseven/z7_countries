@@ -47,52 +47,30 @@ class Redirect implements MiddlewareInterface
         return !empty($this->request->getHeader(self::REDIRECT_HEADER)) || ($_COOKIE['disable-language-redirect'] ?? false);
     }
 
-    protected function parseAcceptedLanguages(): ?array
-    {
-        if ($httpAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null) {
-            return array_map(static function ($v) {
-                return preg_match('/^(\w{2})(-(\w{2}))?($|;)/', $v, $matches) ? [$matches[1], $matches[3] ?? null] : null;
-            }, GeneralUtility::trimExplode(',', strtolower($httpAcceptLanguage)));
-        }
-
-        return null;
-    }
-
     protected function getAcceptedLanguages(): ?array
     {
-        if ($acceptedLanguages = $this->parseAcceptedLanguages()) {
-            return array_unique(array_map(static fn($v) => $v[0], $acceptedLanguages));
+        if ($httpAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null) {
+            return array_filter(array_map(static function ($v) {
+                return preg_match('/^(\w{2})(-(\w{2}))?($|;)/', $v, $matches) ? [$matches[1], $matches[3] ?? null] : null;
+            }, GeneralUtility::trimExplode(',', strtolower($httpAcceptLanguage))));
         }
 
         return null;
     }
 
-    protected function getAcceptedCountries(): ?array
+    protected function getRedirectUrl(array $languageMenu, string $languageCode, string $countryCode = null): ?string
     {
-        if ($acceptedLanguages = $this->parseAcceptedLanguages()) {
-            return array_filter(array_unique(array_map(static fn($v) => $v[1], $acceptedLanguages)));
-        }
-
-        return null;
-    }
-
-    protected function getRedirectUrl(array $languagePriority, array $countryPriority): ?string
-    {
-        if ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu()) {
-            foreach ($languagePriority as $languageCode) {
-                foreach ($languageMenu as $language) {
-                    if ($language['available'] && $language['object']->getTwoLetterIsoCode() === $languageCode) {
-                        foreach ($countryPriority as $countryCode) {
-                            foreach ($language['countries'] as $country) {
-                                if ($country['available'] && strtolower($country['object']->getIsoCode()) === $countryCode) {
-                                    return $country['link'];
-                                }
-                            }
+        foreach ($languageMenu as $language) {
+            if ($language['available'] && $language['object']->getTwoLetterIsoCode() === $languageCode) {
+                if ($countryCode && ($language['countries'] ?? null)) {
+                    foreach ($language['countries'] as $country) {
+                        if ($country['available'] && strtolower($country['object']->getIsoCode()) === $countryCode) {
+                            return $country['link'];
                         }
-
-                        return $language['link'];
                     }
                 }
+
+                return $language['link'];
             }
         }
 
@@ -102,7 +80,7 @@ class Redirect implements MiddlewareInterface
     protected function redirect(string $url): ResponseInterface
     {
         if ($url === (string)$this->request->getUri()) {
-            return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'same url');
+            return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'false (same url)');
         }
 
         return (new RedirectResponse($url, 307))->withHeader(self::REDIRECT_HEADER, 'true');
@@ -116,11 +94,14 @@ class Redirect implements MiddlewareInterface
             $this->isRootPage()
             && !$this->isLocalReferer()
             && !$this->isDisabled()
-            && ($languagePriority = $this->getAcceptedLanguages())
-            && ($countryPriority = $this->getAcceptedCountries())
-            && ($url = $this->getRedirectUrl($languagePriority, $countryPriority))
+            && ($languageSettings = $this->getAcceptedLanguages())
+            && ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
         ) {
-            return $this->redirect($url);
+            foreach ($languageSettings as $value) {
+                if ($url = $this->getRedirectUrl($languageMenu, $value[0], $value[1])) {
+                    return $this->redirect($url);
+                }
+            }
         }
 
         return $handler->handle($request);
