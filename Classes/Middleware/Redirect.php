@@ -80,7 +80,7 @@ class Redirect implements MiddlewareInterface
     protected function redirect(string $url): ResponseInterface
     {
         if ($url === (string)$this->request->getUri()) {
-            return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'false (same url)');
+            return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'same url');
         }
 
         return (new RedirectResponse($url, 307))->withHeader(self::REDIRECT_HEADER, 'true');
