@@ -60,17 +60,17 @@ class Redirect implements MiddlewareInterface
 
     protected function getRedirectUrl(array $languageMenu, string $languageCode, string $countryCode = null): ?string
     {
-        foreach ($languageMenu as $language) {
-            if ($language['available'] && $language['object']->getTwoLetterIsoCode() === $languageCode) {
-                if ($countryCode && ($language['countries'] ?? null)) {
-                    foreach ($language['countries'] as $country) {
-                        if ($country['available'] && strtolower($country['object']->getIsoCode()) === $countryCode) {
-                            return $country['link'];
+        foreach ($languageMenu as $languageItem) {
+            if ($languageItem->isAvailable() && $languageItem->getTwoLetterIsoCode() === $languageCode) {
+                if ($countryCode) {
+                    foreach ($languageItem->getCountries() as $countryItem) {
+                        if ($countryItem->isAvailable() && strtolower($countryItem->getIsoCode()) === $countryCode) {
+                            return $countryItem->getLink();
                         }
                     }
                 }
 
-                return $language['link'];
+                return $languageItem->getLink();
             }
         }
 
