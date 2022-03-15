@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
-use Zeroseven\Countries\Exception\CountryException;
 use Zeroseven\Countries\Model\Country;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageManipulationService;
@@ -22,6 +21,9 @@ use Zeroseven\Countries\Service\TCAService;
 
 abstract class AbstractItem
 {
+    /** @var SiteLanguage|Country */
+    protected $object;
+
     /** @var string */
     protected $link;
 
@@ -36,11 +38,6 @@ abstract class AbstractItem
 
     /** @var bool */
     protected $current;
-
-    public static function makeInstance(SiteLanguage $language, Country $country = null, string $className = null): self
-    {
-        return GeneralUtility::makeInstance($className ?: self::class)->setHreflang(LanguageManipulationService::getHreflang($language, $country));
-    }
 
     public function getLink(): string
     {
@@ -101,52 +98,61 @@ abstract class AbstractItem
 
         return $this;
     }
+
+    /**
+     * Pass methods to the object
+     *
+     * @param $action
+     * @param $arguments
+     */
+    public function __call($action, $arguments)
+    {
+        if (is_callable([$this->object, $action])) {
+            $this->object->$action($arguments);
+        }
+    }
 }
 
 class LanguageItem extends AbstractItem
 {
-    /** @var SiteLanguage */
-    protected $language;
-
     /** @var array */
     protected $countries;
 
-    public static function makeInstance(SiteLanguage $language, Country $country = null, string $className = null): self
+    public static function makeInstance(SiteLanguage $language, Country $country = null): self
     {
-        return AbstractItem::makeInstance($language, $country, $className ?: self::class)->setLanguage($language);
+        return GeneralUtility::makeInstance(self::class)->setHreflang(LanguageManipulationService::getHreflang($language, $country))->setLanguage($language);
     }
 
     public function getLanguage(): SiteLanguage
     {
-        return $this->language;
+        return $this->object;
     }
 
     public function setLanguage(SiteLanguage $language): self
     {
-        $this->language = $language;
+        $this->object = $language;
 
         return $this;
     }
 
     public function getCountries(): array
     {
-        return $this->countries;
+        return (array)$this->countries;
     }
 
-    public function hasCountry(Country $country): bool
+    public function hasCountry($country): bool
     {
-        return isset($this->countries[$country->getUid()]);
+        if ($country instanceof CountryItem || $country instanceof Country) {
+            return isset($this->countries[$country->getUId()]);
+        }
+
+        throw new \Exception('Value musst be type of CountryItem or Country', 1647335434);
     }
 
-    public function hasCountryItem(CountryItem $countryItem): bool
+    public function addCountry(CountryItem $countryItem): self
     {
-        return $this->hasCountry($countryItem->getCountry());
-    }
-
-    public function addCountryItem(CountryItem $countryItem): self
-    {
-        if(!$this->hasCountryItem($countryItem)) {
-            $this->countries[$countryItem->getCountry()->getUid()] = $countryItem;
+        if (!$this->hasCountry($countryItem)) {
+            $this->countries[$countryItem->getUId()] = $countryItem;
         }
 
         return $this;
@@ -155,52 +161,44 @@ class LanguageItem extends AbstractItem
 
 class CountryItem extends AbstractItem
 {
-    /** @var Country */
-    protected $country;
-
     /** @var array */
     protected $languages;
 
-    public static function makeInstance(SiteLanguage $language, Country $country = null, string $className = null): self
+    public static function makeInstance(SiteLanguage $language, Country $country): self
     {
-        if ($country === null) {
-            throw new CountryException('Country object is missing', 1647335435);
-        }
-
-        return AbstractItem::makeInstance($language, $country, $className ?: self::class)->setCountry($country);
+        return GeneralUtility::makeInstance(self::class)->setHreflang(LanguageManipulationService::getHreflang($language, $country))->setCountry($country);
     }
 
     public function getCountry(): Country
     {
-        return $this->country;
+        return $this->object;
     }
 
     public function setCountry(Country $country): self
     {
-        $this->country = $country;
+        $this->object = $country;
 
         return $this;
     }
 
     public function getLanguages(): array
     {
-        return $this->languages;
+        return (array)$this->languages;
     }
 
-    public function hasLanguage(SiteLanguage $language): bool
+    public function hasLanguage($language): bool
     {
-        return isset($this->languages[$language->getLanguageId()]);
-    }
+        if ($language instanceof LanguageItem || $language instanceof SiteLanguage) {
+            return isset($this->languages[$language->getLanguageId()]);
+        }
 
-    public function hasLanguageItem(LanguageItem $languageItem): bool
-    {
-        return $this->hasLanguage($languageItem->getLanguage());
+        throw new \Exception('Value musst be type of LanguageItem or SiteLanguage', 1647335435);
     }
 
     public function addLanguageItem(LanguageItem $languageItem): self
     {
-        if(!$this->hasLanguageItem($languageItem)) {
-            $this->languages[$languageItem->getLanguage()->getLanguageId()] = $languageItem;
+        if (!$this->hasLanguage($languageItem)) {
+            $this->languages[$languageItem->getLanguageId()] = $languageItem;
         }
 
         return $this;
@@ -337,7 +335,7 @@ class MenuUtility
         return LanguageItem::makeInstance($language, $country)
             ->setLink((string)($countryAvailable ? $this->createLink($language, $country) : ''))
             ->setAvailable($available)
-            ->setActive( $available && $this->isActiveLanguage($language))
+            ->setActive($available && $this->isActiveLanguage($language))
             ->setCurrent($available && $this->isActiveCountry($country) && $this->isActiveLanguage($language));
     }
 
@@ -358,7 +356,7 @@ class MenuUtility
                     $menu[$country->getUid()] = $this->getCountryMenuItem($language, $country);
                 }
 
-                if(!$menu[$country->getUid()]->hasLanguage($language)) {
+                if (!$menu[$country->getUid()]->hasLanguage($language)) {
                     $menu[$country->getUid()]->addLanguageItem($this->getLanguageMenuItem($language, $country, $menu[$country->getUid()]->isAvailable()));
                 }
             }
