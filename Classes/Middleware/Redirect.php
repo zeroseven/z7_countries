@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Middleware;
 
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -45,6 +46,11 @@ class Redirect implements MiddlewareInterface
     protected function isDisabled(): bool
     {
         return !empty($this->request->getHeader(self::REDIRECT_HEADER)) || ($_COOKIE['disable-language-redirect'] ?? false);
+    }
+
+    protected function isCrawler(): bool
+    {
+        return class_exists(CrawlerDetect::class) && method_exists(CrawlerDetect::class, 'isCrawler') && GeneralUtility::makeInstance(CrawlerDetect::class)->isCrawler();
     }
 
     protected function getAcceptedLanguages(): ?array
@@ -94,6 +100,7 @@ class Redirect implements MiddlewareInterface
             $this->isRootPage()
             && !$this->isLocalReferer()
             && !$this->isDisabled()
+            && !$this->isCrawler()
             && ($languageSettings = $this->getAcceptedLanguages())
             && ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
         ) {
