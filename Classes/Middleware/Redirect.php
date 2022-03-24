@@ -23,6 +23,9 @@ class Redirect implements MiddlewareInterface
     /** @var RequestHandlerInterface */
     private $handler;
 
+    /** @var array */
+    private $languageMenu;
+
     protected function init(ServerRequestInterface $request, RequestHandlerInterface $handler): void
     {
         $this->request = $request;
@@ -64,9 +67,9 @@ class Redirect implements MiddlewareInterface
         return null;
     }
 
-    protected function getRedirectUrl(array $languageMenu, string $languageCode, string $countryCode = null): ?string
+    protected function getRedirectUrl(string $languageCode, string $countryCode = null): ?string
     {
-        foreach ($languageMenu as $language) {
+        foreach ($this->languageMenu as $language) {
             if ($language['available'] && $language['object']->getTwoLetterIsoCode() === $languageCode) {
                 if ($countryCode && ($language['countries'] ?? null)) {
                     foreach ($language['countries'] as $country) {
@@ -102,10 +105,10 @@ class Redirect implements MiddlewareInterface
             && !$this->isDisabled()
             && !$this->isCrawler()
             && ($languageSettings = $this->getAcceptedLanguages())
-            && ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
+            && ($this->languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
         ) {
             foreach ($languageSettings as $value) {
-                if ($url = $this->getRedirectUrl($languageMenu, $value[0], $value[1])) {
+                if ($url = $this->getRedirectUrl($value[0], $value[1])) {
                     return $this->redirect($url);
                 }
             }
