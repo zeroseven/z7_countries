@@ -34,6 +34,10 @@ abstract class AbstractItem
 
     protected bool $current;
 
+    public function __construct(SiteLanguage $language, Country $country = null) {
+        $this->hreflang = LanguageManipulationService::getHreflang($language, $country);
+    }
+
     /** @return SiteLanguage|Country */
     public function getObject()
     {
@@ -123,21 +127,16 @@ class LanguageItem extends AbstractItem
 {
     protected array $countries;
 
-    public static function makeInstance(SiteLanguage $language, Country $country = null): self
+    public function __construct(SiteLanguage $language, Country $country = null)
     {
-        return GeneralUtility::makeInstance(self::class)->setHreflang(LanguageManipulationService::getHreflang($language, $country))->setLanguage($language);
+        parent::__construct($language, $country);
+
+        $this->object = $language;
     }
 
     public function getLanguage(): SiteLanguage
     {
         return $this->object;
-    }
-
-    public function setLanguage(SiteLanguage $language): self
-    {
-        $this->object = $language;
-
-        return $this;
     }
 
     public function getCountries(): array
@@ -168,21 +167,16 @@ class CountryItem extends AbstractItem
 {
     protected array $languages;
 
-    public static function makeInstance(SiteLanguage $language, Country $country): self
+    public function __construct(SiteLanguage $language, Country $country = null)
     {
-        return GeneralUtility::makeInstance(self::class)->setHreflang(LanguageManipulationService::getHreflang($language, $country))->setCountry($country);
+        parent::__construct($language, $country);
+
+        $this->object = $country;
     }
 
     public function getCountry(): Country
     {
         return $this->object;
-    }
-
-    public function setCountry(Country $country): self
-    {
-        $this->object = $country;
-
-        return $this;
     }
 
     public function getLanguages(): array
@@ -320,7 +314,7 @@ class MenuUtility
         $link = $this->createLink($language, $country);
         $available = $link && $this->isAvailableCountry($country);
 
-        return CountryItem::makeInstance($language, $country)
+        return GeneralUtility::makeInstance(CountryItem::class, $language, $country)
             ->setLink((string)$link)
             ->setAvailable($available)
             ->setActive($available && $this->isActiveCountry($country))
@@ -335,7 +329,7 @@ class MenuUtility
 
         $available = $countryAvailable && $this->isAvailableLanguage($language);
 
-        return LanguageItem::makeInstance($language, $country)
+        return GeneralUtility::makeInstance(LanguageItem::class, $language, $country)
             ->setLink((string)($countryAvailable ? $this->createLink($language, $country) : ''))
             ->setAvailable($available)
             ->setActive($available && $this->isActiveLanguage($language))
