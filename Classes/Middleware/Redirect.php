@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Middleware;
 
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,6 +22,9 @@ class Redirect implements MiddlewareInterface
 
     /** @var RequestHandlerInterface */
     private $handler;
+
+    /** @var array */
+    private $languageMenu;
 
     protected function init(ServerRequestInterface $request, RequestHandlerInterface $handler): void
     {
@@ -47,6 +51,11 @@ class Redirect implements MiddlewareInterface
         return !empty($this->request->getHeader(self::REDIRECT_HEADER)) || ($_COOKIE['disable-language-redirect'] ?? false);
     }
 
+    protected function isCrawler(): bool
+    {
+        return class_exists(CrawlerDetect::class) && method_exists(CrawlerDetect::class, 'isCrawler') && GeneralUtility::makeInstance(CrawlerDetect::class)->isCrawler();
+    }
+
     protected function getAcceptedLanguages(): ?array
     {
         if ($httpAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null) {
@@ -58,9 +67,9 @@ class Redirect implements MiddlewareInterface
         return null;
     }
 
-    protected function getRedirectUrl(array $languageMenu, string $languageCode, string $countryCode = null): ?string
+    protected function getRedirectUrl(string $languageCode, string $countryCode = null): ?string
     {
-        foreach ($languageMenu as $languageItem) {
+        foreach ($this->languageMenu as $languageItem) {
             if ($languageItem->isAvailable() && $languageItem->getTwoLetterIsoCode() === $languageCode) {
                 if ($countryCode) {
                     foreach ($languageItem->getCountries() as $countryItem) {
@@ -94,11 +103,12 @@ class Redirect implements MiddlewareInterface
             $this->isRootPage()
             && !$this->isLocalReferer()
             && !$this->isDisabled()
+            && !$this->isCrawler()
             && ($languageSettings = $this->getAcceptedLanguages())
-            && ($languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
+            && ($this->languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
         ) {
             foreach ($languageSettings as $value) {
-                if ($url = $this->getRedirectUrl($languageMenu, $value[0], $value[1])) {
+                if ($url = $this->getRedirectUrl($value[0], $value[1])) {
                     return $this->redirect($url);
                 }
             }

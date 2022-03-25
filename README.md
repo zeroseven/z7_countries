@@ -159,8 +159,27 @@ Now you can check which content is available for any chosen country without any 
 
 ![filter" style](./Documentation/Images/filter.png)
 
-## Upcoming features:
+## Automatic redirect:
 
-We are currently still in development with this extension. In the near future, you can expect more features, like:
+When the start page is called up, an attempt is made to redirect the user to a suitable language/country URL according to his browser settings.
+For this, the following conditions must be met:
 
-* Middleware for automatic redirects
+1. The domain is called without any path
+2. The referer has the same URL origin
+3. No bot could be determined
+
+If you want to **disable** or **override** the automatic redirects, take a look at [TYPO3's middleware API](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/RequestHandling/Index.html#override-ordering-of-middlewares).
+
+### Example of disabling the redirect feature:
+
+The configuration must be provided in `Configuration/RequestMiddlewares.php` of an extension:
+
+```php
+return [
+    'frontend' => [
+        'zeroseven/z7_countries/redirect' => [
+            'disabled' => true
+        ]
+    ]
+];
+```
