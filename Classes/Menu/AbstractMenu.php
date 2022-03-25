@@ -14,7 +14,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
-use Zeroseven\Countries\Menu\Item\AbstractItem;
 use Zeroseven\Countries\Menu\Item\CountryItem;
 use Zeroseven\Countries\Menu\Item\LanguageItem;
 use Zeroseven\Countries\Model\Country;
@@ -122,7 +121,7 @@ abstract class AbstractMenu implements MenuInterface
         return $language !== null && $language->getLanguageId() === $this->activeLanguageId;
     }
 
-    protected function getCountryMenuItem(SiteLanguage $language, Country $country): AbstractItem
+    protected function getCountryMenuItem(SiteLanguage $language, Country $country): CountryItem
     {
         $link = $this->createLink($language, $country);
         $available = $link && $this->isAvailableCountry($country);
@@ -134,7 +133,7 @@ abstract class AbstractMenu implements MenuInterface
             ->setCurrent($available && $this->isActiveCountry($country) && $this->isActiveLanguage($language));
     }
 
-    protected function getLanguageMenuItem(SiteLanguage $language, Country $country = null, bool $countryAvailable = null): AbstractItem
+    protected function getLanguageMenuItem(SiteLanguage $language, Country $country = null, bool $countryAvailable = null): LanguageItem
     {
         if ($countryAvailable === null) {
             $countryAvailable = $this->isAvailableCountry($country);
