@@ -62,7 +62,7 @@ class AfterFormEnginePageInitializedEvent
 
     protected function isMatching(): bool
     {
-        if (($modeField = TCAService::getModeColumn($this->table)) && (int)($this->row[$modeField] ?? null) === 1) {
+        if ($this->languageUid >= 0 && ($modeField = TCAService::getModeColumn($this->table)) && (int)($this->row[$modeField] ?? null) === 1) {
             $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
             $availableCountries = $this->getAvailableCountries();
             $availableCountryUids = array_map(static function ($country) {
