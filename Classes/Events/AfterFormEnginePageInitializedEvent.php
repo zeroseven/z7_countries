@@ -33,14 +33,14 @@ class AfterFormEnginePageInitializedEvent
 
         $this->table = (string)array_key_first($data);
         $this->uid = (int)array_key_first($data[$this->table] ?? []);
-        $this->row = $data[$this->table][$this->uid] ?? null;
+        $this->row = is_array($row = $data[$this->table][$this->uid] ?? null) ? $row : [];
 
-        if (!is_array($this->row) || !count($this->row) || !isset($this->row['pid'])) {
+        if (empty($this->row) || !isset($this->row['pid'])) {
             $this->row = (array)BackendUtility::getRecord($this->table, $this->uid);
         }
 
         $languageField = $GLOBALS['TCA'][$this->table]['ctrl']['languageField'] ?? null;
-        $this->languageUid = (int)((is_array($this->row[$languageField]) ? $this->row[$languageField][0] : $this->row[$languageField]) ?? 0);
+        $this->languageUid = (int)(($this->row[$languageField][0] ?? ($this->row[$languageField] ?? 0)) ?? 0);
 
         $this->pageUid = (int)($this->table === 'pages' ? ($this->languageUid ? $this->row[$GLOBALS['TCA'][$this->table]['ctrl']['transOrigPointerField']] : $this->row['uid']) : $this->row['pid']);
     }

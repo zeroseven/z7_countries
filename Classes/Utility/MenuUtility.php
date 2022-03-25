@@ -121,8 +121,7 @@ abstract class AbstractItem
 
 class LanguageItem extends AbstractItem
 {
-    /** @var array */
-    protected $countries;
+    protected array $countries;
 
     public static function makeInstance(SiteLanguage $language, Country $country = null): self
     {
@@ -143,7 +142,7 @@ class LanguageItem extends AbstractItem
 
     public function getCountries(): array
     {
-        return (array)$this->countries;
+        return $this->countries;
     }
 
     public function hasCountry($country): bool
@@ -167,8 +166,7 @@ class LanguageItem extends AbstractItem
 
 class CountryItem extends AbstractItem
 {
-    /** @var array */
-    protected $languages;
+    protected array $languages;
 
     public static function makeInstance(SiteLanguage $language, Country $country): self
     {
@@ -189,7 +187,7 @@ class CountryItem extends AbstractItem
 
     public function getLanguages(): array
     {
-        return (array)$this->languages;
+        return $this->languages;
     }
 
     public function hasLanguage($language): bool
@@ -291,11 +289,10 @@ class MenuUtility
 
     protected function createLink(SiteLanguage $language, Country $country = null): ?string
     {
-        $uriBuilder = $this->uriBuilder->reset()->setTargetPageUid($this->pageId)->setCreateAbsoluteUri(false);
-
-        if (!empty($language)) {
-            $uriBuilder->setLanguage((string)$language->getLanguageId());
-        }
+        $uriBuilder = $this->uriBuilder->reset()
+            ->setTargetPageUid($this->pageId)
+            ->setCreateAbsoluteUri(false)
+            ->setLanguage((string)$language->getLanguageId());
 
         if ($url = $uriBuilder->build()) {
             if (($path = parse_url($url, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
@@ -310,12 +307,12 @@ class MenuUtility
 
     protected function isActiveCountry(Country $country = null): bool
     {
-        return empty($country) ? empty($this->activeCountry) : $this->activeCountry && $this->activeCountry->getUid() === $country->getUid();
+        return $country === null ? empty($this->activeCountry) : $this->activeCountry && $this->activeCountry->getUid() === $country->getUid();
     }
 
     protected function isActiveLanguage(SiteLanguage $language = null): bool
     {
-        return !empty($language) && $language->getLanguageId() === $this->activeLanguageId;
+        return $language !== null && $language->getLanguageId() === $this->activeLanguageId;
     }
 
     protected function getCountryMenuItem(SiteLanguage $language, Country $country): CountryItem
