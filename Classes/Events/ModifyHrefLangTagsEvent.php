@@ -21,8 +21,8 @@ class ModifyHrefLangTagsEvent
         $menuUtility = GeneralUtility::makeInstance(MenuUtility::class);
 
         foreach ($menuUtility->getLanguageMenu() as $languageItem) {
-            if($languageItem->isAvailable()) {
-                if($languageItem->getLanguage()->getLanguageId() === 0) {
+            if ($languageItem->isAvailable()) {
+                if ($languageItem->getLanguageId() === 0) {
                     $hreflang['x-default'] = $languageItem->getLink();
                 }
 
@@ -30,7 +30,7 @@ class ModifyHrefLangTagsEvent
             }
 
             foreach ($languageItem->getCountries() as $countryItem) {
-                if($countryItem->isAvailable()) {
+                if ($countryItem->isAvailable()) {
                     $hreflang[$countryItem->getHreflang()] = $countryItem->getLink();
                 }
             }
