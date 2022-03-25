@@ -18,7 +18,8 @@
   "require": {
     "typo3/cms-core": "^10.4 || ^11.2",
     "jaybizzle/crawler-detect": "~1.2",
-    "doctrine/dbal": "^2.13.0"
+    "doctrine/dbal": "^2.13.0",
+    "php": "^7.4 || ^8.0"
   },
   "autoload": {
     "psr-4": {

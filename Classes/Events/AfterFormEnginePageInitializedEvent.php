@@ -17,20 +17,15 @@ use Zeroseven\Countries\Service\TCAService;
 
 class AfterFormEnginePageInitializedEvent
 {
-    /** @var string */
-    protected $table;
+    protected string $table;
 
-    /** @var int */
-    protected $uid;
+    protected int $uid;
 
-    /** @var array */
-    protected $row;
+    protected array $row;
 
-    /** @var int */
-    protected $languageUid;
+    protected int $languageUid;
 
-    /** @var int */
-    protected $pageUid;
+    protected int $pageUid;
 
     protected function init(): void
     {

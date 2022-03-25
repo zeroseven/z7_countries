@@ -11,8 +11,7 @@ use Zeroseven\Countries\Utility\MenuUtility;
 
 abstract class AbstractMenuProcessor implements DataProcessorInterface, MenuProcessorInterface
 {
-    /** @var MenuUtility */
-    protected $menuUtility;
+    protected MenuUtility $menuUtility;
 
     public function __construct()
     {

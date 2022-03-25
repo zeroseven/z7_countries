@@ -24,20 +24,15 @@ abstract class AbstractItem
     /** @var SiteLanguage|Country */
     protected $object;
 
-    /** @var string */
-    protected $link;
+    protected string $link;
 
-    /** @var string */
-    protected $hreflang;
+    protected string $hreflang;
 
-    /** @var bool */
-    protected $available;
+    protected bool $available;
 
-    /** @var bool */
-    protected $active;
+    protected bool $active;
 
-    /** @var bool */
-    protected $current;
+    protected bool $current;
 
     /** @return SiteLanguage|Country */
     public function getObject()

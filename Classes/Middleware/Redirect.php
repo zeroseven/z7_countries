@@ -17,14 +17,11 @@ class Redirect implements MiddlewareInterface
 {
     protected const REDIRECT_HEADER = 'X-z7country-redirect';
 
-    /** @var ServerRequestInterface */
-    private $request;
+    private ServerRequestInterface $request;
 
-    /** @var RequestHandlerInterface */
-    private $handler;
+    private RequestHandlerInterface $handler;
 
-    /** @var array */
-    private $languageMenu;
+    private array $languageMenu;
 
     protected function init(ServerRequestInterface $request, RequestHandlerInterface $handler): void
     {
