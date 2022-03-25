@@ -22,7 +22,7 @@ use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageManipulationService;
 use Zeroseven\Countries\Service\TCAService;
 
-abstract class AbstractMenu
+abstract class AbstractMenu implements MenuInterface
 {
     protected const TABLE_NAME = 'pages';
 
@@ -148,6 +148,4 @@ abstract class AbstractMenu
             ->setActive($available && $this->isActiveLanguage($language))
             ->setCurrent($available && $this->isActiveCountry($country) && $this->isActiveLanguage($language));
     }
-
-    abstract public function render(): array;
 }

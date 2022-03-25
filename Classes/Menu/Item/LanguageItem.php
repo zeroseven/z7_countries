@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Menu\Item;
 
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use Zeroseven\Countries\Exception\MenuException;
 use Zeroseven\Countries\Model\Country;
 
 class LanguageItem extends AbstractItem
@@ -34,7 +35,7 @@ class LanguageItem extends AbstractItem
             return isset($this->countries[$country->getUid()]);
         }
 
-        throw new \Exception('Value musst be type of CountryItem or Country', 1647335434);
+        throw new MenuException('Value musst be type of CountryItem or Country', 1647335434);
     }
 
     public function addCountryItem(CountryItem $countryItem): self
