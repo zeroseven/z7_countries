@@ -40,7 +40,7 @@ class AfterFormEnginePageInitializedEvent
         }
 
         $languageField = $GLOBALS['TCA'][$this->table]['ctrl']['languageField'] ?? null;
-        $this->languageUid = (int)(($this->row[$languageField][0] ?? ($this->row[$languageField] ?? 0)) ?? 0);
+        $this->languageUid = (int)($this->row[$languageField][0] ?? ($this->row[$languageField] ?? 0));
 
         $this->pageUid = (int)($this->table === 'pages' ? ($this->languageUid ? $this->row[$GLOBALS['TCA'][$this->table]['ctrl']['transOrigPointerField']] : $this->row['uid']) : $this->row['pid']);
     }
