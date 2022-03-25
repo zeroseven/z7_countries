@@ -55,6 +55,10 @@ class Redirect implements MiddlewareInterface
 
     protected function getAcceptedLanguages(): ?array
     {
+        /**
+         * Returns something like this "de-DE,de;q=0.9,en-US;q=0.8,en;q=0."
+         * as [['de', 'de'], ['de', null], ['en', 'us'], ['en', null]].
+         */
         if ($httpAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null) {
             return array_filter(array_map(static function ($v) {
                 return preg_match('/^(\w{2})(-(\w{2}))?($|;)/', $v, $matches) ? [$matches[1], $matches[3] ?? null] : null;
