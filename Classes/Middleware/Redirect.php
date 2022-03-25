@@ -11,7 +11,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Zeroseven\Countries\Utility\MenuUtility;
+use Zeroseven\Countries\Menu\LanguageMenu;
 
 class Redirect implements MiddlewareInterface
 {
@@ -102,7 +102,7 @@ class Redirect implements MiddlewareInterface
             && !$this->isDisabled()
             && !$this->isCrawler()
             && ($languageSettings = $this->getAcceptedLanguages())
-            && ($this->languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
+            && ($this->languageMenu = GeneralUtility::makeInstance(LanguageMenu::class)->render())
         ) {
             foreach ($languageSettings as $value) {
                 if ($url = $this->getRedirectUrl($value[0], $value[1])) {

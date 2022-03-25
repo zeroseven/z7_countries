@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\DataProcessing;
 
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Zeroseven\Countries\Menu\AbstractMenu;
+use Zeroseven\Countries\Menu\LanguageMenu;
 
-class LanguageMenuProcessor extends AbstractMenuProcessor implements DataProcessorInterface
+class LanguageMenuProcessor extends AbstractMenuProcessor
 {
-    public function renderMenu(ContentObjectRenderer $cObj, array $contentObjectConfiguration, array $processorConfiguration, array $processedData): array
+    public function getMenu(int $pageId = null): AbstractMenu
     {
-        return $this->menuUtility->getLanguageMenu();
+        return GeneralUtility::makeInstance(LanguageMenu::class, $pageId);
     }
 }

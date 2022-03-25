@@ -7,7 +7,7 @@ namespace Zeroseven\Countries\Events;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent as OriginalEvent;
-use Zeroseven\Countries\Utility\MenuUtility;
+use Zeroseven\Countries\Menu\LanguageMenu;
 
 class ModifyHrefLangTagsEvent
 {
@@ -18,9 +18,8 @@ class ModifyHrefLangTagsEvent
         }
 
         $hreflang = [];
-        $menuUtility = GeneralUtility::makeInstance(MenuUtility::class);
 
-        foreach ($menuUtility->getLanguageMenu() as $languageItem) {
+        foreach (GeneralUtility::makeInstance(LanguageMenu::class)->render() as $languageItem) {
             if ($languageItem->isAvailable()) {
                 if ($languageItem->getLanguageId() === 0) {
                     $hreflang['x-default'] = $languageItem->getLink();

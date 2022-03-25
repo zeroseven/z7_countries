@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\DataProcessing;
 
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use Zeroseven\Countries\Menu\AbstractMenu;
 
 interface MenuProcessorInterface
 {
-    public function renderMenu(ContentObjectRenderer $cObj, array $contentObjectConfiguration, array $processorConfiguration, array $processedData): array;
+    public function getMenu(int $pageId = null): AbstractMenu;
 }
