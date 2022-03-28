@@ -11,20 +11,17 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Zeroseven\Countries\Utility\MenuUtility;
+use Zeroseven\Countries\Menu\LanguageMenu;
 
 class Redirect implements MiddlewareInterface
 {
     protected const REDIRECT_HEADER = 'X-z7country-redirect';
 
-    /** @var ServerRequestInterface */
-    private $request;
+    private ServerRequestInterface $request;
 
-    /** @var RequestHandlerInterface */
-    private $handler;
+    private RequestHandlerInterface $handler;
 
-    /** @var array */
-    private $languageMenu;
+    private array $languageMenu;
 
     protected function init(ServerRequestInterface $request, RequestHandlerInterface $handler): void
     {
@@ -58,6 +55,10 @@ class Redirect implements MiddlewareInterface
 
     protected function getAcceptedLanguages(): ?array
     {
+        /**
+         * Returns something like this "de-DE,de;q=0.9,en-US;q=0.8,en;q=0."
+         * as [['de', 'de'], ['de', null], ['en', 'us'], ['en', null]].
+         */
         if ($httpAcceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null) {
             return array_filter(array_map(static function ($v) {
                 return preg_match('/^(\w{2})(-(\w{2}))?($|;)/', $v, $matches) ? [$matches[1], $matches[3] ?? null] : null;
@@ -69,17 +70,17 @@ class Redirect implements MiddlewareInterface
 
     protected function getRedirectUrl(string $languageCode, string $countryCode = null): ?string
     {
-        foreach ($this->languageMenu as $language) {
-            if ($language['available'] && $language['object']->getTwoLetterIsoCode() === $languageCode) {
-                if ($countryCode && ($language['countries'] ?? null)) {
-                    foreach ($language['countries'] as $country) {
-                        if ($country['available'] && strtolower($country['object']->getIsoCode()) === $countryCode) {
-                            return $country['link'];
+        foreach ($this->languageMenu as $languageItem) {
+            if ($languageItem->isAvailable() && $languageItem->getTwoLetterIsoCode() === $languageCode) {
+                if ($countryCode) {
+                    foreach ($languageItem->getCountries() as $countryItem) {
+                        if ($countryItem->isAvailable() && strtolower($countryItem->getIsoCode()) === $countryCode) {
+                            return $countryItem->getLink();
                         }
                     }
                 }
 
-                return $language['link'];
+                return $languageItem->getLink();
             }
         }
 
@@ -105,7 +106,7 @@ class Redirect implements MiddlewareInterface
             && !$this->isDisabled()
             && !$this->isCrawler()
             && ($languageSettings = $this->getAcceptedLanguages())
-            && ($this->languageMenu = GeneralUtility::makeInstance(MenuUtility::class)->getLanguageMenu())
+            && ($this->languageMenu = GeneralUtility::makeInstance(LanguageMenu::class)->render())
         ) {
             foreach ($languageSettings as $value) {
                 if ($url = $this->getRedirectUrl($value[0], $value[1])) {
