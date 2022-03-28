@@ -35,7 +35,7 @@ class LanguageItem extends AbstractItem
             return isset($this->countries[$country->getUid()]);
         }
 
-        throw new MenuException('Value musst be type of CountryItem or Country', 1647335434);
+        throw new MenuException('Value must be type of CountryItem or Country', 1647335434);
     }
 
     public function addCountryItem(CountryItem $countryItem): self

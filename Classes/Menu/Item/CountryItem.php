@@ -35,7 +35,7 @@ class CountryItem extends AbstractItem
             return isset($this->languages[$language->getLanguageId()]);
         }
 
-        throw new MenuException('Value musst be type of LanguageItem or SiteLanguage', 1647335435);
+        throw new MenuException('Value must be type of LanguageItem or SiteLanguage', 1647335435);
     }
 
     public function addLanguageItem(LanguageItem $languageItem): self
