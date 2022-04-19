@@ -36,8 +36,8 @@ class Redirect implements MiddlewareInterface
 
     protected function isLocalReferer(): bool
     {
-        if ($referer = $_SERVER['HTTP_REFERER'] ?? null) {
-            return strtolower(parse_url($referer, PHP_URL_HOST)) === strtolower($this->request->getUri()->getHost());
+        if (($referer = $_SERVER['HTTP_REFERER'] ?? null) && $host = $this->request->getUri()->getHost()) {
+            return strtolower(parse_url($referer, PHP_URL_HOST)) === strtolower($host);
         }
 
         return false;
