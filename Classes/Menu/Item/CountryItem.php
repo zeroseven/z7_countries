@@ -10,7 +10,7 @@ use Zeroseven\Countries\Model\Country;
 
 class CountryItem extends AbstractItem
 {
-    protected array $languages;
+    protected array $languages = [];
 
     public function __construct(SiteLanguage $language, Country $country = null)
     {
