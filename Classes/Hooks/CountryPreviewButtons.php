@@ -29,19 +29,21 @@ class CountryPreviewButtons
     protected ?array $data;
     protected int $languageUid;
     protected int $pageUid;
-    protected ?Site $site;
-    protected ?SiteLanguage $siteLanguage;
+    protected ?Site $site = null;
+    protected ?SiteLanguage $siteLanguage = null;
 
     public function __construct()
     {
         $this->data = $this->getPageRecord();
 
-        $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
-        $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
+        if($this->data !== null) {
+            $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
+            $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
 
-        $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
-        $this->site = $this->getSite();
-        $this->siteLanguage = $this->getSiteLanguage($languageUid);
+            $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
+            $this->site = $this->getSite();
+            $this->siteLanguage = $this->getSiteLanguage($languageUid);
+        }
     }
 
     protected function getPageRecord(): ?array
@@ -77,7 +79,9 @@ class CountryPreviewButtons
     protected function getSite(): ?Site
     {
         try {
-            return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+            if ($this->pageUid) {
+                return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+            }
         } catch (SiteNotFoundException $e) {
         }
 
