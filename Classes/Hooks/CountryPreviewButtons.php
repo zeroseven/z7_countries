@@ -72,6 +72,23 @@ class CountryPreviewButtons
             if ($routeIdentifier === 'record_edit' && isset($queryParams['edit'][self::TABLE]) && $id = array_key_first($queryParams['edit'][self::TABLE])) {
                 return BackendUtility::getRecord(self::TABLE, $id);
             }
+
+            if ($routeIdentifier === 'record_edit' && isset($queryParams['edit']['tt_content']) && $id = array_key_first($queryParams['edit']['tt_content'])) {
+                $languageField = $GLOBALS['TCA']['tt_content']['ctrl']['languageField'];
+                $content = BackendUtility::getRecord('tt_content', $id, 'pid,' . $languageField);
+                $pageUid = (int)($content['pid'] ?? 0);
+                $languageUid = (int)($content[$languageField] ?? 0);
+
+                if ($pageUid) {
+                    if($languageUid > 0) {
+                        $data = BackendUtility::getRecordLocalization(self::TABLE, $pageUid, $languageUid);
+
+                        return $data[0] ?? null;
+                    }
+
+                    return BackendUtility::getRecord(self::TABLE, $pageUid);
+                }
+            }
         }
 
         return null;
