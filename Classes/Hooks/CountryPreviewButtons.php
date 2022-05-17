@@ -160,7 +160,7 @@ class CountryPreviewButtons
                         ])
                     ] : [])
                     ->setTitle('Country:' . $country->getTitle())
-                    ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-view-page', Icon::SIZE_SMALL, IconService::getCountryIdentifier($country)))
+                    ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL, IconService::getCountryIdentifier($country)))
                     ->setDisabled(!$enabled)
                     ->setHref('#');
             }
