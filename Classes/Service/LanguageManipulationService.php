@@ -63,12 +63,12 @@ class LanguageManipulationService
     public static function getManipulatedLanguage(SiteLanguage $language, Country $country): SiteLanguage
     {
         $configuration = $language->toArray();
-        $configuration['hreflang'] = LanguageManipulationService::getHreflang($language, $country);
+        $configuration['hreflang'] = self::getHreflang($language, $country);
 
         return new SiteLanguage(
             $language->getLanguageId(),
             $language->getLocale(),
-            LanguageManipulationService::getBase($language, $country),
+            self::getBase($language, $country),
             $configuration
         );
     }
@@ -84,5 +84,14 @@ class LanguageManipulationService
         }
 
         return $manipulatedLanguages;
+    }
+
+    public static function manipulateUrl(string $internationalUrl, SiteLanguage $language, Country $country = null): ?string
+    {
+        if (($path = parse_url($internationalUrl, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
+            return self::getBase($language, $country) . substr($path, strlen($languageBase));
+        }
+
+        return null;
     }
 }
