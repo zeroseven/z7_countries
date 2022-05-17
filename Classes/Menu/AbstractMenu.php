@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Menu;
 
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -14,6 +16,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
+use Zeroseven\Countries\Exception\RequestTypeException;
 use Zeroseven\Countries\Menu\Item\CountryItem;
 use Zeroseven\Countries\Menu\Item\LanguageItem;
 use Zeroseven\Countries\Model\Country;
@@ -39,6 +42,10 @@ abstract class AbstractMenu implements MenuInterface
 
     public function __construct(int $pageId = null, Site $site = null)
     {
+        if (($request = $GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface && ($applicationType = ApplicationType::fromRequest($request)) && $applicationType->isBackend()) {
+            throw new RequestTypeException(sprintf('The class "%s" cannot be used in the TYPO3 backend. Maybe the class "%s" can help you to generate country urls. 🤷', get_class($this), LanguageManipulationService::class), 1652815364);
+        }
+
         $this->pageId = $pageId ?: (int)$this->getTypoScriptFrontendController()->id;
 
         $this->site = $site instanceof Site ? $site : GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId ?: $this->pageId);
