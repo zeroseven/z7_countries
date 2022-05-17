@@ -9,6 +9,7 @@ use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -50,6 +51,23 @@ class CountryPreviewButtons
         return null;
     }
 
+    protected function needButtons(array $data): bool
+    {
+        $tsConfig = BackendUtility::getPagesTSconfig((int)$data['uid']);
+
+        $excludedDoktypes = array_merge(
+            [
+                PageRepository::DOKTYPE_RECYCLER,
+                PageRepository::DOKTYPE_SYSFOLDER,
+                PageRepository::DOKTYPE_SPACER,
+            ],
+            ($listConfig = $tsConfig['mod.']['web_list.']['noViewWithDokTypes'] ?? null) ? GeneralUtility::intExplode($listConfig) : [],
+            ($pageConfig = $tsConfig['TCEMAIN.']['preview.']['disableButtonForDokType'] ?? null) ? GeneralUtility::intExplode($pageConfig) : [],
+        );
+
+        return !in_array((int)$data['doktype'], $excludedDoktypes, true);
+    }
+
     protected function disablePreview(array &$buttons): void
     {
         foreach ($buttons as $button) {
@@ -67,7 +85,7 @@ class CountryPreviewButtons
     {
         $buttons = $params['buttons'] ?? [];
 
-        if ($data = $this->getPageRecord()) {
+        if (($data = $this->getPageRecord()) && $this->needButtons($data)) {
 
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
