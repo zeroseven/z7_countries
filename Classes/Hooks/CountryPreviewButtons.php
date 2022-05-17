@@ -7,6 +7,7 @@ namespace Zeroseven\Countries\Hooks;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
+use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -42,12 +43,24 @@ class CountryPreviewButtons
             }
 
             if ($routeIdentifier === 'record_edit' && isset($queryParams['edit'][self::TABLE]) && $id = array_key_first($queryParams['edit'][self::TABLE])) {
-                debug($id);
                 return BackendUtility::getRecord(self::TABLE, $id);
             }
         }
 
         return null;
+    }
+
+    protected function disablePreview(array &$buttons): void
+    {
+        foreach ($buttons as $button) {
+            if (is_array($button)) {
+                $this->disablePreview($button);
+            }
+
+            if ($button instanceof LinkButton && $button->getIcon()->getIdentifier() === 'actions-view-page') {
+                $button->setDisabled(true);
+            }
+        }
     }
 
     public function add(array $params, ButtonBar $buttonBar): array
@@ -60,6 +73,11 @@ class CountryPreviewButtons
             $modeField = TCAService::getModeColumn(self::TABLE);
             $listField = TCAService::getListColumn(self::TABLE);
             $enabledCountries = ($list = empty($data[$modeField]) ? null : $data[$listField] ?? null) && is_string($list) ? GeneralUtility::intExplode(',', $list) : [];
+
+            // Disable orginial "actions-view-page" icon
+            if ((int)($data[$modeField] ?? 0) === 1) {
+                $this->disablePreview($buttons);
+            }
 
             foreach (CountryService::getAllCountries() ?: [] as $country) {
                 $enabled = empty($enabledCountries) || in_array($country->getUid(), $enabledCountries, true);
