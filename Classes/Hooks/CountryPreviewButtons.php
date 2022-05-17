@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -36,7 +37,7 @@ class CountryPreviewButtons
     {
         $this->data = $this->getPageRecord();
 
-        if($this->data !== null) {
+        if ($this->data !== null) {
             $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
             $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
 
@@ -146,6 +147,9 @@ class CountryPreviewButtons
             // Get the original preview url
             $url = BackendUtility::getPreviewUrl($this->pageUid, '', null, '', '', '&L=' . $this->siteLanguage->getLanguageId());
 
+            // Button title
+            $title = ($GLOBALS['LANG'] ?? null) instanceof LanguageService ? $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage') : 'Preview';
+
             // Create split button
             foreach (CountryService::getAllCountries() ?: [] as $country) {
                 $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
@@ -159,7 +163,7 @@ class CountryPreviewButtons
                             'newTYPO3frontendWindow'
                         ])
                     ] : [])
-                    ->setTitle('Country:' . $country->getTitle())
+                    ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
                     ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL, IconService::getCountryIdentifier($country)))
                     ->setDisabled(!$enabled)
                     ->setHref('#');
