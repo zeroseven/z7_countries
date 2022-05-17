@@ -137,7 +137,7 @@ class CountryPreviewButtons
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
             $listField = TCAService::getListColumn(self::TABLE);
-            $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) && is_string($list) ? GeneralUtility::intExplode(',', $list) : null;
+            $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) === null ? null : GeneralUtility::intExplode(',', $list);
 
             // Disable original "actions-view-page" icon
             if ((int)($this->data[$modeField] ?? 0) === 1) {
