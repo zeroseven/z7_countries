@@ -10,16 +10,39 @@ use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\IconService;
+use Zeroseven\Countries\Service\LanguageManipulationService;
 use Zeroseven\Countries\Service\TCAService;
 
 class CountryPreviewButtons
 {
     protected const TABLE = 'pages';
+
+    protected ?array $data;
+    protected int $languageUid;
+    protected int $pageUid;
+    protected ?Site $site;
+    protected ?SiteLanguage $siteLanguage;
+
+    public function __construct()
+    {
+        $this->data = $this->getPageRecord();
+
+        $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
+        $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
+
+        $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
+        $this->site = $this->getSite();
+        $this->siteLanguage = $this->getSiteLanguage($languageUid);
+    }
 
     protected function getPageRecord(): ?array
     {
@@ -51,9 +74,28 @@ class CountryPreviewButtons
         return null;
     }
 
-    protected function needButtons(array $data): bool
+    protected function getSite(): ?Site
     {
-        $tsConfig = BackendUtility::getPagesTSconfig((int)$data['uid']);
+        try {
+            return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+        } catch (SiteNotFoundException $e) {
+        }
+
+        return null;
+    }
+
+    protected function getSiteLanguage(int $languageUid): ?SiteLanguage
+    {
+        if (empty($this->site)) {
+            return null;
+        }
+
+        return $this->site->getLanguageById($languageUid);
+    }
+
+    protected function needButtons(): bool
+    {
+        $tsConfig = BackendUtility::getPagesTSconfig($this->pageUid);
 
         $excludedDoktypes = array_merge(
             [
@@ -65,7 +107,7 @@ class CountryPreviewButtons
             ($pageConfig = $tsConfig['TCEMAIN.']['preview.']['disableButtonForDokType'] ?? null) ? GeneralUtility::intExplode($pageConfig) : [],
         );
 
-        return !in_array((int)$data['doktype'], $excludedDoktypes, true);
+        return !in_array((int)$this->data['doktype'], $excludedDoktypes, true);
     }
 
     protected function disablePreview(array &$buttons): void
@@ -75,7 +117,7 @@ class CountryPreviewButtons
                 $this->disablePreview($button);
             }
 
-            if ($button instanceof LinkButton && $button->getIcon()->getIdentifier() === 'actions-view-page') {
+            if ($button instanceof LinkButton && ($icon = $button->getIcon()) && ($icon->getIdentifier() === 'actions-view-page' || $icon->getIdentifier() === 'actions-view')) {
                 $button->setDisabled(true);
             }
         }
@@ -85,29 +127,38 @@ class CountryPreviewButtons
     {
         $buttons = $params['buttons'] ?? [];
 
-        if (($data = $this->getPageRecord()) && $this->needButtons($data)) {
+        if ($this->siteLanguage && $this->needButtons()) {
 
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
             $listField = TCAService::getListColumn(self::TABLE);
-            $enabledCountries = ($list = empty($data[$modeField]) ? null : $data[$listField] ?? null) && is_string($list) ? GeneralUtility::intExplode(',', $list) : [];
+            $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) && is_string($list) ? GeneralUtility::intExplode(',', $list) : null;
 
-            // Disable orginial "actions-view-page" icon
-            if ((int)($data[$modeField] ?? 0) === 1) {
+            // Disable original "actions-view-page" icon
+            if ((int)($this->data[$modeField] ?? 0) === 1) {
                 $this->disablePreview($buttons);
             }
 
-            foreach (CountryService::getAllCountries() ?: [] as $country) {
-                $enabled = empty($enabledCountries) || in_array($country->getUid(), $enabledCountries, true);
+            // Get the original preview url
+            $url = BackendUtility::getPreviewUrl($this->pageUid, '', null, '', '', '&L=' . $this->siteLanguage->getLanguageId());
 
-                $button = $buttonBar->makeLinkButton()
-                    ->setDataAttributes([])
-                    ->setTitle('test')
+            // Create split button
+            foreach (CountryService::getAllCountries() ?: [] as $country) {
+                $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
+
+                $buttons[isset($buttons['left']) ? 'left' : $buttons[array_key_first($buttons)]][self::class][] = $buttonBar->makeLinkButton()
+                    ->setDataAttributes($enabled ? [
+                        'dispatch-action' => 'TYPO3.WindowManager.localOpen',
+                        'dispatch-args' => json_encode([
+                            LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
+                            null,
+                            'newTYPO3frontendWindow'
+                        ])
+                    ] : [])
+                    ->setTitle('Country:' . $country->getTitle())
                     ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-view-page', Icon::SIZE_SMALL, IconService::getCountryIdentifier($country)))
                     ->setDisabled(!$enabled)
                     ->setHref('#');
-
-                $buttons['left'][self::class][] = $button;
             }
         }
 
