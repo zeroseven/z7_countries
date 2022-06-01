@@ -171,7 +171,7 @@ class CountryPreviewButtons
             foreach (CountryService::getAllCountries() ?: [] as $country) {
                 $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
 
-                $buttons[isset($buttons['left']) ? 'left' : $buttons[array_key_first($buttons)]][self::class][] = $buttonBar->makeLinkButton()
+                $buttons[isset($buttons['left']) ? 'left' : $buttons[array_key_first($buttons) ?: 0]][self::class][] = $buttonBar->makeLinkButton()
                     ->setDataAttributes($enabled ? [
                         'dispatch-action' => 'TYPO3.WindowManager.localOpen',
                         'dispatch-args' => json_encode([
