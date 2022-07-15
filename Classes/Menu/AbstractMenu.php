@@ -108,8 +108,8 @@ abstract class AbstractMenu implements MenuInterface
             ->setLanguage((string)$language->getLanguageId());
 
         if ($url = $uriBuilder->build()) {
-            if (($path = parse_url($url, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
-                return LanguageManipulationService::getBase($language, $country) . substr($path, strlen($languageBase));
+            if ($manipulatedUrl = LanguageManipulationService::manipulateUrl($url, $language, $country)) {
+                return $manipulatedUrl;
             }
 
             return $url;

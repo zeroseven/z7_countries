@@ -1,4 +1,15 @@
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Zeroseven\Countries\:
+    resource: '../Classes/*'
+
+  Zeroseven\Countries\Hooks\CountryPreviewButtons:
+    public: true
+
   Zeroseven\Countries\Events\AlterTableDefinitionStatementsEvent:
     tags:
       - name: event.listener
