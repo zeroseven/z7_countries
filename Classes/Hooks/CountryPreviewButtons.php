@@ -14,7 +14,7 @@ use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Routing\UnableToLinkToPageException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -30,20 +30,21 @@ class CountryPreviewButtons
     protected ?array $data;
     protected int $languageUid;
     protected int $pageUid;
-    protected ?Site $site = null;
     protected ?SiteLanguage $siteLanguage = null;
 
-    public function __construct()
+    public function __construct(SiteFinder $siteFinder)
     {
         $this->data = $this->getPageRecord();
 
         if ($this->data !== null) {
             $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
             $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
-
             $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
-            $this->site = $this->getSite();
-            $this->siteLanguage = $this->getSiteLanguage($languageUid);
+            try {
+                $this->siteLanguage = $siteFinder->getSiteByPageId($this->pageUid)->getLanguageById($languageUid);
+            } catch (SiteNotFoundException $e) {
+                // This occurs when the site config is missing or the page is outside any rootline (e.g. global sys_folder)
+            }
         }
     }
 
@@ -80,7 +81,7 @@ class CountryPreviewButtons
                 $languageUid = (int)($content[$languageField] ?? 0);
 
                 if ($pageUid) {
-                    if($languageUid > 0) {
+                    if ($languageUid > 0) {
                         $data = BackendUtility::getRecordLocalization(self::TABLE, $pageUid, $languageUid);
 
                         return $data[0] ?? null;
@@ -94,27 +95,6 @@ class CountryPreviewButtons
         return null;
     }
 
-    protected function getSite(): ?Site
-    {
-        try {
-            if ($this->pageUid) {
-                return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
-            }
-        } catch (SiteNotFoundException $e) {
-        }
-
-        return null;
-    }
-
-    protected function getSiteLanguage(int $languageUid): ?SiteLanguage
-    {
-        if (empty($this->site)) {
-            return null;
-        }
-
-        return $this->site->getLanguageById($languageUid);
-    }
-
     protected function needButtons(): bool
     {
         $tsConfig = BackendUtility::getPagesTSconfig($this->pageUid);
@@ -125,8 +105,8 @@ class CountryPreviewButtons
                 PageRepository::DOKTYPE_SYSFOLDER,
                 PageRepository::DOKTYPE_SPACER,
             ],
-            ($listConfig = $tsConfig['mod.']['web_list.']['noViewWithDokTypes'] ?? null) ? GeneralUtility::intExplode($listConfig) : [],
-            ($pageConfig = $tsConfig['TCEMAIN.']['preview.']['disableButtonForDokType'] ?? null) ? GeneralUtility::intExplode($pageConfig) : [],
+            ($listConfig = $tsConfig['mod.']['web_list.']['noViewWithDokTypes'] ?? null) ? GeneralUtility::intExplode(',', $listConfig, true) : [],
+            ($pageConfig = $tsConfig['TCEMAIN.']['preview.']['disableButtonForDokType'] ?? null) ? GeneralUtility::intExplode(',', $pageConfig, true) : [],
         );
 
         return !in_array((int)$this->data['doktype'], $excludedDoktypes, true);
@@ -145,6 +125,10 @@ class CountryPreviewButtons
         }
     }
 
+    /**
+     * @throws UnableToLinkToPageException
+     * @throws \JsonException
+     */
     public function add(array $params, ButtonBar $buttonBar): array
     {
         $buttons = $params['buttons'] ?? [];
@@ -154,7 +138,7 @@ class CountryPreviewButtons
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
             $listField = TCAService::getListColumn(self::TABLE);
-            $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) === null ? null : GeneralUtility::intExplode(',', $list);
+            $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) === null ? null : GeneralUtility::intExplode(',', $list, true);
 
             // Disable original "actions-view-page" icon
             if ((int)($this->data[$modeField] ?? 0) === 1) {
@@ -178,10 +162,11 @@ class CountryPreviewButtons
                             LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
                             null,
                             'newTYPO3frontendWindow'
-                        ])
+                        ], JSON_THROW_ON_ERROR)
                     ] : [])
                     ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
-                    ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL, IconService::getCountryIdentifier($country)))
+                    ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL,
+                        IconService::getCountryIdentifier($country)))
                     ->setDisabled(!$enabled)
                     ->setHref('#');
             }
