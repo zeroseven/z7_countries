@@ -10,19 +10,19 @@ services:
   Zeroseven\Countries\Hooks\CountryPreviewButtons:
     public: true
 
-  Zeroseven\Countries\Events\AlterTableDefinitionStatementsEvent:
+  Zeroseven\Countries\Event\Listener\AlterTableDefinitionStatementsEvent:
     tags:
       - name: event.listener
         identifier: 'z7_country/add-fields'
         method: 'addCountryConfiguration'
         event: TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent
-  Zeroseven\Countries\Events\ModifyHrefLangTagsEvent:
+  Zeroseven\Countries\Event\Listener\ModifyHrefLangTagsEvent:
     tags:
       - name: event.listener
         identifier: 'z7_country/hreflang'
         after: 'typo3-seo/hreflangGenerator'
         event: TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent
-  Zeroseven\Countries\Events\AfterFormEnginePageInitializedEvent:
+  Zeroseven\Countries\Event\Listener\AfterFormEnginePageInitializedEvent:
     tags:
       - name: event.listener
         identifier: 'z7_country/form-engine'

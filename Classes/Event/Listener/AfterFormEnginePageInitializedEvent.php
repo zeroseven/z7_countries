@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zeroseven\Countries\Events;
+namespace Zeroseven\Countries\Event\Listener;
 
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
