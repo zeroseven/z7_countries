@@ -95,13 +95,13 @@ class Redirect implements MiddlewareInterface
         return null;
     }
 
-    protected function redirect(string $url): ResponseInterface
+    protected function redirect(string $url, int $status): ResponseInterface
     {
         if ($url === (string)$this->request->getUri()) {
             return $this->handler->handle($this->request)->withHeader(self::REDIRECT_HEADER, 'same url');
         }
 
-        return (new RedirectResponse($url, 307))->withHeader(self::REDIRECT_HEADER, 'true');
+        return (new RedirectResponse($url, $status))->withHeader(self::REDIRECT_HEADER, 'true');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -119,7 +119,7 @@ class Redirect implements MiddlewareInterface
             $event = $this->eventDispatcher->dispatch(new RedirectEvent($this->languageMenu, $url));
 
             if ($url = $event->getUrl()) {
-                return $this->redirect($url);
+                return $this->redirect($url, $event->getStatus());
             }
         }
 
