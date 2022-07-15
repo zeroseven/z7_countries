@@ -96,7 +96,7 @@ class AfterFormEnginePageInitializedEvent
                 $this->translate('unavailableLanguage.description', [$languageTitle, $availableCountryNames]),
                 $this->translate('unavailableLanguage.title', [$languageTitle]),
                 FlashMessage::WARNING,
-                true
+                false
             );
 
             $flashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
