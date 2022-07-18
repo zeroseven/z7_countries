@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zeroseven\Countries\Events;
+namespace Zeroseven\Countries\Event\Listener;
 
 use Zeroseven\Countries\Service\TCAService;
 
