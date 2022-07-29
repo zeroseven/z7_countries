@@ -37,7 +37,7 @@ class Redirect implements MiddlewareInterface
 
     protected function isRootPage(): bool
     {
-        return $this->request->getUri()->getPath() === '/';
+        return $this->request->getUri()->getPath() === '/' && empty($this->request->getQueryParams());
     }
 
     protected function isLocalReferer(): bool
