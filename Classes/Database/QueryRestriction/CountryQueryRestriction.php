@@ -18,13 +18,14 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
 {
     protected function isFrontend(): bool
     {
-        return isset($GLOBALS['TYPO3_REQUEST']) && $GLOBALS['TYPO3_REQUEST'] instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
+        return ($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
     }
 
-    public static function getExpression(ExpressionBuilder $expressionBuilder, string $table, Country $country = null)
+    public static function getExpression(ExpressionBuilder $expressionBuilder, string $tableName, Country $country = null, string $tableAlias = null)
     {
-        $mode = TCAService::getModeColumn($table);
-        $list = TCAService::getListColumn($table);
+        $queriedTable = $tableAlias ?: $tableName;
+        $mode = $queriedTable . '.' . TCAService::getModeColumn($tableName);
+        $list = $queriedTable . '.' . TCAService::getListColumn($tableName);
 
         return $country === null ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
             $expressionBuilder->eq($mode, 0),
@@ -43,8 +44,8 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
             $country = CountryService::getCountryByUri();
 
             foreach ($queriedTables as $tableAlias => $tableName) {
-                if (TCAService::hasCountryConfiguration($tableAlias)) {
-                    $constraints[] = self::getExpression($expressionBuilder, $tableAlias, $country);
+                if (TCAService::hasCountryConfiguration($tableName)) {
+                    $constraints[] = self::getExpression($expressionBuilder, $tableName, $country, $tableAlias);
                 }
             }
         }
