@@ -45,7 +45,10 @@ class LanguageManipulationService
     public static function getBase(SiteLanguage $language, Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
-            return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
+            $basePath = $language->getBase()->getPath();
+            $langIsoCode = $language->getTwoLetterIsoCode();
+            $newIsoCode = self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter);
+            return $language->getBase()->withPath(preg_replace('/('.$langIsoCode.'(?!.*'.$langIsoCode.'))/', $newIsoCode, $basePath));
         }
 
         return self::getOriginalLanguage($language)->getBase();
