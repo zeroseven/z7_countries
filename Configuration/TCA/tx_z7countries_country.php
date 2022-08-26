@@ -21,19 +21,35 @@ return [
         ],
         'typeicon_column' => 'flag'
     ],
+    'palettes' => [
+        'visibility' => [
+            'showitem' => 'hidden, enabled',
+            'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.palette.visibility'
+        ]
+    ],
     'types' => [
         '1' => [
-            'showitem' => 'hidden, title, iso_code, parameter, flag'
+            'showitem' => '--palette--;;visibility, title, iso_code, parameter, flag'
         ]
     ],
     'columns' => [
         'hidden' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+            'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.hidden',
             'config' => [
                 'type' => 'check',
                 'items' => [
-                    ['LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.enabled', 1]
+                    ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.hidden.label', 1]
+                ]
+            ]
+        ],
+        'enabled' => [
+            'exclude' => true,
+            'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.enabled',
+            'config' => [
+                'type' => 'check',
+                'items' => [
+                    ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.enabled.label', 1]
                 ]
             ]
         ],
