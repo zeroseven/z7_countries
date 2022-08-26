@@ -10,16 +10,10 @@
 				<source>Visibility</source>
 			</trans-unit>
 			<trans-unit id="tx_z7countries_country.hidden">
-				<source>Hide</source>
-			</trans-unit>
-			<trans-unit id="tx_z7countries_country.hidden.label">
-				<source>Disabled country</source>
-			</trans-unit>
-			<trans-unit id="tx_z7countries_country.enabled">
 				<source>Enabled</source>
 			</trans-unit>
-			<trans-unit id="tx_z7countries_country.enabled.label">
-				<source>Visible in frontend</source>
+			<trans-unit id="tx_z7countries_country.enabled">
+				<source>Visible in Frontend</source>
 			</trans-unit>
 			<trans-unit id="tx_z7countries_country.title">
 				<source>Title</source>

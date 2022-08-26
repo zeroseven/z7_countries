@@ -39,7 +39,7 @@ return [
             'config' => [
                 'type' => 'check',
                 'items' => [
-                    ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.hidden.label', 1]
+                    [0 => '', 'invertStateDisplay' => true]
                 ]
             ]
         ],
@@ -49,7 +49,7 @@ return [
             'config' => [
                 'type' => 'check',
                 'items' => [
-                    ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:tx_z7countries_country.enabled.label', 1]
+                    [0 => '']
                 ]
             ]
         ],
