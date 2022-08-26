@@ -40,7 +40,8 @@ return [
                 'type' => 'check',
                 'items' => [
                     [0 => '', 'invertStateDisplay' => true]
-                ]
+                ],
+                'default' => 0
             ]
         ],
         'enabled' => [
@@ -50,7 +51,8 @@ return [
                 'type' => 'check',
                 'items' => [
                     [0 => '']
-                ]
+                ],
+                'default' => 0
             ]
         ],
         'title' => [
