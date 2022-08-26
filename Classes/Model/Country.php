@@ -10,10 +10,25 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject;
 use Zeroseven\Countries\Exception\CountryException;
 use Zeroseven\Countries\Exception\ValidationException;
 
+/**
+ * @method getUid()
+ * @method setUid()
+ * @method getEnabled()
+ * @method setEnabled()
+ * @method getTitle()
+ * @method setTitle()
+ * @method getIsoCode()
+ * @method setIsoCode()
+ * @method getParameter()
+ * @method setParameter()
+ * @method getFlag()
+ * @method setFlag()
+ */
 class Country
 {
     protected array $properties;
 
+    /** @throws ValidationException | CountryException */
     public function __construct(array $row)
     {
         // Check required fields of a valid country object
@@ -34,6 +49,7 @@ class Country
         return GeneralUtility::makeInstance(self::class, $row);
     }
 
+    /** @throws ValidationException */
     public static function castValue($value)
     {
         if (is_string($value) || is_null($value)) {
@@ -51,6 +67,7 @@ class Country
         throw new ValidationException(sprintf('Value of type "%s" in %s cannot be interpreted as an integer or string.', gettype($value), __CLASS__), 1625127364);
     }
 
+    /** @throws ValidationException */
     protected function setProperty(string $propertyName, $value)
     {
         $propertyName = GeneralUtility::underscoredToLowerCamelCase($propertyName);
@@ -85,6 +102,7 @@ class Country
         return $array;
     }
 
+    /** @throws CountryException | ValidationException */
     public function __call($name, $arguments)
     {
         if (preg_match('/(get|set|has|is)((?:[A-Z][a-z]+)+)/', $name, $matches)) {

@@ -23,7 +23,7 @@ use Zeroseven\Countries\Service\IconService;
 use Zeroseven\Countries\Service\LanguageManipulationService;
 use Zeroseven\Countries\Service\TCAService;
 
-class CountryPreviewButtons
+class CountryPreviewButtons implements HookInterface
 {
     protected const TABLE = 'pages';
 
@@ -173,5 +173,10 @@ class CountryPreviewButtons
         }
 
         return $buttons;
+    }
+
+    public static function register(): void
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Backend\Template\Components\ButtonBar']['getButtonsHook'][self::class] = self::class . '->add';
     }
 }
