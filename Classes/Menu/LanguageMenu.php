@@ -16,7 +16,9 @@ class LanguageMenu extends AbstractMenu
             $menu[$language->getLanguageId()] = $this->getLanguageMenuItem($language);
 
             foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
-                $menu[$language->getLanguageId()]->addCountryItem($this->getCountryMenuItem($language, $country));
+                if ($country->isEnabled()) {
+                    $menu[$language->getLanguageId()]->addCountryItem($this->getCountryMenuItem($language, $country));
+                }
             }
         }
 
