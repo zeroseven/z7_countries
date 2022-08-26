@@ -58,6 +58,7 @@ class TCAService
                         'type' => 'select',
                         'renderType' => 'selectCheckBox',
                         'foreign_table' => 'tx_z7countries_country',
+                        'foreign_table_where' => 'AND tx_z7countries_country.hidden = 0',
                         'default' => ''
                     ]
                 ]
