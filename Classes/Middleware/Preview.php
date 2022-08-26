@@ -12,7 +12,6 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Controller\ErrorPageController;
 use TYPO3\CMS\Core\Http\HtmlResponse;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Page\PageAccessFailureReasons;
@@ -20,17 +19,14 @@ use Zeroseven\Countries\Service\CountryService;
 
 class Preview implements MiddlewareInterface
 {
-    protected function createError(int $errorCode = 403): ResponseInterface
+    protected function createErrorResponse(): ResponseInterface
     {
         $content = GeneralUtility::makeInstance(ErrorPageController::class)->errorAction(
             GeneralUtility::makeInstance(PageAccessFailureReasons::class)->getMessageForReason(PageAccessFailureReasons::LANGUAGE_NOT_AVAILABLE),
             '',
-            AbstractMessage::ERROR,
-            0,
-            $errorCode
         );
 
-        return new HtmlResponse($content, $errorCode);
+        return (new HtmlResponse($content, 403))->withHeader('X-Extension', 'z7_countries');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -42,7 +38,7 @@ class Preview implements MiddlewareInterface
                 if ($context->getPropertyFromAspect('backend.user', 'isLoggedIn', false)) {
                     $context->setAspect('frontend.preview', GeneralUtility::makeInstance(PreviewAspect::class, true));
                 } else {
-                    return $this->createError();
+                    return $this->createErrorResponse();
                 }
             } catch (AspectNotFoundException $e) {
             }
