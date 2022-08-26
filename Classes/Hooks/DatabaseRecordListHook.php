@@ -9,13 +9,14 @@ use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
 use TYPO3\CMS\Recordlist\RecordList\RecordListHookInterface;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\IconService;
 use Zeroseven\Countries\Service\TCAService;
 
-class DatabaseRecordListHook implements RecordListHookInterface
+class DatabaseRecordListHook implements RecordListHookInterface, HookInterface
 {
     protected const PARAMETER = 'tx_z7country';
 
@@ -95,5 +96,11 @@ class DatabaseRecordListHook implements RecordListHookInterface
     public function renderListHeaderActions($table, $currentIdList, $cells, &$parentObject)
     {
         return $cells;
+    }
+
+    public static function register(): void
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.db_list_extra.inc']['actions'][self::class] = self::class;
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][DatabaseRecordList::class]['modifyQuery'][] = self::class;
     }
 }

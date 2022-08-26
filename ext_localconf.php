@@ -10,12 +10,11 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] = ['back
 $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'] = [];
 
 // Register hooks
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\TYPO3\CMS\Core\Imaging\IconFactory::class]['overrideIconOverlay'][] = \Zeroseven\Countries\Hooks\IconFactoryHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][\TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class]['modifyQuery'][] = \Zeroseven\Countries\Hooks\DatabaseRecordListHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.db_list_extra.inc']['actions'][] = \Zeroseven\Countries\Hooks\DatabaseRecordListHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][] = \Zeroseven\Countries\Hooks\DataHandlerHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tceforms_inline.php']['tceformsInlineHook'][] = \Zeroseven\Countries\Hooks\InlineRecordContainerHook::class;
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Backend\Template\Components\ButtonBar']['getButtonsHook'][] = \Zeroseven\Countries\Hooks\CountryPreviewButtons::class . '->add';
+\Zeroseven\Countries\Hooks\IconFactoryHook::register();
+\Zeroseven\Countries\Hooks\DatabaseRecordListHook::register();
+\Zeroseven\Countries\Hooks\DataHandlerHook::register();
+\Zeroseven\Countries\Hooks\InlineRecordContainerHook::register();
+\Zeroseven\Countries\Hooks\CountryPreviewButtons::register();
 
 // Register xclass objects
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Site\Entity\Site::class] = [

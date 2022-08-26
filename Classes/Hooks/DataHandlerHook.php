@@ -7,7 +7,7 @@ namespace Zeroseven\Countries\Hooks;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use Zeroseven\Countries\Service\TCAService;
 
-class DataHandlerHook
+class DataHandlerHook implements HookInterface
 {
     /**
      * Refresh pagetree, if the country configurations have changed on table "pages"
@@ -27,5 +27,10 @@ class DataHandlerHook
         ) {
             $dataHandler->pagetreeNeedsRefresh = true;
         }
+    }
+
+    public static function register(): void
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass'][self::class] = self::class;
     }
 }
