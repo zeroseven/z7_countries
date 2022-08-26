@@ -11,18 +11,19 @@ use Zeroseven\Countries\Exception\CountryException;
 use Zeroseven\Countries\Exception\ValidationException;
 
 /**
- * @method getUid()
  * @method setUid()
- * @method getEnabled()
+ * @method getUid()
  * @method setEnabled()
- * @method getTitle()
+ * @method getEnabled()
+ * @method isEnabled()
  * @method setTitle()
- * @method getIsoCode()
+ * @method getTitle()
  * @method setIsoCode()
- * @method getParameter()
+ * @method getIsoCode()
  * @method setParameter()
- * @method getFlag()
+ * @method getParameter()
  * @method setFlag()
+ * @method getFlag()
  */
 class Country
 {
