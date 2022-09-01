@@ -10,11 +10,11 @@ return [
         ],
         'zeroseven/z7_countries/preview' => [
             'target' => \Zeroseven\Countries\Middleware\Preview::class,
-            'after' => [
+            'before' => [
                 'typo3/cms-frontend/preview-simulator'
             ],
-            'before' => [
-                'typo3/cms-frontend/prepare-tsfe-rendering'
+            'after' => [
+                'typo3/cms-frontend/page-resolver'
             ]
         ]
     ]
