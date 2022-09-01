@@ -6,6 +6,15 @@
 			<trans-unit id="tx_z7countries_country">
 				<source>Country</source>
 			</trans-unit>
+			<trans-unit id="tx_z7countries_country.palette.visibility">
+				<source>Visibility</source>
+			</trans-unit>
+			<trans-unit id="tx_z7countries_country.hidden">
+				<source>Enabled</source>
+			</trans-unit>
+			<trans-unit id="tx_z7countries_country.enabled">
+				<source>Visible in Frontend</source>
+			</trans-unit>
 			<trans-unit id="tx_z7countries_country.title">
 				<source>Title</source>
 			</trans-unit>

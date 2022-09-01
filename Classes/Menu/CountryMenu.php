@@ -14,12 +14,14 @@ class CountryMenu extends AbstractMenu
 
         foreach ($this->site->getLanguages() as $language) {
             foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
-                if (!isset($menu[$country->getUid()])) {
-                    $menu[$country->getUid()] = $this->getCountryMenuItem($language, $country);
-                }
+                if ($country->isEnabled()) {
+                    if (!isset($menu[$country->getUid()])) {
+                        $menu[$country->getUid()] = $this->getCountryMenuItem($language, $country);
+                    }
 
-                if (!$menu[$country->getUid()]->hasLanguage($language)) {
-                    $menu[$country->getUid()]->addLanguageItem($this->getLanguageMenuItem($language, $country, $menu[$country->getUid()]->isAvailable()));
+                    if (!$menu[$country->getUid()]->hasLanguage($language)) {
+                        $menu[$country->getUid()]->addLanguageItem($this->getLanguageMenuItem($language, $country, $menu[$country->getUid()]->isAvailable()));
+                    }
                 }
             }
         }
