@@ -26,7 +26,7 @@ class Preview implements MiddlewareInterface
             '',
         );
 
-        return (new HtmlResponse($content, 403))->withHeader('X-Extension', 'z7_countries');
+        return (new HtmlResponse($content, 404))->withHeader('X-Extension', 'z7_countries');
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
