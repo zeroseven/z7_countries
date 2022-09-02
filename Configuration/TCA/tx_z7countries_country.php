@@ -52,7 +52,7 @@ return [
                 'items' => [
                     [0 => '']
                 ],
-                'default' => 0
+                'default' => 1
             ]
         ],
         'title' => [
