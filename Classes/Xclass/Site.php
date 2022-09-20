@@ -17,7 +17,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         parent::__construct($identifier, $rootPageId, $configuration);
 
         // Handle languages
-        $originalLanguages = $this->getLanguages();
+        $originalLanguages = $this->languages;
         $manipulatedLanguages = LanguageManipulationService::getManipulatedLanguages($originalLanguages);
 
         // Sore languages in context
