@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Xclass;
 
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Error\PageErrorHandler\InvalidPageErrorHandlerException;
+use TYPO3\CMS\Core\Error\PageErrorHandler\PageErrorHandlerInterface;
+use TYPO3\CMS\Core\Error\PageErrorHandler\PageErrorHandlerNotConfiguredException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Context\CountryContext;
+use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\LanguageManipulationService;
 
 class Site extends \TYPO3\CMS\Core\Site\Entity\Site
@@ -28,5 +32,14 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         if (!empty($manipulatedLanguages)) {
             $this->languages = $manipulatedLanguages;
         }
+    }
+
+    public function getErrorHandler(int $statusCode): PageErrorHandlerInterface
+    {
+        if (($this->errorHandlers[$statusCode]['errorHandler'] ?? null) === self::ERRORHANDLER_TYPE_PAGE && ($country = CountryService::getCountryByUri()) && !$country->isEnabled()) {
+            throw new PageErrorHandlerNotConfiguredException(sprintf('Avoid error handler of type page "%s" ', self::ERRORHANDLER_TYPE_PAGE), 1663703635);
+        }
+
+        return parent::getErrorHandler($statusCode);
     }
 }
