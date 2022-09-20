@@ -37,7 +37,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
     public function getErrorHandler(int $statusCode): PageErrorHandlerInterface
     {
         if (($this->errorHandlers[$statusCode]['errorHandler'] ?? null) === self::ERRORHANDLER_TYPE_PAGE && ($country = CountryService::getCountryByUri()) && !$country->isEnabled()) {
-            throw new PageErrorHandlerNotConfiguredException(sprintf('Avoid error handler of type page "%s" ', self::ERRORHANDLER_TYPE_PAGE), 1663703635);
+            throw new PageErrorHandlerNotConfiguredException(sprintf('Configured error handling for "%s" is prevented because the page content is not available for the selected country.', self::ERRORHANDLER_TYPE_PAGE), 1663703635);
         }
 
         return parent::getErrorHandler($statusCode);
