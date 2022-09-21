@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Xclass;
 
 use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Core\Error\PageErrorHandler\InvalidPageErrorHandlerException;
 use TYPO3\CMS\Core\Error\PageErrorHandler\PageErrorHandlerInterface;
 use TYPO3\CMS\Core\Error\PageErrorHandler\PageErrorHandlerNotConfiguredException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
