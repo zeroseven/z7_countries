@@ -152,25 +152,25 @@ class CountryPreviewButtons implements HookInterface
             $title = ($GLOBALS['LANG'] ?? null) instanceof LanguageService ? $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage') : 'Preview';
 
             // Create link buttons
-            $position = isset($buttons['left']) ? 'left' : (array_key_first($buttons) ?? 0);
+            if ($position = isset($buttons['left']) ? 'left' : (array_key_first($buttons) ?? 0)) {
+                foreach (CountryService::getAllCountries() ?: [] as $country) {
+                    $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
 
-            foreach (CountryService::getAllCountries() ?: [] as $country) {
-                $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
-
-                $buttons[$position][self::class][] = $buttonBar->makeLinkButton()
-                    ->setDataAttributes($enabled ? [
-                        'dispatch-action' => 'TYPO3.WindowManager.localOpen',
-                        'dispatch-args' => json_encode([
-                            LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
-                            null,
-                            'newTYPO3frontendWindow'
-                        ], JSON_THROW_ON_ERROR)
-                    ] : [])
-                    ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
-                    ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL,
-                        IconService::getCountryIdentifier($country)))
-                    ->setDisabled(!$enabled)
-                    ->setHref('#');
+                    $buttons[$position][self::class][] = $buttonBar->makeLinkButton()
+                        ->setDataAttributes($enabled ? [
+                            'dispatch-action' => 'TYPO3.WindowManager.localOpen',
+                            'dispatch-args' => json_encode([
+                                LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
+                                null,
+                                'newTYPO3frontendWindow'
+                            ], JSON_THROW_ON_ERROR)
+                        ] : [])
+                        ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
+                        ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL,
+                            IconService::getCountryIdentifier($country)))
+                        ->setDisabled(!$enabled)
+                        ->setHref('#');
+                }
             }
         }
 
