@@ -55,7 +55,7 @@ class CountryService
                     $row = (array)BackendUtility::getRecord($table, $uid, $modeColumn . ',' . $listColumn);
                 }
 
-                if ($row[$modeColumn]) {
+                if (isset($row[$listColumn]) && $row[$modeColumn] ?? null) {
                     if ($row[$listColumn] === '') {
                         return [];
                     }
