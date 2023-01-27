@@ -151,11 +151,13 @@ class CountryPreviewButtons implements HookInterface
             // Button title
             $title = ($GLOBALS['LANG'] ?? null) instanceof LanguageService ? $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage') : 'Preview';
 
-            // Create split button
+            // Create link buttons
+            $position = isset($buttons['left']) ? 'left' : (array_key_first($buttons) ?? 0);
+
             foreach (CountryService::getAllCountries() ?: [] as $country) {
                 $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
 
-                $buttons[isset($buttons['left']) ? 'left' : $buttons[array_key_first($buttons) ?: 0]][self::class][] = $buttonBar->makeLinkButton()
+                $buttons[$position][self::class][] = $buttonBar->makeLinkButton()
                     ->setDataAttributes($enabled ? [
                         'dispatch-action' => 'TYPO3.WindowManager.localOpen',
                         'dispatch-args' => json_encode([
