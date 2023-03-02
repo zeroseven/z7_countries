@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Service;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -34,6 +38,7 @@ class CountryService
 
     public static function getAllCountries(): array
     {
+        /** @throws DBALException | Exception */
         $function = static function () {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_z7countries_country');
@@ -41,7 +46,7 @@ class CountryService
 
             return array_map(static function ($row) {
                 return Country::makeInstance($row);
-            }, (array)$queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+            }, $queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
         };
 
         return self::cacheObject($function, 'allCountries');
@@ -74,13 +79,14 @@ class CountryService
 
     public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
     {
+        /** @throws SiteNotFoundException | AspectNotFoundException */
         $function = static function () use ($languageUid, $site) {
             if ($languageUid === null) {
                 $context = GeneralUtility::makeInstance(Context::class);
                 $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
             }
 
-            $siteConfiguration = ($site ?: GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($GLOBALS['TSFE']->id))->getConfiguration();
+            $siteConfiguration = ($site ?? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($languageUid))->getConfiguration();
 
             if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
                 return array_filter(array_map(static function ($uid) {
