@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Model\Country;
 
@@ -81,17 +82,19 @@ class CountryService
     {
         /** @throws SiteNotFoundException | AspectNotFoundException */
         $function = static function () use ($languageUid, $site) {
-            if ($languageUid === null) {
-                $context = GeneralUtility::makeInstance(Context::class);
-                $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
-            }
+            if (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TSFE']->id) {
+                if ($languageUid === null) {
+                    $context = GeneralUtility::makeInstance(Context::class);
+                    $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
+                }
 
-            $siteConfiguration = ($site ?? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($languageUid))->getConfiguration();
+                $siteConfiguration = ($site ?? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid))->getConfiguration();
 
-            if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
-                return array_filter(array_map(static function ($uid) {
-                    return self::getCountryByUid((int)$uid);
-                }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
+                if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
+                    return array_filter(array_map(static function ($uid) {
+                        return self::getCountryByUid((int)$uid);
+                    }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
+                }
             }
 
             return [];
