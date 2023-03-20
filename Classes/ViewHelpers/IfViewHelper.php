@@ -30,7 +30,7 @@ class IfViewHelper extends AbstractConditionViewHelper
     public static function verdict(array $arguments, RenderingContextInterface $renderingContext): bool
     {
         $country = CountryService::getCountryByUri();
-        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['__thenClosure', '__elseClosures'])), static function ($v) {
+        $conditionalArguments = array_filter(array_diff_key($arguments, array_flip(['else', 'then', '__thenClosure', '__elseClosures'])), static function ($v) {
             return $v !== null;
         });
 
