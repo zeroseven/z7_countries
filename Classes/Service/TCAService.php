@@ -9,9 +9,9 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 class TCAService
 {
     protected const PALETTE_NAME = 'tx_z7countries';
-
+    protected const FIELD_KEY_MODE = 'country_mode';
     protected const FIELD_NAME_MODE = 'tx_z7countries_mode'; // Countries mode, take me home, to the place I belong … 🎶
-
+    protected const FIELD_KEY_LIST = 'country_list';
     protected const FIELD_NAME_LIST = 'tx_z7countries_list';
 
     public static function isDisallowedTable(string $table): bool
@@ -22,10 +22,8 @@ class TCAService
     public static function addEnableColumns(string $table): void
     {
         if (isset($GLOBALS['TCA'][$table]) && !isset($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'])) {
-            $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries'] = [
-                'mode' => self::FIELD_NAME_MODE,
-                'list' => self::FIELD_NAME_LIST
-            ];
+            $GLOBALS['TCA'][$table]['ctrl']['enablecolumns'][self::FIELD_KEY_MODE] = self::FIELD_NAME_MODE;
+            $GLOBALS['TCA'][$table]['ctrl']['enablecolumns'][self::FIELD_KEY_LIST] = self::FIELD_NAME_LIST;
         }
     }
 
@@ -87,12 +85,12 @@ class TCAService
 
     public static function getModeColumn(string $table): ?string
     {
-        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries']['mode'] ?? null;
+        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns'][self::FIELD_KEY_MODE] ?? null;
     }
 
     public static function getListColumn(string $table): ?string
     {
-        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['countries']['list'] ?? null;
+        return $GLOBALS['TCA'][$table]['ctrl']['enablecolumns'][self::FIELD_KEY_LIST] ?? null;
     }
 
     public static function getEnableColumns(string $table): ?array
