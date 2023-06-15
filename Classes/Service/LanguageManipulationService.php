@@ -66,11 +66,10 @@ class LanguageManipulationService
         $configuration['hreflang'] = self::getHreflang($language, $country);
 
         // Disable language if country is not configured
-        $base = $language->isEnabled()
-        && isset($configuration['countries'])
-        && in_array($country->getUid(), GeneralUtility::intExplode(',', (string)$configuration['countries']), true)
-        ? self::getBase($language, $country)
-        : $language->getBase();
+        $base = ($availableCountries = $configuration['countries'] ?? null)
+        && in_array($country->getUid(), GeneralUtility::intExplode(',', (string)$availableCountries), true)
+            ? self::getBase($language, $country)
+            : $language->getBase();
 
         return new SiteLanguage(
             $language->getLanguageId(),
