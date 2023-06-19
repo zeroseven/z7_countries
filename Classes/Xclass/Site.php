@@ -28,7 +28,7 @@ class Site extends \TYPO3\CMS\Core\Site\Entity\Site
         $context->setAspect('country', GeneralUtility::makeInstance(CountryContext::class, $originalLanguages, $manipulatedLanguages));
 
         // Manipulate site
-        if (!empty($manipulatedLanguages)) {
+        if ($manipulatedLanguages !== null) {
             $this->languages = $manipulatedLanguages;
         }
     }

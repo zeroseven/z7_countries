@@ -11,12 +11,12 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 class CountryContext implements AspectInterface
 {
     /** @var SiteLanguage[] */
-    protected $originalLanguages;
+    protected ?array $originalLanguages = null;
 
     /** @var SiteLanguage[] */
-    protected $manipulatedLanguages;
+    protected ?array $manipulatedLanguages = null;
 
-    public function __construct(array $originalLanguages, array $manipulatedLanguages)
+    public function __construct(array $originalLanguages, array $manipulatedLanguages = null)
     {
         $this->originalLanguages = $originalLanguages;
         $this->manipulatedLanguages = $manipulatedLanguages;
@@ -26,9 +26,9 @@ class CountryContext implements AspectInterface
     {
         switch ($name) {
             case 'originalLanguages':
-                return (array)$this->originalLanguages;
+                return $this->originalLanguages;
             case 'manipulatedLanguages':
-                return (array)$this->manipulatedLanguages;
+                return $this->manipulatedLanguages;
         }
 
         throw new AspectPropertyNotFoundException('Property "' . $name . '" not found in Aspect "' . __CLASS__ . '".', 1621452385);
