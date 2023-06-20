@@ -10,6 +10,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
+use TYPO3\CMS\Core\Error\Http\PageNotFoundException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -20,6 +21,7 @@ use Zeroseven\Countries\Service\CountryService;
 
 class DisableInternational implements MiddlewareInterface
 {
+    /** @throws PageNotFoundException */
     protected function createErrorResponse(ServerRequestInterface $request): ResponseInterface
     {
         $reasonCode = PageAccessFailureReasons::LANGUAGE_NOT_AVAILABLE;
@@ -29,7 +31,7 @@ class DisableInternational implements MiddlewareInterface
             ->withHeader('X-Extension', 'z7_countries');
     }
 
-    /** @throws AspectNotFoundException | SiteNotFoundException */
+    /** @throws AspectNotFoundException | SiteNotFoundException | PageNotFoundException */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         return CountryService::getCountryByUri() === null

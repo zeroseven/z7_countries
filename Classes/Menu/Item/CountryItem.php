@@ -29,6 +29,7 @@ class CountryItem extends AbstractItem
         return $this->languages;
     }
 
+    /** @throws MenuException */
     public function hasLanguage($language): bool
     {
         if ($language instanceof LanguageItem || $language instanceof SiteLanguage) {
@@ -38,6 +39,7 @@ class CountryItem extends AbstractItem
         throw new MenuException('Value must be type of LanguageItem or SiteLanguage', 1647335435);
     }
 
+    /** @throws MenuException */
     public function addLanguageItem(LanguageItem $languageItem): self
     {
         if (!$this->hasLanguage($languageItem)) {

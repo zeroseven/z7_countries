@@ -11,12 +11,14 @@ use Zeroseven\Countries\Model\Country;
 class LanguageItem extends AbstractItem
 {
     protected array $countries = [];
+    protected bool $disabled = false;
 
     public function __construct(SiteLanguage $language, Country $country = null)
     {
         parent::__construct($language, $country);
 
         $this->object = $language;
+        $this->disabled = $country === null && ($this->getData()['disable_international'] ?? false);
     }
 
     public function getLanguage(): SiteLanguage
@@ -29,6 +31,7 @@ class LanguageItem extends AbstractItem
         return $this->countries;
     }
 
+    /** @throws MenuException */
     public function hasCountry($country): bool
     {
         if ($country instanceof CountryItem || $country instanceof Country) {
@@ -38,6 +41,7 @@ class LanguageItem extends AbstractItem
         throw new MenuException('Value must be type of CountryItem or Country', 1647335434);
     }
 
+    /** @throws MenuException */
     public function addCountryItem(CountryItem $countryItem): self
     {
         if (!$this->hasCountry($countryItem)) {
@@ -45,5 +49,20 @@ class LanguageItem extends AbstractItem
         }
 
         return $this;
+    }
+
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    public function isEnabled(): bool
+    {
+        return !$this->isDisabled();
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->isEnabled() && parent::isAvailable();
     }
 }
