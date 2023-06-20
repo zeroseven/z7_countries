@@ -82,19 +82,19 @@ class CountryService
     {
         /** @throws SiteNotFoundException | AspectNotFoundException */
         $function = static function () use ($languageUid, $site) {
-            if (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TSFE']->id) {
-                if ($languageUid === null) {
-                    $context = GeneralUtility::makeInstance(Context::class);
-                    $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
-                }
+            if ($languageUid === null) {
+                $context = GeneralUtility::makeInstance(Context::class);
+                $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
+            }
 
-                $siteConfiguration = ($site ?? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid))->getConfiguration();
+            if($site === null && ($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TSFE']->id) {
+                $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid);
+            }
 
-                if ($countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
-                    return array_filter(array_map(static function ($uid) {
-                        return self::getCountryByUid((int)$uid);
-                    }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
-                }
+            if ($site && ($siteConfiguration = $site->getConfiguration()) && $countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
+                return array_filter(array_map(static function ($uid) {
+                    return self::getCountryByUid((int)$uid);
+                }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
             }
 
             return [];
