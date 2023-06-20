@@ -57,20 +57,29 @@ class AfterFormEnginePageInitializedEvent
 
     protected function isMatching(): bool
     {
-        if ($this->languageUid >= 0 && ($modeField = TCAService::getModeColumn($this->table)) && (int)($this->row[$modeField] ?? null) === 1) {
-            $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
-            $availableCountries = $this->getAvailableCountries();
-            $availableCountryUids = array_map(static function ($country) {
-                return $country->getUid();
-            }, $availableCountries);
+        if ($this->languageUid >= 0) {
+            $modeField = TCAService::getModeColumn($this->table);
+            $mode = (int)($this->row[$modeField] ?? null);
 
-            foreach ($configuredCountries as $country) {
-                if (in_array($country->getUid(), $availableCountryUids, true)) {
-                    return true;
-                }
+            if ($mode === 0 && ($this->getSite()->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false)) {
+                return false;
             }
 
-            return false;
+            if ($mode === 1) {
+                $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
+                $availableCountries = $this->getAvailableCountries();
+                $availableCountryUids = array_map(static function ($country) {
+                    return $country->getUid();
+                }, $availableCountries);
+
+                foreach ($configuredCountries as $country) {
+                    if (in_array($country->getUid(), $availableCountryUids, true)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
 
         return true;
