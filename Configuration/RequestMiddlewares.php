@@ -16,6 +16,12 @@ return [
             'after' => [
                 'typo3/cms-frontend/page-resolver'
             ]
+        ],
+        'zeroseven/z7_countries/international' => [
+            'target' => \Zeroseven\Countries\Middleware\DisableInternational::class,
+            'after' => [
+                'typo3/cms-frontend/tsfe'
+            ]
         ]
     ]
 ];
