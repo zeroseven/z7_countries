@@ -66,11 +66,7 @@ class AfterFormEnginePageInitializedEvent
             $modeField = TCAService::getModeColumn($this->table);
             $mode = (int)($this->row[$modeField] ?? null);
 
-            if ($mode === 0 && ($site = $this->getSite()) && ($site->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false)) {
-                return false;
-            }
-
-            if ($mode === 1) {
+            if ($mode === 1 || ($mode > 0 && ($site = $this->getSite()) && ($site->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false))) {
                 $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
                 $availableCountries = $this->getAvailableCountries();
                 $availableCountryUids = array_map(static function ($country) {
