@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Event\Listener;
 
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -45,9 +46,13 @@ class AfterFormEnginePageInitializedEvent
         $this->pageUid = (int)($this->table === 'pages' ? ($this->languageUid ? $this->row[$GLOBALS['TCA'][$this->table]['ctrl']['transOrigPointerField']] : ($this->row['uid'] ?? 0)) : $this->row['pid'] ?? 0);
     }
 
-    protected function getSite(): Site
+    protected function getSite(): ?Site
     {
-        return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+        try {
+            return $this->pageUid ? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid) : null;
+        } catch (SiteNotFoundException $e) {
+            return null;
+        }
     }
 
     protected function getAvailableCountries(): array
@@ -61,7 +66,7 @@ class AfterFormEnginePageInitializedEvent
             $modeField = TCAService::getModeColumn($this->table);
             $mode = (int)($this->row[$modeField] ?? null);
 
-            if ($mode === 0 && ($this->getSite()->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false)) {
+            if ($mode === 0 && ($site = $this->getSite()) && ($site->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false)) {
                 return false;
             }
 
