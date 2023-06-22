@@ -141,7 +141,7 @@ class CountryPreviewButtons implements HookInterface
             $enabledCountries = ($list = empty($this->data[$modeField] ?? null) ? null : $this->data[$listField] ?? null) === null ? null : GeneralUtility::intExplode(',', $list, true);
 
             // Disable original "actions-view-page" icon
-            if ((int)($this->data[$modeField] ?? 0) === 1) {
+            if ((int)($this->data[$modeField] ?? 0) === 1 || ($this->siteLanguage->toArray()['disable_international'] ?? false)) {
                 $this->disablePreview($buttons);
             }
 
