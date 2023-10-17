@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Event\Listener;
 
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Site\Entity\Site;
@@ -45,9 +46,13 @@ class AfterFormEnginePageInitializedEvent
         $this->pageUid = (int)($this->table === 'pages' ? ($this->languageUid ? $this->row[$GLOBALS['TCA'][$this->table]['ctrl']['transOrigPointerField']] : ($this->row['uid'] ?? 0)) : $this->row['pid'] ?? 0);
     }
 
-    protected function getSite(): Site
+    protected function getSite(): ?Site
     {
-        return GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid);
+        try {
+            return $this->pageUid ? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid) : null;
+        } catch (SiteNotFoundException $e) {
+            return null;
+        }
     }
 
     protected function getAvailableCountries(): array
@@ -57,20 +62,25 @@ class AfterFormEnginePageInitializedEvent
 
     protected function isMatching(): bool
     {
-        if ($this->languageUid >= 0 && ($modeField = TCAService::getModeColumn($this->table)) && (int)($this->row[$modeField] ?? null) === 1) {
-            $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
-            $availableCountries = $this->getAvailableCountries();
-            $availableCountryUids = array_map(static function ($country) {
-                return $country->getUid();
-            }, $availableCountries);
+        if ($this->languageUid >= 0) {
+            $modeField = TCAService::getModeColumn($this->table);
+            $mode = (int)($this->row[$modeField] ?? null);
 
-            foreach ($configuredCountries as $country) {
-                if (in_array($country->getUid(), $availableCountryUids, true)) {
-                    return true;
+            if ($mode === 1 || ($mode > 0 && ($site = $this->getSite()) && ($site->getLanguageById($this->languageUid)->toArray()['disable_international'] ?? false))) {
+                $configuredCountries = CountryService::getCountriesByRecord($this->table, $this->uid, $this->row);
+                $availableCountries = $this->getAvailableCountries();
+                $availableCountryUids = array_map(static function ($country) {
+                    return $country->getUid();
+                }, $availableCountries);
+
+                foreach ($configuredCountries as $country) {
+                    if (in_array($country->getUid(), $availableCountryUids, true)) {
+                        return true;
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         return true;

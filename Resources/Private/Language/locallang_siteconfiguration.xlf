@@ -9,6 +9,12 @@
 			<trans-unit id="site_language.countries.description">
 				<source>Here you can select the country combinations for which the language should be available in order to generate dynamic language base such as "en-de", "en-it" etc.</source>
 			</trans-unit>
+			<trans-unit id="site_language.disable_international">
+				<source>Disable language without selected country</source>
+			</trans-unit>
+			<trans-unit id="site_language.disable_international.description">
+				<source>The language is only available in combination with one of the selected countries.</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

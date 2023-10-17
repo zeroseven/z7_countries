@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Service;
 
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Model\Country;
@@ -31,10 +32,13 @@ class LanguageManipulationService
 
     protected static function getOriginalLanguage(SiteLanguage $language): SiteLanguage
     {
-        $languageId = $language->getLanguageId();
-        $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages');
+        try {
+            $originalLanguages = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country', 'originalLanguages');
+        } catch (AspectNotFoundException $e) {
+            return $language;
+        }
 
-        return $originalLanguages[$languageId] ?? $language;
+        return $originalLanguages[$language->getLanguageId()] ?? $language;
     }
 
     protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null)
@@ -65,7 +69,7 @@ class LanguageManipulationService
         $configuration = $language->toArray();
         $configuration['hreflang'] = self::getHreflang($language, $country);
 
-        // Disable language if country is not configured
+        // Update base if country is configured
         $base = ($availableCountries = $configuration['countries'] ?? null)
         && in_array($country->getUid(), GeneralUtility::intExplode(',', (string)$availableCountries), true)
             ? self::getBase($language, $country)
@@ -79,17 +83,15 @@ class LanguageManipulationService
         );
     }
 
-    public static function getManipulatedLanguages(array $originalLanguages): array
+    public static function getManipulatedLanguages(array $originalLanguages): ?array
     {
-        $manipulatedLanguages = [];
-
-        if (!empty($country = CountryService::getCountryByUri())) {
-            foreach ($originalLanguages as $originalLanguage) {
-                $manipulatedLanguages[] = self::getManipulatedLanguage($originalLanguage, $country);
-            }
+        if ($country = CountryService::getCountryByUri()) {
+            return array_map(static function (SiteLanguage $language) use ($country) {
+                return self::getManipulatedLanguage($language, $country);
+            }, $originalLanguages);
         }
 
-        return $manipulatedLanguages;
+        return null;
     }
 
     public static function manipulateUrl(string $internationalUrl, SiteLanguage $language, Country $country = null): ?string

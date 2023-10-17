@@ -13,6 +13,15 @@ $GLOBALS['SiteConfiguration']['site_language']['columns']['countries'] = [
     ]
 ];
 
+$GLOBALS['SiteConfiguration']['site_language']['columns']['disable_international'] = [
+    'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_siteconfiguration.xlf:site_language.disable_international',
+    'description' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_siteconfiguration.xlf:site_language.disable_international.description',
+    'config' => [
+        'type' => 'check',
+        'default' => 0
+    ]
+];
+
 foreach ($GLOBALS['SiteConfiguration']['site_language']['types'] ?? [] as $key => $value) {
-    $GLOBALS['SiteConfiguration']['site_language']['types'][$key]['showitem'] .= ',countries';
+    $GLOBALS['SiteConfiguration']['site_language']['types'][$key]['showitem'] .= ',countries, disable_international';
 }
