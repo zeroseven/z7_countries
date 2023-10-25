@@ -13,7 +13,7 @@ class CountryMenu extends AbstractMenu
         $menu = [];
 
         foreach ($this->site->getLanguages() as $language) {
-            foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId()) as $country) {
+            foreach (CountryService::getCountriesByLanguageUid($language->getLanguageId(), $this->site) as $country) {
                 if ($country->isEnabled()) {
                     if (!isset($menu[$country->getUid()])) {
                         $menu[$country->getUid()] = $this->getCountryMenuItem($language, $country);

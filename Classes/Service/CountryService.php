@@ -91,10 +91,14 @@ class CountryService
                 $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid);
             }
 
-            if ($site && ($siteConfiguration = $site->getConfiguration()) && $countries = $siteConfiguration['languages'][$languageUid]['countries'] ?? null) {
-                return array_filter(array_map(static function ($uid) {
-                    return self::getCountryByUid((int)$uid);
-                }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
+            if ($site && $siteConfiguration = $site->getConfiguration()) {
+                foreach ($siteConfiguration['languages'] ?? [] as $language) {
+                    if ($language['languageId'] === $languageUid && $countries = $language['countries'] ?? null) {
+                        return array_filter(array_map(static function ($uid) {
+                            return self::getCountryByUid((int)$uid);
+                        }, is_string($countries) ? GeneralUtility::intExplode(',', $countries) : $countries));
+                    }
+                }
             }
 
             return [];
