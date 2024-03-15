@@ -134,8 +134,15 @@ class CountryService
         $function = static function () use ($uri) {
             $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . ':// . ' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '')))->getPath();
 
+            $hasAMatch = false;
+            if (LanguageManipulationService::LANGUAGE_FIRST) {
+                $hasAMatch = preg_match('#^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)#', $path, $matches);
+            } else {
+                $hasAMatch = preg_match('#^\/([a-zA-Z0-9_-]+)?' . LanguageManipulationService::BASE_DELIMITER . '[a-z]{2}#', $path, $matches);
+            }
+
             return
-                preg_match('/^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)
+                $hasAMatch
                 && ($countryParameter = $matches[1])
                 && ($country = self::getCountryByParameter($countryParameter)) ? $country : null;
         };
