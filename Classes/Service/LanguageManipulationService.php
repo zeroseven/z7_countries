@@ -14,6 +14,7 @@ use Zeroseven\Countries\Model\Country;
 class LanguageManipulationService
 {
     public const BASE_DELIMITER = '-';
+    public const LANGUAGE_FIRST = true;
 
     protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
     {
@@ -49,7 +50,13 @@ class LanguageManipulationService
     public static function getBase(SiteLanguage $language, Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
-            return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
+            $languageCountryPart = '';
+            if (self::LANGUAGE_FIRST) {
+                $languageCountryPart = self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter);
+            } else {
+                $languageCountryPart = self::cleanString($parameter) . self::BASE_DELIMITER . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true);
+            }
+            return $language->getBase()->withPath($siteBase->getPath() . $languageCountryPart . '/');
         }
 
         return self::getOriginalLanguage($language)->getBase();
