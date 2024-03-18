@@ -14,6 +14,7 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Exception\RequestTypeException;
@@ -54,7 +55,8 @@ abstract class AbstractMenu implements MenuInterface
 
         $this->activeCountry = CountryService::getCountryByUri();
 
-        $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->uriBuilder = $objectManager->get(UriBuilder::class);
 
         $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE_NAME);
         $this->queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
