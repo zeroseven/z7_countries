@@ -47,7 +47,7 @@ class CountryService
 
             return array_map(static function ($row) {
                 return Country::makeInstance($row);
-            }, $queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+            }, $queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAll(FetchMode::ASSOCIATIVE));
         };
 
         return self::cacheObject($function, 'allCountries');
