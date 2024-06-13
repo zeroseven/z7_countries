@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Hooks;
 
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use Zeroseven\Countries\Service\IconService;
 
@@ -14,8 +15,12 @@ class IconFactoryHook implements HookInterface
         if (empty($iconName)) {
 
             // If country is not enabled
-            if ($table === 'tx_z7countries_country' && empty($row['enabled'])) {
-                return 'overlay-locked';
+            if ($table === 'tx_z7countries_country') {
+                $row['enabled'] ?? ($row = BackendUtility::getRecord($table, (int)($row['uid'] ?? 0)) ?? $row);
+
+                if (empty($row['enabled'])) {
+                    return 'overlay-locked';
+                }
             }
 
             // Check country configuration of record
