@@ -40,9 +40,18 @@ class TCAService
                         'type' => 'select',
                         'renderType' => 'selectSingle',
                         'items' => [
-                            ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.0', '0'],
-                            ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.1', '1'],
-                            ['LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.2', '2'],
+                            [
+                                'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.0',
+                                'value' => '0'
+                            ],
+                            [
+                                'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.1',
+                                'value' => '1'
+                            ],
+                            [
+                                'label' => 'LLL:EXT:z7_countries/Resources/Private/Language/locallang_db.xlf:*.' . self::FIELD_NAME_MODE . '.2',
+                                'value' => '2'
+                            ],
                         ],
                         'default' => '0'
                     ]

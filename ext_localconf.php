@@ -8,6 +8,7 @@ $GLOBALS['TYPO3_CONF_VARS']['DB']['additionalQueryRestrictions'][\Zeroseven\Coun
 // Add some local extension configuration
 $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['disallowedTables'] = ['backend_layout', 'be_dashboards', 'be_groups', 'be_users', 'fe_groups', 'fe_users', 'index_config', 'sys_category', 'sys_collection', 'sys_file', 'sys_filemounts', 'sys_file_collection', 'sys_file_metadata', 'sys_file_storage', 'sys_language', 'sys_log', 'sys_news', 'sys_note', 'sys_redirect', 'sys_template', 'tx_z7countries_country'];
 $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'] = [];
+$GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] = [];
 
 // Register hooks
 \Zeroseven\Countries\Hooks\IconFactoryHook::register();
