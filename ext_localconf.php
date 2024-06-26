@@ -21,3 +21,7 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] = [];
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Site\Entity\Site::class] = [
     'className' => \Zeroseven\Countries\Xclass\Site::class
 ];
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Configuration\SiteConfiguration::class] = [
+    'className' => \Zeroseven\Countries\Xclass\SiteConfiguration::class
+];

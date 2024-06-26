@@ -7,6 +7,11 @@ services:
   Zeroseven\Countries\:
     resource: '../Classes/*'
 
+  Zeroseven\Countries\Xclass\SiteConfiguration:
+    arguments:
+      $coreCache: '@cache.core'
+      $configPath: '%env(TYPO3:configPath)%/sites'
+
   Zeroseven\Countries\Hooks\CountryPreviewButtons:
     public: true
 
