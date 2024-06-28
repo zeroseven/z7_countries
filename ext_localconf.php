@@ -12,7 +12,6 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] = [];
 
 // Register hooks
 \Zeroseven\Countries\Hooks\IconFactoryHook::register();
-\Zeroseven\Countries\Hooks\DatabaseRecordListHook::register();
 \Zeroseven\Countries\Hooks\DataHandlerHook::register();
 \Zeroseven\Countries\Hooks\InlineRecordContainerHook::register();
 \Zeroseven\Countries\Hooks\CountryPreviewButtons::register();
