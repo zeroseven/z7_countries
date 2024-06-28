@@ -37,4 +37,13 @@ services:
       - name: event.listener
         identifier: 'z7_country/modify-tca'
         event: TYPO3\CMS\Core\Core\Event\BootCompletedEvent
-
+  Zeroseven\Countries\Event\Listener\ModifyRecordListHeaderColumnsEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/modify-record-list-header'
+        event: TYPO3\CMS\Backend\RecordList\Event\ModifyRecordListHeaderColumnsEvent
+  Zeroseven\Countries\Event\Listener\ModifyDatabaseQueryForRecordListingEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/modify-record-list-query'
+        event: TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent

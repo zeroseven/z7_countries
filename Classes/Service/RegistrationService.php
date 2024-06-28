@@ -19,6 +19,7 @@ class RegistrationService
         return $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] ?? [];
     }
 
+    /** @throws Exception */
     public static function extendInlineChildOverrides(string $foreign_table, string $table, string $field, string $typeList = null): void
     {
         if (!TCAService::hasCountryConfiguration($foreign_table)) {

@@ -135,6 +135,7 @@ class CountryPreviewButtons implements HookInterface
 
         if ($this->siteLanguage && $this->needButtons()) {
 
+
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
             $listField = TCAService::getListColumn(self::TABLE);
