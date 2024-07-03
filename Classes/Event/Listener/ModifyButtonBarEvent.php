@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Zeroseven\Countries\Hooks;
+namespace Zeroseven\Countries\Event\Listener;
 
+use JsonException;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
+use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -23,7 +25,7 @@ use Zeroseven\Countries\Service\IconService;
 use Zeroseven\Countries\Service\LanguageManipulationService;
 use Zeroseven\Countries\Service\TCAService;
 
-class CountryPreviewButtons implements HookInterface
+class ModifyButtonBarEvent
 {
     protected const TABLE = 'pages';
 
@@ -31,22 +33,6 @@ class CountryPreviewButtons implements HookInterface
     protected int $languageUid;
     protected int $pageUid;
     protected ?SiteLanguage $siteLanguage = null;
-
-    public function __construct(SiteFinder $siteFinder)
-    {
-        $this->data = $this->getPageRecord();
-
-        if ($this->data !== null) {
-            $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
-            $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
-            $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
-            try {
-                $this->siteLanguage = $siteFinder->getSiteByPageId($this->pageUid)->getLanguageById($languageUid);
-            } catch (SiteNotFoundException $e) {
-                // This occurs when the site config is missing or the page is outside any rootline (e.g. global sys_folder)
-            }
-        }
-    }
 
     protected function getPageRecord(): ?array
     {
@@ -95,6 +81,23 @@ class CountryPreviewButtons implements HookInterface
         return null;
     }
 
+    protected function initData(): void
+    {
+        $this->data = $this->getPageRecord();
+
+        if ($this->data !== null) {
+            $languageField = $GLOBALS['TCA'][self::TABLE]['ctrl']['languageField'] ?? null;
+            $languageUid = (int)($this->data[$languageField][0] ?? ($this->data[$languageField] ?? 0));
+            $this->pageUid = (int)($languageUid > 0 ? $this->data[$GLOBALS['TCA'][self::TABLE]['ctrl']['transOrigPointerField']] : $this->data['uid']);
+
+            try {
+                $this->siteLanguage = GeneralUtility::makeInstance(SiteFinder::class)?->getSiteByPageId($this->pageUid)->getLanguageById($languageUid);
+            } catch (SiteNotFoundException $e) {
+                // This occurs when the site config is missing or the page is outside any rootline (e.g. global sys_folder)
+            }
+        }
+    }
+
     protected function needButtons(): bool
     {
         $tsConfig = BackendUtility::getPagesTSconfig($this->pageUid);
@@ -125,16 +128,13 @@ class CountryPreviewButtons implements HookInterface
         }
     }
 
-    /**
-     * @throws UnableToLinkToPageException
-     * @throws \JsonException
-     */
-    public function add(array $params, ButtonBar $buttonBar): array
+    /** @throws UnableToLinkToPageException | JsonException */
+    public function __invoke(Event $event): void
     {
-        $buttons = $params['buttons'] ?? [];
+        $this->initData();
 
         if ($this->siteLanguage && $this->needButtons()) {
-
+            $buttons = $event->getButtons();
 
             // Get list of enabled countries
             $modeField = TCAService::getModeColumn(self::TABLE);
@@ -157,7 +157,7 @@ class CountryPreviewButtons implements HookInterface
                 foreach (CountryService::getAllCountries() ?: [] as $country) {
                     $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
 
-                    $buttons[$position][self::class][] = $buttonBar->makeLinkButton()
+                    $buttons[$position][self::class][] = $event->getButtonBar()->makeLinkButton()
                         ->setDataAttributes($enabled ? [
                             'dispatch-action' => 'TYPO3.WindowManager.localOpen',
                             'dispatch-args' => json_encode([
@@ -173,13 +173,8 @@ class CountryPreviewButtons implements HookInterface
                         ->setHref('#');
                 }
             }
+
+            $event->setButtons($buttons);
         }
-
-        return $buttons;
-    }
-
-    public static function register(): void
-    {
-        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Backend\Template\Components\ButtonBar']['getButtonsHook'][self::class] = self::class . '->add';
     }
 }
