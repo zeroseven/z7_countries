@@ -52,3 +52,8 @@ services:
       - name: event.listener
         identifier: 'z7_country/modify-button-bar'
         event: TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent
+  Zeroseven\Countries\Event\Listener\ModifyInlineElementControlsEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/modify-inline-element-controls'
+        event: TYPO3\CMS\Backend\Form\Event\ModifyInlineElementControlsEvent

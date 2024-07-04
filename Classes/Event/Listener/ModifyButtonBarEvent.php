@@ -7,7 +7,6 @@ namespace Zeroseven\Countries\Event\Listener;
 use JsonException;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Route;
-use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
