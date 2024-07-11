@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Event\Listener;
 
-use TYPO3\CMS\Core\Configuration\Event\AfterTcaCompilationEvent as Event;
+use TYPO3\CMS\Core\Core\Event\BootCompletedEvent as Event;
 use Zeroseven\Countries\Exception\BackendException as Exception;
 use Zeroseven\Countries\Service\RegistrationService;
 use Zeroseven\Countries\Service\TCAService;
 
-class AfterTcaCompilationEvent
+class BootCompletedEvent
 {
     /** @throws Exception */
-    public function __invoke(\TYPO3\CMS\Core\Core\Event\BootCompletedEvent $event): void
+    public function __invoke(Event $event): void
     {
         foreach (RegistrationService::getTables() as $table => [$position, $typeList]) {
             if (TCAService::isDisallowedTable($table)) {
