@@ -6,11 +6,13 @@ namespace Zeroseven\Countries\Event\Listener;
 
 use TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use Zeroseven\Countries\Service\CountryService;
@@ -30,7 +32,7 @@ class AfterFormEnginePageInitializedEvent
 
     protected function init(): void
     {
-        $data = GeneralUtility::_GP('edit') ?: [];
+        $data = $_GET['edit'] ?? [];
 
         $this->table = (string)array_key_first($data);
         $this->uid = (int)array_key_first($data[$this->table] ?? []);
@@ -49,7 +51,7 @@ class AfterFormEnginePageInitializedEvent
     protected function getSite(): ?Site
     {
         try {
-            return $this->pageUid ? GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->pageUid) : null;
+            return $this->pageUid ? GeneralUtility::makeInstance(SiteFinder::class)?->getSiteByPageId($this->pageUid) : null;
         } catch (SiteNotFoundException $e) {
             return null;
         }
@@ -105,12 +107,16 @@ class AfterFormEnginePageInitializedEvent
                 FlashMessage::class,
                 $this->translate('unavailableLanguage.description', [$languageTitle, $availableCountryNames]),
                 $this->translate('unavailableLanguage.title', [$languageTitle]),
-                FlashMessage::WARNING,
+                ContextualFeedbackSeverity::WARNING,
                 false
             );
 
-            $flashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)->getMessageQueueByIdentifier();
-            $flashMessageQueue->enqueue($flashMessage);
+            $flashMessageQueue = GeneralUtility::makeInstance(FlashMessageService::class)?->getMessageQueueByIdentifier();
+
+            try {
+                $flashMessageQueue->enqueue($flashMessage);
+            } catch (Exception $e) {
+            }
         }
     }
 }

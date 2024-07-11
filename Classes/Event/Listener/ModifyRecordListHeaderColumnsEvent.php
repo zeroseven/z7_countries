@@ -17,7 +17,7 @@ class ModifyRecordListHeaderColumnsEvent
 {
     protected function getCountryParameter(): int
     {
-        return (int)(GeneralUtility::_GET(ModifyDatabaseQueryForRecordListingEvent::PARAMETER) ?: 0);
+        return (int)($_GET[ModifyDatabaseQueryForRecordListingEvent::PARAMETER] ?? 0);
     }
 
     protected function translate(string $key): string
