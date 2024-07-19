@@ -25,22 +25,26 @@ class DisableInternational implements MiddlewareInterface
     protected function createErrorResponse(ServerRequestInterface $request): ResponseInterface
     {
         $reasonCode = PageAccessFailureReasons::LANGUAGE_NOT_AVAILABLE;
-        $message = GeneralUtility::makeInstance(PageAccessFailureReasons::class)->getMessageForReason($reasonCode);
+        $message = GeneralUtility::makeInstance(PageAccessFailureReasons::class)?->getMessageForReason($reasonCode);
 
-        return GeneralUtility::makeInstance(ErrorController::class)->pageNotFoundAction($request, $message, ['code' => $reasonCode])
+        return GeneralUtility::makeInstance(ErrorController::class)?->pageNotFoundAction($request, $message, ['code' => $reasonCode])
             ->withHeader('X-Extension', 'z7_countries');
     }
 
     /** @throws AspectNotFoundException | SiteNotFoundException | PageNotFoundException */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return CountryService::getCountryByUri() === null
-        && (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController)
-        && ($uid = $GLOBALS['TSFE']->id)
-        && ($languageUid = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('language', 'id'))
-        && ($language = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid)->getLanguageById($languageUid))
-        && ($language->toArray()['disable_international'] ?? false)
-            ? $this->createErrorResponse($request)
-            : $handler->handle($request);
+        if (CountryService::getCountryByUri() === null) {
+            $languageUid = GeneralUtility::makeInstance(Context::class)?->getPropertyFromAspect('language', 'id');
+
+            return (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController)
+            && ($uid = $GLOBALS['TSFE']->id)
+            && ($language = GeneralUtility::makeInstance(SiteFinder::class)?->getSiteByPageId($uid)->getLanguageById($languageUid))
+            && ($language->toArray()['disable_international'] ?? false)
+                ? $this->createErrorResponse($request)
+                : $handler->handle($request);
+        }
+
+        return $handler->handle($request);
     }
 }
