@@ -32,11 +32,11 @@ services:
         identifier: 'z7_country/form-engine'
         method: 'checkCountryAndLanguageSettings'
         event: TYPO3\CMS\Backend\Controller\Event\AfterFormEnginePageInitializedEvent
-  Zeroseven\Countries\Event\Listener\BootCompletedEvent:
+  Zeroseven\Countries\Event\Listener\AfterTcaCompilationEvent:
     tags:
       - name: event.listener
         identifier: 'z7_country/modify-tca'
-        event: TYPO3\CMS\Core\Core\Event\BootCompletedEvent
+        event: TYPO3\CMS\Core\Configuration\Event\AfterTcaCompilationEvent
   Zeroseven\Countries\Event\Listener\ModifyRecordListHeaderColumnsEvent:
     tags:
       - name: event.listener
