@@ -82,7 +82,7 @@ abstract class AbstractMenu implements MenuInterface
             ->from(self::TABLE_NAME)
             ->where($this->queryBuilder->expr()->andX(...$constraints))
             ->execute()
-            ->fetchOne();
+            ->fetchColumn();
     }
 
     protected function isAvailableCountry(Country $country = null): bool
@@ -97,7 +97,7 @@ abstract class AbstractMenu implements MenuInterface
             ->from(self::TABLE_NAME)
             ->where($this->queryBuilder->expr()->andX(...$constraints))
             ->execute()
-            ->fetchOne();
+            ->fetchColumn();
     }
 
     protected function createLink(SiteLanguage $language, Country $country = null): ?string
