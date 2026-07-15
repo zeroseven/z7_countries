@@ -16,10 +16,12 @@
     }
   ],
   "require": {
-    "typo3/cms-core": "^12.4",
+    "typo3/cms-core": "^13.4",
+    "typo3/cms-frontend": "^13.4",
+    "typo3/cms-backend": "^13.4",
     "jaybizzle/crawler-detect": "~1.2",
     "ext-json": "*",
-    "php": "^8.0"
+    "php": "^8.2"
   },
   "autoload": {
     "psr-4": {
