@@ -26,6 +26,11 @@ class LanguageItem extends AbstractItem
         return $this->object;
     }
 
+    public function getTwoLetterIsoCode(): string
+    {
+        return $this->object->getLocale()->getLanguageCode();
+    }
+
     public function getCountries(): array
     {
         return $this->countries;

@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Service;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Context\Context;
@@ -47,7 +48,7 @@ class CountryService
 
             return array_map(static function ($row) {
                 return Country::makeInstance($row);
-            }, $queryBuilder->select('*')->from('tx_z7countries_country')->execute()->fetchAllAssociative());
+            }, $queryBuilder->select('*')->from('tx_z7countries_country')->executeQuery()->fetchAllAssociative());
         };
 
         return self::cacheObject($function, 'allCountries');
@@ -87,7 +88,7 @@ class CountryService
                 $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
             }
 
-            if($site === null && ($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TSFE']->id) {
+            if($site === null && ($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId()) {
                 $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid);
             }
 
@@ -132,7 +133,18 @@ class CountryService
     public static function getCountryByUri(UriInterface $uri = null): ?Country
     {
         $function = static function () use ($uri) {
-            $path = ($uri ?: new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '')))->getPath();
+            if ($uri === null) {
+                if (($request = $GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface) {
+                    $uri = $request->getUri();
+                } elseif (!empty($_SERVER['HTTP_HOST'])) {
+                    $uri = new Uri((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . ($_SERVER['REQUEST_URI'] ?? ''));
+                } else {
+                    // No request context available (e.g. CLI)
+                    return null;
+                }
+            }
+
+            $path = $uri->getPath();
 
             return
                 preg_match('/^\/?[a-z]{2}' . LanguageManipulationService::BASE_DELIMITER . '([a-zA-Z0-9_-]+)/', $path, $matches)

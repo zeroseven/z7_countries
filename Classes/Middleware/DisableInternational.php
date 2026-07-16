@@ -38,7 +38,7 @@ class DisableInternational implements MiddlewareInterface
             $languageUid = GeneralUtility::makeInstance(Context::class)?->getPropertyFromAspect('language', 'id');
 
             return (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController)
-            && ($uid = $GLOBALS['TSFE']->id)
+            && ($uid = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId())
             && ($language = GeneralUtility::makeInstance(SiteFinder::class)?->getSiteByPageId($uid)->getLanguageById($languageUid))
             && ($language->toArray()['disable_international'] ?? false)
                 ? $this->createErrorResponse($request)

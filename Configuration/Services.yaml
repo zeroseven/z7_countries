@@ -6,13 +6,12 @@ services:
 
   Zeroseven\Countries\:
     resource: '../Classes/*'
+    exclude: '../Classes/Xclass/*'
 
-  Zeroseven\Countries\Xclass\SiteConfiguration:
-    arguments:
-      $coreCache: '@cache.core'
-      $configPath: '%env(TYPO3:configPath)%/sites'
-
-  Zeroseven\Countries\Hooks\CountryPreviewButtons:
+  # Replaces the core service, so that country-aware site entities are created.
+  # See \Zeroseven\Countries\Xclass\SiteConfiguration for details.
+  TYPO3\CMS\Core\Configuration\SiteConfiguration:
+    class: Zeroseven\Countries\Xclass\SiteConfiguration
     public: true
 
   Zeroseven\Countries\Event\Listener\AlterTableDefinitionStatementsEvent:

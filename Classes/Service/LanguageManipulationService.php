@@ -49,7 +49,7 @@ class LanguageManipulationService
     public static function getBase(SiteLanguage $language, Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
-            return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
+            return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getLocale()->getLanguageCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
         }
 
         return self::getOriginalLanguage($language)->getBase();
@@ -58,7 +58,7 @@ class LanguageManipulationService
     public static function getHreflang(SiteLanguage $language, Country $country = null): string
     {
         if ($country && ($isoCode = $country->getIsoCode())) {
-            return self::cleanIsoCode($language->getTwoLetterIsoCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);
+            return self::cleanIsoCode($language->getLocale()->getLanguageCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);
         }
 
         return self::getOriginalLanguage($language)->getHreflang();

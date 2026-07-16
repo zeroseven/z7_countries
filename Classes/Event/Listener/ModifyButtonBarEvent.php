@@ -6,6 +6,7 @@ namespace Zeroseven\Countries\Event\Listener;
 
 use JsonException;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\PreviewUriBuilder;
 use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent as Event;
@@ -103,7 +104,6 @@ class ModifyButtonBarEvent
 
         $excludedDoktypes = array_merge(
             [
-                PageRepository::DOKTYPE_RECYCLER,
                 PageRepository::DOKTYPE_SYSFOLDER,
                 PageRepository::DOKTYPE_SPACER,
             ],
@@ -146,7 +146,9 @@ class ModifyButtonBarEvent
             }
 
             // Get the original preview url
-            $url = BackendUtility::getPreviewUrl($this->pageUid, '', null, '', '', '&L=' . $this->siteLanguage->getLanguageId());
+            $url = (string)PreviewUriBuilder::create($this->pageUid)
+                ->withLanguage($this->siteLanguage->getLanguageId())
+                ->buildUri();
 
             // Button title
             $title = ($GLOBALS['LANG'] ?? null) instanceof LanguageService ? $GLOBALS['LANG']->sL('LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:labels.showPage') : 'Preview';
@@ -166,7 +168,7 @@ class ModifyButtonBarEvent
                             ], JSON_THROW_ON_ERROR)
                         ] : [])
                         ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
-                        ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', Icon::SIZE_SMALL,
+                        ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', \TYPO3\CMS\Core\Imaging\IconSize::SMALL,
                             IconService::getCountryIdentifier($country)))
                         ->setDisabled(!$enabled)
                         ->setHref('#');

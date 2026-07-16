@@ -8,7 +8,6 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'r.thanner@zeroseven.de',
     'author_company' => 'zeroseven design studios GmbH',
     'state' => 'stable',
-    'clearCacheOnLoad' => true,
     'version' => '3.0.0',
     'constraints' => [
         'depends' => [

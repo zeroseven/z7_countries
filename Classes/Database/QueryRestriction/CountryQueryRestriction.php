@@ -27,9 +27,9 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         $mode = $queriedTable . '.' . TCAService::getModeColumn($tableName);
         $list = $queriedTable . '.' . TCAService::getListColumn($tableName);
 
-        return $country === null ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->orX(
+        return $country === null ? $expressionBuilder->in($mode, ['0', '2']) : $expressionBuilder->or(
             $expressionBuilder->eq($mode, 0),
-            $expressionBuilder->andX(
+            $expressionBuilder->and(
                 $expressionBuilder->in($mode, ['1', '2']),
                 $expressionBuilder->inSet($list, (string)$country->getUid())
             )
@@ -50,7 +50,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
             }
         }
 
-        return $expressionBuilder->andX(...$constraints);
+        return $expressionBuilder->and(...$constraints);
     }
 
     public function isEnforced(): bool

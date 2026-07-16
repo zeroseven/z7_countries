@@ -14,11 +14,9 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] = [];
 \Zeroseven\Countries\Hooks\IconFactoryHook::register();
 \Zeroseven\Countries\Hooks\DataHandlerHook::register();
 
-// Register xclass objects
+// Let makeInstance() resolve the site entity to the country-aware variant.
+// The SiteConfiguration service is replaced via Services.yaml, because the
+// class is wired through dependency injection (XCLASS has no effect there).
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Site\Entity\Site::class] = [
     'className' => \Zeroseven\Countries\Xclass\Site::class
-];
-
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Configuration\SiteConfiguration::class] = [
-    'className' => \Zeroseven\Countries\Xclass\SiteConfiguration::class
 ];

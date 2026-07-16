@@ -39,7 +39,7 @@ class IconService
     public static function getCountryIcon(Country $country, $size = null, $overlayIdentifier = null): ?Icon
     {
         if ($identifier = self::getCountryIdentifier($country)) {
-            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL, $overlayIdentifier);
+            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: \TYPO3\CMS\Core\Imaging\IconSize::SMALL, $overlayIdentifier);
         }
 
         return null;
@@ -59,7 +59,7 @@ class IconService
     public static function getRecordFlagIcon(string $table, int $uid, array $row = null, $size = null): ?Icon
     {
         if ($identifier = self::getRecordFlagIdentifier($table, $uid, $row)) {
-            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: Icon::SIZE_SMALL);
+            return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: \TYPO3\CMS\Core\Imaging\IconSize::SMALL);
         }
 
         return null;

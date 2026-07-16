@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Xclass;
 
-use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteSettings;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * Replaces the core SiteConfiguration service (see Configuration/Services.yaml)
+ * to create country-aware Site entities: TYPO3 v13 instantiates Site objects
+ * with "new" and resolves the service via dependency injection, so neither
+ * entity nor service can be exchanged through the XCLASS mechanism anymore.
+ *
+ * Both methods mirror their core implementation; the only difference is the
+ * instantiated Site class (\Zeroseven\Countries\Xclass\Site).
+ */
 class SiteConfiguration extends \TYPO3\CMS\Core\Configuration\SiteConfiguration
 {
-    private function getXClassSites(array &$sites, string $identifier, array $configuration, $siteSettings): void
-    {
-        $rootPageId = (int)($configuration['rootPageId'] ?? 0);
-
-        if ($rootPageId > 0) {
-            $sites[$identifier] = GeneralUtility::makeInstance(Site::class, $identifier, $rootPageId, $configuration, $siteSettings);
-        }
-    }
+    /**
+     * Same value as the private constant in the core class, used for the
+     * runtime cache shared with getAllExistingSites().
+     */
+    private const CACHE_IDENTIFIER = 'sites-configuration';
 
     public function resolveAllExistingSites(bool $useCache = true): array
     {
@@ -26,21 +30,19 @@ class SiteConfiguration extends \TYPO3\CMS\Core\Configuration\SiteConfiguration
         foreach ($siteConfiguration as $identifier => $configuration) {
             // cast $identifier to string, as the identifier can potentially only consist of (int) digit numbers
             $identifier = (string)$identifier;
-            $siteSettings = $this->getSiteSettings($identifier, $configuration);
+            $siteSettings = $this->siteSettingsFactory->getSettings($identifier, $configuration);
+            $siteTypoScript = $this->getSiteTypoScript($identifier);
+            $siteTSconfig = $this->getSiteTSconfig($identifier);
             $configuration['contentSecurityPolicies'] = $this->getContentSecurityPolicies($identifier);
 
-            /**
-             * $rootPageId = (int)($configuration['rootPageId'] ?? 0);
-             * if ($rootPageId > 0) {
-             * $sites[$identifier] = GeneralUtility::makeInstance(Site::class, $identifier, $rootPageId, $configuration, $siteSettings);
-             * }
-             *
-             * This part must be overwritten by the following line for the extension to work with TYPO3 12. Sorry!
-             */
-
-            $this->getXClassSites($sites, $identifier, $configuration, $siteSettings);
+            $rootPageId = (int)($configuration['rootPageId'] ?? 0);
+            if ($rootPageId > 0) {
+                $site = new Site($identifier, $rootPageId, $configuration, $siteSettings, $siteTypoScript, $siteTSconfig);
+                $this->determineInvalidSets($site);
+                $sites[$identifier] = $site;
+            }
         }
-        $this->firstLevelCache = $sites;
+        $this->runtimeCache->set(self::CACHE_IDENTIFIER, $sites);
         return $sites;
     }
 
@@ -51,18 +53,16 @@ class SiteConfiguration extends \TYPO3\CMS\Core\Configuration\SiteConfiguration
         foreach ($siteConfiguration as $identifier => $configuration) {
             // cast $identifier to string, as the identifier can potentially only consist of (int) digit numbers
             $identifier = (string)$identifier;
-            $siteSettings = new SiteSettings($configuration['settings'] ?? []);
+            $inlineSettings = $configuration['settings'] ?? [];
+            $siteSettings = SiteSettings::createFromSettingsTree($inlineSettings);
+            $siteTypoScript = $this->getSiteTypoScript($identifier);
 
-            /**
-             * $rootPageId = (int)($configuration['rootPageId'] ?? 0);
-             * if ($rootPageId > 0) {
-             * $sites[$identifier] = GeneralUtility::makeInstance(Site::class, $identifier, $rootPageId, $configuration, $siteSettings);
-             * }
-             *
-             * This part must be overwritten by the following line for the extension to work with TYPO3 12. Sorry!
-             */
-
-            $this->getXClassSites($sites, $identifier, $configuration, $siteSettings);
+            $rootPageId = (int)($configuration['rootPageId'] ?? 0);
+            if ($rootPageId > 0) {
+                $site = new Site($identifier, $rootPageId, $configuration, $siteSettings, $siteTypoScript);
+                $this->determineInvalidSets($site);
+                $sites[$identifier] = $site;
+            }
         }
         return $sites;
     }

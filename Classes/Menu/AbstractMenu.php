@@ -12,8 +12,8 @@ use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Routing\InvalidRouteArgumentsException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Exception\RequestTypeException;
@@ -36,8 +36,6 @@ abstract class AbstractMenu implements MenuInterface
 
     protected ?Country $activeCountry;
 
-    protected UriBuilder $uriBuilder;
-
     protected QueryBuilder $queryBuilder;
 
     public function __construct(int $pageId = null, Site $site = null)
@@ -46,15 +44,13 @@ abstract class AbstractMenu implements MenuInterface
             throw new RequestTypeException(sprintf('The class "%s" cannot be used in the TYPO3 backend. Maybe the class "%s" can help you to generate country urls. 🤷', get_class($this), LanguageManipulationService::class), 1652815364);
         }
 
-        $this->pageId = $pageId ?: (int)$this->getTypoScriptFrontendController()->id;
+        $this->pageId = $pageId ?: (int)$GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId();
 
         $this->site = $site instanceof Site ? $site : GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pageId ?: $this->pageId);
 
         $this->activeLanguageId = (int)GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('language', 'id');
 
         $this->activeCountry = CountryService::getCountryByUri();
-
-        $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
 
         $this->queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(self::TABLE_NAME);
         $this->queryBuilder->getRestrictions()->removeByType(CountryQueryRestriction::class);
@@ -70,7 +66,7 @@ abstract class AbstractMenu implements MenuInterface
         $constraints = [];
 
         if ($language->getLanguageId()) {
-            $constraints[] = $this->queryBuilder->expr()->andX(
+            $constraints[] = $this->queryBuilder->expr()->and(
                 $this->queryBuilder->expr()->eq('l10n_parent', $this->pageId),
                 $this->queryBuilder->expr()->eq('sys_language_uid', $language->getLanguageId())
             );
@@ -80,8 +76,8 @@ abstract class AbstractMenu implements MenuInterface
 
         return (bool)$this->queryBuilder->count('uid')
             ->from(self::TABLE_NAME)
-            ->where($this->queryBuilder->expr()->andX(...$constraints))
-            ->execute()
+            ->where($this->queryBuilder->expr()->and(...$constraints))
+            ->executeQuery()
             ->fetchOne();
     }
 
@@ -95,19 +91,20 @@ abstract class AbstractMenu implements MenuInterface
 
         return (bool)$this->queryBuilder->count('uid')
             ->from(self::TABLE_NAME)
-            ->where($this->queryBuilder->expr()->andX(...$constraints))
-            ->execute()
+            ->where($this->queryBuilder->expr()->and(...$constraints))
+            ->executeQuery()
             ->fetchOne();
     }
 
     protected function createLink(SiteLanguage $language, Country $country = null): ?string
     {
-        $uriBuilder = $this->uriBuilder->reset()
-            ->setTargetPageUid($this->pageId)
-            ->setCreateAbsoluteUri(false)
-            ->setLanguage((string)$language->getLanguageId());
+        try {
+            $url = (string)$this->site->getRouter()->generateUri($this->pageId, ['_language' => $language]);
+        } catch (InvalidRouteArgumentsException $e) {
+            return null;
+        }
 
-        if ($url = $uriBuilder->build()) {
+        if ($url) {
             if ($manipulatedUrl = LanguageManipulationService::manipulateUrl($url, $language, $country)) {
                 return $manipulatedUrl;
             }

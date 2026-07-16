@@ -13,7 +13,7 @@ class ModifyHrefLangTagsEvent
 {
     public function __invoke(OriginalEvent $event): void
     {
-        if ((int)$this->getTypoScriptFrontendController()->page['no_index'] === 1) {
+        if ((int)$GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getPageRecord()['no_index'] === 1) {
             return;
         }
 
