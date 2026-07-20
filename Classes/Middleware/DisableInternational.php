@@ -15,7 +15,6 @@ use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\ErrorController;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageAccessFailureReasons;
 use Zeroseven\Countries\Service\CountryService;
 
@@ -37,8 +36,7 @@ class DisableInternational implements MiddlewareInterface
         if (CountryService::getCountryByUri() === null) {
             $languageUid = GeneralUtility::makeInstance(Context::class)?->getPropertyFromAspect('language', 'id');
 
-            return (($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController)
-            && ($uid = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId())
+            return ($uid = $request->getAttribute('frontend.page.information')?->getId())
             && ($language = GeneralUtility::makeInstance(SiteFinder::class)?->getSiteByPageId($uid)->getLanguageById($languageUid))
             && ($language->toArray()['disable_international'] ?? false)
                 ? $this->createErrorResponse($request)

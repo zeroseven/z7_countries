@@ -18,7 +18,6 @@ use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use Zeroseven\Countries\Database\QueryRestriction\CountryQueryRestriction;
 use Zeroseven\Countries\Model\Country;
 
@@ -88,7 +87,11 @@ class CountryService
                 $languageUid = (int)$context->getPropertyFromAspect('language', 'id');
             }
 
-            if($site === null && ($GLOBALS['TSFE'] ?? null) instanceof TypoScriptFrontendController && $uid = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId()) {
+            if (
+                $site === null
+                && ($request = $GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface
+                && ($uid = $request->getAttribute('frontend.page.information')?->getId())
+            ) {
                 $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($uid);
             }
 

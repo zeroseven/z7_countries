@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Zeroseven\Countries\Event\Listener;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Event\ModifyHrefLangTagsEvent as OriginalEvent;
 use Zeroseven\Countries\Menu\LanguageMenu;
 
@@ -13,7 +12,8 @@ class ModifyHrefLangTagsEvent
 {
     public function __invoke(OriginalEvent $event): void
     {
-        if ((int)$GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getPageRecord()['no_index'] === 1) {
+        $pageRecord = $event->getRequest()->getAttribute('frontend.page.information')?->getPageRecord() ?? [];
+        if ((int)($pageRecord['no_index'] ?? 0) === 1) {
             return;
         }
 
@@ -36,10 +36,5 @@ class ModifyHrefLangTagsEvent
         }
 
         $event->setHrefLangs($hreflang);
-    }
-
-    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
-    {
-        return $GLOBALS['TSFE'];
     }
 }
