@@ -23,7 +23,7 @@ abstract class AbstractItem
 
     protected bool $current;
 
-    public function __construct(SiteLanguage $language, Country $country = null)
+    public function __construct(SiteLanguage $language, ?Country $country = null)
     {
         $this->hreflang = LanguageManipulationService::getHreflang($language, $country);
     }

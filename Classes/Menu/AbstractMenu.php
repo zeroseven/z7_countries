@@ -38,7 +38,7 @@ abstract class AbstractMenu implements MenuInterface
 
     protected QueryBuilder $queryBuilder;
 
-    public function __construct(int $pageId = null, Site $site = null)
+    public function __construct(?int $pageId = null, ?Site $site = null)
     {
         if (($request = $GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface && ($applicationType = ApplicationType::fromRequest($request)) && $applicationType->isBackend()) {
             throw new RequestTypeException(sprintf('The class "%s" cannot be used in the TYPO3 backend. Maybe the class "%s" can help you to generate country urls. 🤷', get_class($this), LanguageManipulationService::class), 1652815364);
@@ -81,7 +81,7 @@ abstract class AbstractMenu implements MenuInterface
             ->fetchOne();
     }
 
-    protected function isAvailableCountry(Country $country = null): bool
+    protected function isAvailableCountry(?Country $country = null): bool
     {
         $constraints = [$this->queryBuilder->expr()->eq('uid', $this->pageId)];
 
@@ -96,7 +96,7 @@ abstract class AbstractMenu implements MenuInterface
             ->fetchOne();
     }
 
-    protected function createLink(SiteLanguage $language, Country $country = null): ?string
+    protected function createLink(SiteLanguage $language, ?Country $country = null): ?string
     {
         try {
             $url = (string)$this->site->getRouter()->generateUri($this->pageId, ['_language' => $language]);
@@ -115,12 +115,12 @@ abstract class AbstractMenu implements MenuInterface
         return null;
     }
 
-    protected function isActiveCountry(Country $country = null): bool
+    protected function isActiveCountry(?Country $country = null): bool
     {
         return $country === null ? $this->activeCountry === null : $this->activeCountry && $this->activeCountry->getUid() === $country->getUid();
     }
 
-    protected function isActiveLanguage(SiteLanguage $language = null): bool
+    protected function isActiveLanguage(?SiteLanguage $language = null): bool
     {
         return $language !== null && $language->getLanguageId() === $this->activeLanguageId;
     }
@@ -137,7 +137,7 @@ abstract class AbstractMenu implements MenuInterface
             ->setCurrent($available && $this->isActiveCountry($country) && $this->isActiveLanguage($language));
     }
 
-    protected function getLanguageMenuItem(SiteLanguage $language, Country $country = null, bool $countryAvailable = null): LanguageItem
+    protected function getLanguageMenuItem(SiteLanguage $language, ?Country $country = null, ?bool $countryAvailable = null): LanguageItem
     {
         if ($countryAvailable === null) {
             $countryAvailable = $this->isAvailableCountry($country);

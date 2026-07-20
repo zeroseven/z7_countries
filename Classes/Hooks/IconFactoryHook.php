@@ -10,7 +10,7 @@ use Zeroseven\Countries\Service\IconService;
 
 class IconFactoryHook implements HookInterface
 {
-    public function postOverlayPriorityLookup(string $table, array $row, array $status, string $iconName = null): ?string
+    public function postOverlayPriorityLookup(string $table, array $row, array $status, ?string $iconName = null): ?string
     {
         if (empty($iconName)) {
 

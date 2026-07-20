@@ -12,7 +12,7 @@ class CountryItem extends AbstractItem
 {
     protected array $languages = [];
 
-    public function __construct(SiteLanguage $language, Country $country = null)
+    public function __construct(SiteLanguage $language, ?Country $country = null)
     {
         parent::__construct($language, $country);
 

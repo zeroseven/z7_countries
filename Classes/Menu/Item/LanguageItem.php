@@ -13,7 +13,7 @@ class LanguageItem extends AbstractItem
     protected array $countries = [];
     protected bool $disabled = false;
 
-    public function __construct(SiteLanguage $language, Country $country = null)
+    public function __construct(SiteLanguage $language, ?Country $country = null)
     {
         parent::__construct($language, $country);
 

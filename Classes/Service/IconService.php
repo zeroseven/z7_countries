@@ -45,7 +45,7 @@ class IconService
         return null;
     }
 
-    public static function getRecordFlagIdentifier(string $table, int $uid, array $row = null): ?string
+    public static function getRecordFlagIdentifier(string $table, int $uid, ?array $row = null): ?string
     {
         if (is_array($countries = CountryService::getCountriesByRecord($table, $uid, $row))) {
             $data = count($countries) === 1 && ($countries[0] ?? null) ? $countries[0]->getRow() : [];
@@ -56,7 +56,7 @@ class IconService
         return null;
     }
 
-    public static function getRecordFlagIcon(string $table, int $uid, array $row = null, $size = null): ?Icon
+    public static function getRecordFlagIcon(string $table, int $uid, ?array $row = null, $size = null): ?Icon
     {
         if ($identifier = self::getRecordFlagIdentifier($table, $uid, $row)) {
             return GeneralUtility::makeInstance(IconFactory::class)->getIcon($identifier, $size ?: \TYPO3\CMS\Core\Imaging\IconSize::SMALL);

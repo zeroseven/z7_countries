@@ -15,7 +15,7 @@ class LanguageManipulationService
 {
     public const BASE_DELIMITER = '-';
 
-    protected static function cleanString(string $string, int $maxLength = null, bool $forceLowercase = null): string
+    protected static function cleanString(string $string, ?int $maxLength = null, ?bool $forceLowercase = null): string
     {
         $string = preg_replace('/[^a-z0-9_-]/i', '', $string);
 
@@ -41,12 +41,12 @@ class LanguageManipulationService
         return $originalLanguages[$language->getLanguageId()] ?? $language;
     }
 
-    protected static function cleanIsoCode(string $string, int $maxLength = null, bool $forceLowercase = null)
+    protected static function cleanIsoCode(string $string, ?int $maxLength = null, ?bool $forceLowercase = null)
     {
         return self::cleanString(preg_replace('/[^a-z]/i', '', $string), $maxLength, $forceLowercase);
     }
 
-    public static function getBase(SiteLanguage $language, Country $country = null): UriInterface
+    public static function getBase(SiteLanguage $language, ?Country $country = null): UriInterface
     {
         if ($country && ($parameter = $country->getParameter())) {
             return $language->getBase()->withPath('/' . self::cleanIsoCode($language->getLocale()->getLanguageCode(), 2, true) . self::BASE_DELIMITER . self::cleanString($parameter) . '/');
@@ -55,7 +55,7 @@ class LanguageManipulationService
         return self::getOriginalLanguage($language)->getBase();
     }
 
-    public static function getHreflang(SiteLanguage $language, Country $country = null): string
+    public static function getHreflang(SiteLanguage $language, ?Country $country = null): string
     {
         if ($country && ($isoCode = $country->getIsoCode())) {
             return self::cleanIsoCode($language->getLocale()->getLanguageCode(), 2, true) . '-' . self::cleanIsoCode($isoCode, 2);
@@ -94,7 +94,7 @@ class LanguageManipulationService
         return null;
     }
 
-    public static function manipulateUrl(string $internationalUrl, SiteLanguage $language, Country $country = null): ?string
+    public static function manipulateUrl(string $internationalUrl, SiteLanguage $language, ?Country $country = null): ?string
     {
         if (($path = parse_url($internationalUrl, PHP_URL_PATH)) && ($languageBase = $language->getBase()->getPath()) && strpos($path, $languageBase) === 0) {
             return self::getBase($language, $country) . substr($path, strlen($languageBase));

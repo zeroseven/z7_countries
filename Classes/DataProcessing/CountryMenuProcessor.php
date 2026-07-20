@@ -10,7 +10,7 @@ use Zeroseven\Countries\Menu\MenuInterface;
 
 class CountryMenuProcessor extends AbstractMenuProcessor
 {
-    public function getMenu(int $pageId = null): MenuInterface
+    public function getMenu(?int $pageId = null): MenuInterface
     {
         return GeneralUtility::makeInstance(CountryMenu::class, $pageId);
     }

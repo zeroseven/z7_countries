@@ -16,7 +16,7 @@ class CountryContext implements AspectInterface
     /** @var SiteLanguage[] */
     protected ?array $manipulatedLanguages = null;
 
-    public function __construct(array $originalLanguages, array $manipulatedLanguages = null)
+    public function __construct(array $originalLanguages, ?array $manipulatedLanguages = null)
     {
         $this->originalLanguages = $originalLanguages;
         $this->manipulatedLanguages = $manipulatedLanguages;

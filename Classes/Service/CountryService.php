@@ -54,7 +54,7 @@ class CountryService
         return self::cacheObject($function, 'allCountries');
     }
 
-    public static function getCountriesByRecord(string $table, int $uid, array $row = null): ?array
+    public static function getCountriesByRecord(string $table, int $uid, ?array $row = null): ?array
     {
         $function = static function () use ($table, $uid, $row) {
             if (($modeColumn = TCAService::getModeColumn($table)) && $listColumn = TCAService::getListColumn($table)) {
@@ -79,7 +79,7 @@ class CountryService
         return self::cacheObject($function, 'CountriesByRecord', $table, $uid, $row);
     }
 
-    public static function getCountriesByLanguageUid(int $languageUid = null, Site $site = null): array
+    public static function getCountriesByLanguageUid(?int $languageUid = null, ?Site $site = null): array
     {
         /** @throws SiteNotFoundException | AspectNotFoundException */
         $function = static function () use ($languageUid, $site) {
@@ -130,7 +130,7 @@ class CountryService
         return null;
     }
 
-    public static function getCountryByUri(UriInterface $uri = null): ?Country
+    public static function getCountryByUri(?UriInterface $uri = null): ?Country
     {
         $function = static function () use ($uri) {
             if ($uri === null) {

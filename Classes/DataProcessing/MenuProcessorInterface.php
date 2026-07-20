@@ -8,5 +8,5 @@ use Zeroseven\Countries\Menu\MenuInterface;
 
 interface MenuProcessorInterface
 {
-    public function getMenu(int $pageId = null): MenuInterface;
+    public function getMenu(?int $pageId = null): MenuInterface;
 }

@@ -10,7 +10,7 @@ use Zeroseven\Countries\Menu\MenuInterface;
 
 class LanguageMenuProcessor extends AbstractMenuProcessor
 {
-    public function getMenu(int $pageId = null): MenuInterface
+    public function getMenu(?int $pageId = null): MenuInterface
     {
         return GeneralUtility::makeInstance(LanguageMenu::class, $pageId);
     }

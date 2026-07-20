@@ -21,7 +21,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         return ($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
     }
 
-    public static function getExpression(ExpressionBuilder $expressionBuilder, string $tableName, Country $country = null, string $tableAlias = null)
+    public static function getExpression(ExpressionBuilder $expressionBuilder, string $tableName, ?Country $country = null, ?string $tableAlias = null)
     {
         $queriedTable = $tableAlias ?: $tableName;
         $mode = $queriedTable . '.' . TCAService::getModeColumn($tableName);

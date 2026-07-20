@@ -10,7 +10,7 @@ final class RedirectEvent
     private ?string $url;
     private int $status;
 
-    public function __construct(array $languageMenu, string $url = null, int $status = null)
+    public function __construct(array $languageMenu, ?string $url = null, ?int $status = null)
     {
         $this->languageMenu = $languageMenu;
         $this->url = $url;

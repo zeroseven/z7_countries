@@ -88,7 +88,7 @@ class AfterFormEnginePageInitializedEvent
         return true;
     }
 
-    protected function translate(string $key, array $arguments = null): string
+    protected function translate(string $key, ?array $arguments = null): string
     {
         return LocalizationUtility::translate('LLL:EXT:z7_countries/Resources/Private/Language/locallang_be.xlf:' . $key, null, $arguments) ?: $key;
     }
