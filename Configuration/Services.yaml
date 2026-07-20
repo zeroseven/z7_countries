@@ -56,3 +56,8 @@ services:
       - name: event.listener
         identifier: 'z7_country/modify-inline-element-controls'
         event: TYPO3\CMS\Backend\Form\Event\ModifyInlineElementControlsEvent
+  Zeroseven\Countries\Event\Listener\ModifyRecordOverlayIconIdentifierEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/modify-record-overlay-icon'
+        event: TYPO3\CMS\Core\Imaging\Event\ModifyRecordOverlayIconIdentifierEvent

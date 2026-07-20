@@ -11,7 +11,6 @@ $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['cache'] = [];
 $GLOBALS['TYPO3_CONF_VARS']['USER']['z7_countries']['enableColumns'] = [];
 
 // Register hooks
-\Zeroseven\Countries\Hooks\IconFactoryHook::register();
 \Zeroseven\Countries\Hooks\DataHandlerHook::register();
 
 // Let makeInstance() resolve the site entity to the country-aware variant.
