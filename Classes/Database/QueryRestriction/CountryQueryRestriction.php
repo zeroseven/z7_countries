@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Zeroseven\Countries\Database\QueryRestriction;
 
-use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\AbstractRestrictionContainer;
 use TYPO3\CMS\Core\Database\Query\Restriction\EnforceableQueryRestrictionInterface;
-use TYPO3\CMS\Core\Http\ApplicationType;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Zeroseven\Countries\Model\Country;
-use Zeroseven\Countries\Service\CountryService;
 use Zeroseven\Countries\Service\TCAService;
 
 class CountryQueryRestriction extends AbstractRestrictionContainer implements EnforceableQueryRestrictionInterface
 {
     protected function isFrontend(): bool
     {
-        return ($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface && ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend();
+        return GeneralUtility::makeInstance(Context::class)->hasAspect('country.request');
     }
 
     public static function getExpression(ExpressionBuilder $expressionBuilder, string $tableName, ?Country $country = null, ?string $tableAlias = null)
@@ -41,7 +40,7 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         $constraints = [];
 
         if ($this->isFrontend()) {
-            $country = CountryService::getCountryByUri();
+            $country = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country.request', 'country');
 
             foreach ($queriedTables as $tableAlias => $tableName) {
                 if (TCAService::hasCountryConfiguration($tableName)) {

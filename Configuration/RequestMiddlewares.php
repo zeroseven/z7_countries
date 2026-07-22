@@ -2,6 +2,15 @@
 
 return [
     'frontend' => [
+        'zeroseven/z7_countries/request-context' => [
+            'target' => \Zeroseven\Countries\Middleware\InitializeCountryRequestContext::class,
+            'after' => [
+                'typo3/cms-frontend/site'
+            ],
+            'before' => [
+                'typo3/cms-frontend/page-resolver'
+            ]
+        ],
         'zeroseven/z7_countries/redirect' => [
             'target' => \Zeroseven\Countries\Middleware\Redirect::class,
             'after' => [
