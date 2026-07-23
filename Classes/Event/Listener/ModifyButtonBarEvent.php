@@ -8,13 +8,14 @@ use JsonException;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\PreviewUriBuilder;
 use TYPO3\CMS\Backend\Routing\Route;
+use TYPO3\CMS\Backend\Template\Components\Buttons\GenericButton;
 use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 use TYPO3\CMS\Backend\Template\Components\ModifyButtonBarEvent as Event;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Routing\UnableToLinkToPageException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -157,21 +158,40 @@ class ModifyButtonBarEvent
             if ($position = isset($buttons['left']) ? 'left' : (array_key_first($buttons) ?? 0)) {
                 foreach (CountryService::getAllCountries() ?: [] as $country) {
                     $enabled = $enabledCountries === null || in_array($country->getUid(), $enabledCountries, true);
+                    $buttonTitle = $title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')';
+                    $icon = GeneralUtility::makeInstance(IconFactory::class)->getIcon(
+                        'actions-preview',
+                        IconSize::SMALL,
+                        IconService::getCountryIdentifier($country)
+                    );
 
-                    $buttons[$position][self::class][] = $event->getButtonBar()->makeLinkButton()
-                        ->setDataAttributes($enabled ? [
-                            'dispatch-action' => 'TYPO3.WindowManager.localOpen',
-                            'dispatch-args' => json_encode([
-                                LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
-                                null,
-                                'newTYPO3frontendWindow'
-                            ], JSON_THROW_ON_ERROR)
-                        ] : [])
-                        ->setTitle($title . ' (' . LanguageManipulationService::getHreflang($this->siteLanguage, $country) . ')')
-                        ->setIcon(GeneralUtility::makeInstance(IconFactory::class)->getIcon('actions-preview', \TYPO3\CMS\Core\Imaging\IconSize::SMALL,
-                            IconService::getCountryIdentifier($country)))
-                        ->setDisabled(!$enabled)
-                        ->setHref('#');
+                    if ($enabled) {
+                        $button = $event->getButtonBar()->makeLinkButton()
+                            ->setDataAttributes([
+                                'dispatch-action' => 'TYPO3.WindowManager.localOpen',
+                                'dispatch-args' => json_encode([
+                                    LanguageManipulationService::manipulateUrl($url, $this->siteLanguage, $country),
+                                    null,
+                                    'newTYPO3frontendWindow'
+                                ], JSON_THROW_ON_ERROR)
+                            ])
+                            ->setTitle($buttonTitle)
+                            ->setIcon($icon)
+                            ->setHref('#');
+                    } else {
+                        $button = GeneralUtility::makeInstance(GenericButton::class)
+                            ->setTag('span')
+                            ->setLabel($buttonTitle)
+                            ->setTitle($buttonTitle)
+                            ->setIcon($icon)
+                            ->setClasses('disabled')
+                            ->setAttributes([
+                                'role' => 'button',
+                                'aria-disabled' => 'true',
+                            ]);
+                    }
+
+                    $buttons[$position][self::class][] = $button;
                 }
             }
 
