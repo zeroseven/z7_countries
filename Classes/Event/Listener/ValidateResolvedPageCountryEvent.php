@@ -39,6 +39,10 @@ final readonly class ValidateResolvedPageCountryEvent
 
     public function __invoke(AfterPageAndLanguageIsResolvedEvent $event): void
     {
+        if (!$this->context->hasAspect('country.request')) {
+            return;
+        }
+
         $country = $this->context->getPropertyFromAspect('country.request', 'country');
         $pageRecord = $this->getRequestedPageRecord($event->getPageInformation());
 
