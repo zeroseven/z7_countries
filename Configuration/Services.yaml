@@ -52,6 +52,7 @@ services:
         identifier: 'z7_country/modify-record-list-query'
         event: TYPO3\CMS\Backend\View\Event\ModifyDatabaseQueryForRecordListingEvent
   Zeroseven\Countries\Event\Listener\ModifyButtonBarEvent:
+    shared: false
     tags:
       - name: event.listener
         identifier: 'z7_country/modify-button-bar'
