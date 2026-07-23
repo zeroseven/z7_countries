@@ -40,10 +40,12 @@ class CountryQueryRestriction extends AbstractRestrictionContainer implements En
         $constraints = [];
 
         if ($this->isFrontend()) {
-            $country = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('country.request', 'country');
+            $context = GeneralUtility::makeInstance(Context::class);
+            $country = $context->getPropertyFromAspect('country.request', 'country');
+            $pageResolved = $context->getPropertyFromAspect('country.request', 'pageResolved');
 
             foreach ($queriedTables as $tableAlias => $tableName) {
-                if (TCAService::hasCountryConfiguration($tableName)) {
+                if (($tableName !== 'pages' || $pageResolved) && TCAService::hasCountryConfiguration($tableName)) {
                     $constraints[] = self::getExpression($expressionBuilder, $tableName, $country, $tableAlias);
                 }
             }

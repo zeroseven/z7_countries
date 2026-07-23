@@ -78,6 +78,25 @@ class CountryService
         return self::cacheObject($function, 'CountriesByRecord', $table, $uid, $row);
     }
 
+    public static function isRecordAvailableForCountry(string $table, array $row, ?Country $country): bool
+    {
+        $enableColumns = TCAService::getEnableColumns($table);
+        if ($enableColumns === null) {
+            return true;
+        }
+
+        $mode = (int)($row[$enableColumns['mode']] ?? 0);
+        if ($mode === 0) {
+            return true;
+        }
+        if ($country === null) {
+            return $mode === 2;
+        }
+
+        $countryUids = GeneralUtility::intExplode(',', (string)($row[$enableColumns['list']] ?? ''), true);
+        return in_array($country->getUid(), $countryUids, true);
+    }
+
     public static function getCountriesByLanguageUid(?int $languageUid = null, ?Site $site = null): array
     {
         /** @throws SiteNotFoundException | AspectNotFoundException */

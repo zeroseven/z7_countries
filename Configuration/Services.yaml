@@ -36,6 +36,11 @@ services:
       - name: event.listener
         identifier: 'z7_country/modify-tca'
         event: TYPO3\CMS\Core\Configuration\Event\AfterTcaCompilationEvent
+  Zeroseven\Countries\Event\Listener\ValidateResolvedPageCountryEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/validate-resolved-page'
+        event: TYPO3\CMS\Frontend\Event\AfterPageAndLanguageIsResolvedEvent
   Zeroseven\Countries\Event\Listener\ModifyRecordListHeaderColumnsEvent:
     tags:
       - name: event.listener
