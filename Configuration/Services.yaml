@@ -62,6 +62,11 @@ services:
       - name: event.listener
         identifier: 'z7_country/modify-inline-element-controls'
         event: TYPO3\CMS\Backend\Form\Event\ModifyInlineElementControlsEvent
+  Zeroseven\Countries\Event\Listener\ModifyFileReferenceControlsEvent:
+    tags:
+      - name: event.listener
+        identifier: 'z7_country/modify-file-reference-controls'
+        event: TYPO3\CMS\Backend\Form\Event\ModifyFileReferenceControlsEvent
   Zeroseven\Countries\Event\Listener\ModifyRecordOverlayIconIdentifierEvent:
     tags:
       - name: event.listener
