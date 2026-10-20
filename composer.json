@@ -40,6 +40,10 @@
       "rm .gitignore",
       "rm .gitlab-ci.yml",
       "rm -rf .github"
-    ]
+    ],
+    "test:unit": "phpunit --bootstrap vendor/autoload.php --do-not-cache-result Tests/Unit"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5 || ^11.5"
   }
 }

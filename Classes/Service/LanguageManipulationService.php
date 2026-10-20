@@ -77,7 +77,7 @@ class LanguageManipulationService
 
         return new SiteLanguage(
             $language->getLanguageId(),
-            (string)$language->getLocale(),
+            $language->getLocale()->posixFormatted(),
             $base,
             $configuration
         );
